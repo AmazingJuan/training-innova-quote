@@ -25,3 +25,13 @@ yarn-error.log
 /backups
 /load-tests/resultados
 .kiro/
+
+# Manual del administrador: dependencias y archivos temporales
+/manual-admin/herramientas/node_modules
+/manual-admin/herramientas/.entorno
+__pycache__/
+/manual-admin/*.aux
+/manual-admin/*.log
+/manual-admin/*.toc
+/manual-admin/*.lof
+/manual-admin/*.out
