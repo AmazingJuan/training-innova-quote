@@ -35,7 +35,7 @@ export function BusinessUnitForm({ businessUnit }: { businessUnit?: BusinessUnit
                 label="Abreviado"
                 required
                 error={errors.abbreviation}
-                hint="Letras y números, sin espacios. Prefijo de los códigos de cotización (ej. CNN-2601)."
+                hint="Letras y números, sin espacios. Prefijo de los códigos de cotización (ej. CNN-V-2601)."
             >
                 <input
                     type="text"
@@ -64,7 +64,7 @@ export function BusinessUnitForm({ businessUnit }: { businessUnit?: BusinessUnit
     );
 }
 
-/** "CNN-2607" style preview of the last code issued this year. */
+/** "CNN-V-2607" style preview of the last code issued this year. */
 export function SequenceLabel({ unit }: { unit: BusinessUnit }) {
     if (unit.quotation_seq_year == null) {
         return <span className="text-pizarra">sin cotizaciones aún</span>;
@@ -73,5 +73,5 @@ export function SequenceLabel({ unit }: { unit: BusinessUnit }) {
     const year = String(unit.quotation_seq_year).padStart(2, '0');
     const value = String(unit.quotation_seq_value ?? 0).padStart(2, '0');
 
-    return <span className="font-display font-semibold">{`${unit.abbreviation}-${year}${value}`}</span>;
+    return <span className="font-display font-semibold">{`${unit.abbreviation}-V-${year}${value}`}</span>;
 }

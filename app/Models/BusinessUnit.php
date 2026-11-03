@@ -97,7 +97,7 @@ class BusinessUnit extends Model
     }
 
     /**
-     * Siguiente código tipo ABBREV-YYnn (año de 2 dígitos + correlativo dentro del año).
+     * Siguiente código tipo ABBREV-V-YYnn (año de 2 dígitos + V que indica que la cotización es Virtual + correlativo dentro del año).
      * Debe ejecutarse dentro de una transacción; bloquea la fila de la unidad.
      */
     public function lockAndAllocateNextQuotationCode(): string
@@ -115,6 +115,6 @@ class BusinessUnit extends Model
         $row->quotation_seq_value = $val;
         $row->save();
 
-        return sprintf('%s-%02d%02d', strtoupper(trim((string) $row->abbreviation)), $yy, $val);
+        return sprintf('%s-V-%02d%02d', strtoupper(trim((string) $row->abbreviation)), $yy, $val);
     }
 }
