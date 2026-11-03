@@ -168,7 +168,7 @@ class EncuadreSeederTest extends TestCase
     {
         $required = [
             'Descripción del servicio a solicitar',
-            'Descripción del alcance del sistema de gestión',
+            'Descripción del alcance actual del sistema de gestión',
             'Descripción del número de procesos y/o macroprocesos',
             'Alcance certificado',
             'Perfil del equipo requerido para la prestación del servicio',
