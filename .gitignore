@@ -22,7 +22,5 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
-manual-admin/
-.kiro/
 /backups
 /load-tests/resultados

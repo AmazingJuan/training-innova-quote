@@ -1,0 +1,87 @@
+% =====================================================================
+%  Capítulo 6 — Ver el sitio público y cerrar sesión
+% =====================================================================
+\chapter{Ver el sitio y cerrar sesión}\label{cap:salida}
+
+\entradilla{El final del recorrido: comprobar lo que ve el cliente y salir del panel de forma
+segura.}
+
+\section{Ver el sitio público}\label{sec:sitio-publico}
+
+Al final de la barra lateral, \textbf{\icExterno\ Ver sitio público} abre la página de inicio de Trainova en una pestaña nueva. El panel sigue abierto en la pestaña original.
+
+Úselo para comprobar sus cambios desde el punto de vista del cliente. Por ejemplo:
+
+\begin{itemize}
+  \item Que una unidad de negocio nueva aparezca en \msg{Elija el tipo de servicio}, después de
+        crear sus preguntas.
+  \item Que el formulario de una unidad muestre las preguntas y los bloques en el orden
+        esperado.
+\end{itemize}
+
+\captura[8cm]{06-01-sitio-publico}{/}{Página de inicio de Trainova.}
+  {la página de inicio pública de Trainova, abierta desde «Ver sitio público».}
+
+\begin{importante}
+Si envía una solicitud de prueba desde el sitio público, se creará una cotización real con su
+código y llegarán los correos de confirmación. Para revisar el formulario sin crear solicitudes,
+use \botonsec{\icPlay\ Probar como cliente} (\seccion{sec:probar}).
+\end{importante}
+
+\section{Cerrar sesión}\label{sec:cerrar-sesion}
+
+\begin{pasos}
+  \item Guarde lo que esté editando. Por ejemplo, en el árbol de decisión, termine con
+        \boton{Guardar pregunta} o \botonsec{Cancelar}.
+  \item Vaya al final de la barra lateral. En un celular, abra antes el menú con
+        \textbf{\icMenu} (\seccion{sec:movil}).
+  \item Debajo de \textbf{Ver sitio público} verá \textbf{\icSalir\ Cerrar sesión}, con el
+        correo de su cuenta.
+  \item Haga clic en \textbf{Cerrar sesión}.
+\end{pasos}
+
+\capturaconnotas[6.5cm]{06-02-cerrar-sesion}{/dashboard}{Opción «Cerrar sesión» al final de la barra lateral.}
+  {un recorte de la parte inferior de la barra lateral, con «Ver sitio público», «Cerrar
+   sesión» y el correo de la cuenta.}
+  {\textbf{Antes de salir}
+
+   \begin{itemize}
+     \item Compruebe que el último aviso fue de éxito.
+     \item Si dejó una pregunta abierta en el árbol de decisión, guárdela o cancélela: al cerrar
+           sesión, el sistema no le avisa y los cambios sin guardar se pierden.
+     \item El correo bajo \textbf{Cerrar sesión} le confirma con qué cuenta está trabajando.
+   \end{itemize}}
+
+\begin{resultado}
+La sesión se cierra y el navegador lo lleva a la página de inicio pública de Trainova. Para
+volver a entrar, siga los pasos de la \seccion{sec:iniciar-sesion}.
+\end{resultado}
+
+\begin{consejo}
+\begin{itemize}
+  \item Cierre sesión siempre que use un computador compartido. Cerrar la pestaña o el
+        navegador no basta, sobre todo si marcó \campo{Mantener la sesión iniciada}.
+  \item Si deja el panel sin usar por un tiempo largo (por defecto, 2 horas), la sesión se
+        cierra sola y deberá iniciar sesión de nuevo. Si estaba llenando un formulario, podría
+        perder lo que escribió.
+\end{itemize}
+\end{consejo}
+
+\newcommand{\caprefclaro}[1]{\hyperref[#1]{\textcolor{cielo}{\fontseries{sb}\selectfont capítulo~\ref*{#1}}}}
+
+\begin{tcolorbox}[enhanced, colback=noche, colframe=noche, coltext=white, arc=6pt,
+    left=16pt, right=16pt, top=14pt, bottom=14pt, before skip=18pt,
+    overlay={\begin{scope}
+        \clip (frame.south west) rectangle (frame.north east);
+        \pic[opacity=0.35] at ([xshift=-1.6cm, yshift=-0.3cm]frame.north east) {anillo={2.6cm/1.2pt/cielo}};
+      \end{scope}}]
+  {\montserrat\bfseries\large\color{white}Recorrido completo}\par\vspace{4pt}
+  {\color{niebla}Ya conoce el flujo completo del administrador:}\par\vspace{6pt}
+  \begin{itemize}[label={\color{cielo}\ico{F00C}}, leftmargin=1.6em]
+    \item Iniciar sesión y recuperar la contraseña (\caprefclaro{cap:acceso}).
+    \item Revisar solicitudes, enviar propuestas y consultar clientes (\caprefclaro{cap:operacion}).
+    \item Mantener el catálogo y el árbol de decisión (\caprefclaro{cap:catalogo}).
+    \item Administrar usuarios, invitaciones y configuración (\caprefclaro{cap:sistema}).
+    \item Revisar el sitio público y cerrar sesión (\caprefclaro{cap:salida}).
+  \end{itemize}
+\end{tcolorbox}

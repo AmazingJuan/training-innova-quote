@@ -1,0 +1,388 @@
+% =====================================================================
+%  Capítulo 2 — Acceso al panel
+% =====================================================================
+\chapter{Acceso al panel}\label{cap:acceso}
+
+\entradilla{Cómo entrar al panel, recuperar la contraseña y moverse por la interfaz. Lo que
+aprenda en este capítulo le sirve para todos los módulos.}
+
+\section{Iniciar sesión}\label{sec:iniciar-sesion}
+
+\ficha{F084}{Pantalla de acceso de Trainova}{/login}{Entrar al panel con su correo y contraseña.}
+
+\begin{pasos}
+  \item Abra el navegador y escriba la dirección de Trainova seguida de \ruta{/login}, es decir,
+        \ruta{\dominio\allowbreak/login}.
+        También puede entrar desde el sitio público: al final de la página de inicio está el
+        enlace \textbf{Acceso administradores}.
+  \item Verá el logo de Training Corporation y el título \textbf{Panel de cotizaciones}.
+  \item En \campo{Correo electrónico}, escriba el correo de su cuenta.
+  \item En \campo{Contraseña}, escriba su contraseña.
+  \item Si está en su equipo personal, puede marcar \campo{Mantener la sesión iniciada}. Así el
+        navegador conserva la sesión abierta aunque lo cierre, hasta que usted cierre sesión.
+  \item Haga clic en \boton{Iniciar sesión}.
+\end{pasos}
+
+\captura{02-01-login}{/login}{Pantalla de inicio de sesión.}
+  {la pantalla de inicio de sesión completa, con el logo, el título «Panel de cotizaciones»
+   y los campos vacíos.}
+
+\begin{resultado}
+El sistema lo lleva al \textbf{Panel de inicio} (\ruta{/dashboard}), donde lo saluda por su
+nombre. Continúe en la \seccion{sec:panel-inicio}.
+\end{resultado}
+
+\begin{importante}
+No marque \campo{Mantener la sesión iniciada} en computadores compartidos o públicos:
+cualquier persona que use ese navegador después podría entrar al panel con su cuenta.
+\end{importante}
+
+\subsection{Si no puede entrar}\label{sec:errores-acceso}
+
+Cuando algo falla, el formulario muestra un mensaje en rojo debajo del campo afectado.
+
+\begin{tabla}{colspec={Q[3.6cm,l] X[l] Q[4.4cm,l]}}
+  Situación & Qué verá & Qué hacer \\
+  Dejó un campo vacío & \msg{El correo electrónico es obligatorio.} o
+    \msg{La contraseña es obligatoria.} & Complete el campo y vuelva a intentar. \\
+  El correo no tiene un formato válido & El navegador le pide corregirlo, o el sistema muestra
+    \msg{Ingresa un correo electrónico válido.} & Revise que el correo tenga la forma
+    \texttt{nombre@empresa.com}. \\
+  El correo o la contraseña no coinciden & Un mensaje bajo el correo. Actualmente aparece en
+    inglés: \msg{These credentials do not match our records.} & Revise mayúsculas y la tecla
+    \tecla{Bloq Mayús}. Si no la recuerda, recupérela (\seccion{sec:recuperar}). \\
+  Varios intentos fallidos seguidos & Tras 5 intentos fallidos el acceso se bloquea por unos
+    segundos. El mensaje aparece en inglés: \msg{Too many login attempts. Please try again in
+    \var{N} seconds.} & Espere el tiempo indicado e intente de nuevo. \\
+\end{tabla}
+
+\captura{02-02-login-error}{/login}{Mensaje de error al iniciar sesión.}
+  {el formulario de inicio de sesión después de escribir una contraseña incorrecta, con el
+   mensaje en rojo visible debajo del correo.}
+
+\section{Recuperar la contraseña}\label{sec:recuperar}
+
+Si olvidó su contraseña, puede crear una nueva desde la pantalla de inicio de sesión.
+
+\begin{pasos}
+  \item En la pantalla de inicio de sesión, haga clic en \textbf{¿Olvidó su contraseña?}
+  \item Verá el texto \msg{¿Olvidó su contraseña? Escriba su correo electrónico y le enviaremos
+        un enlace para crear una nueva.} Escriba en el campo el correo de su cuenta.
+  \item Haga clic en \boton{Enviar enlace para restablecer contraseña}. Verá un mensaje de
+        confirmación en verde (actualmente en inglés).
+  \item Revise su bandeja de entrada y, si no lo encuentra, la carpeta de correo no deseado.
+        El correo llega en inglés, con el asunto \msg{Reset Password Notification}.
+  \item Abra el correo y haga clic en el botón \textbf{Reset Password}.
+  \item En la pantalla \textbf{Restablecer contraseña}, verifique su correo en
+        \campo{Correo electrónico}, escriba la nueva contraseña en \campo{Contraseña} y repítala
+        en \campo{Confirmar contraseña}. Debe tener al menos 8 caracteres.
+  \item Haga clic en \boton{Reset Password}.
+\end{pasos}
+
+\captura{02-03-recuperar-contrasena}{/forgot-password}{Solicitud del enlace para restablecer la contraseña.}
+  {la pantalla «¿Olvidó su contraseña?» con el campo de correo y el botón «Enviar enlace para
+   restablecer contraseña».}
+
+\begin{resultado}
+Vuelve a la pantalla de inicio de sesión con un mensaje de confirmación. Inicie sesión con la
+nueva contraseña.
+\end{resultado}
+
+\begin{nota}
+El enlace del correo vence a los 60 minutos y solo puede pedirse uno por minuto. Si vence,
+solicite uno nuevo. Otra opción es pedirle a otro administrador que le asigne una contraseña
+nueva desde \menu{Sistema}{Usuarios} (ver \seccion{sec:usuario-editar}).
+\end{nota}
+
+\section{El Panel de inicio}\label{sec:panel-inicio}
+
+\ficha{F015}{Primera pantalla después de iniciar sesión}{/dashboard}{Ir con un clic a cualquier
+módulo del panel.}
+
+Después de iniciar sesión verá el saludo \textbf{Bienvenido/a, \var{su primer nombre}} y el texto
+\msg{Gestione las solicitudes de cotización, el catálogo que ve el cliente y la configuración
+del sistema.} Debajo aparecen tarjetas de acceso directo, agrupadas igual que la barra lateral.
+Haga clic en una tarjeta para abrir el módulo.
+
+\captura[8.5cm]{02-04-panel-inicio}{/dashboard}{Panel de inicio del administrador.}
+  {la pantalla completa del Panel justo después de iniciar sesión: la barra lateral azul a la
+   izquierda, el saludo «Bienvenido/a, …» y todas las tarjetas de los grupos Operación, Catálogo y
+   Sistema.}
+
+\begin{tabla}{colspec={Q[2.2cm,l] Q[3.8cm,l] X[l] Q[1.9cm,c]}}
+  Grupo & Tarjeta & Descripción en pantalla & Sección \\
+  Operación & \icono{\icCotizacion}\ Cotizaciones & Solicitudes recibidas y su estado & \ref*{sec:cotizaciones} \\
+  Operación & \icono{\icContactos}\ Clientes & Quién ha cotizado y su historial & \ref*{sec:clientes} \\
+  Catálogo & \icono{\icMaletin}\ Unidades de negocio & Unidades y su código de cotización & \ref*{sec:unidades} \\
+  Catálogo & \icono{\icRama}\ Líneas de gestión & Agrupan los servicios ofrecidos & \ref*{sec:lineas} \\
+  Catálogo & \icono{\icLlave}\ Servicios & Servicios por unidad y línea & \ref*{sec:servicios} \\
+  Catálogo & \icono{\icArbol}\ Árbol de decisión & Preguntas del cotizador & \ref*{sec:arbol} \\
+  Sistema & \icono{\icUsuarios}\ Usuarios & Cuentas con acceso al panel & \ref*{sec:usuarios} \\
+  Sistema & \icono{\icCorreo}\ Correos de bienvenida & Invitar clientes a la plataforma & \ref*{sec:bienvenida} \\
+  Sistema & \icono{\icAjustes}\ Configuración & Notificaciones y datos de contacto & \ref*{sec:configuracion} \\
+\end{tabla}
+
+\begin{consejo}
+Para volver al Panel de inicio desde cualquier pantalla, haga clic en el logo o en el texto
+\textbf{Panel de cotizaciones}, en la parte superior de la barra lateral.
+\end{consejo}
+
+\section{Partes de la pantalla}\label{sec:partes}
+
+Todas las pantallas del panel comparten la misma estructura. La \figref{fig:esquema-pantalla}
+la muestra en forma de esquema; las letras se explican a continuación.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1cm, y=1cm,
+    menu/.style={anchor=west, inner sep=0pt, text=white, font=\montserrat\fontseries{sb}\selectfont\fontsize{6}{7}\selectfont},
+    grupomenu/.style={anchor=west, inner sep=0pt, text=white!80!azul, font=\montserrat\bfseries\fontsize{5.5}{6}\selectfont},
+    marca/.style={circle, fill=noche, draw=white, line width=1pt, text=white, inner sep=0pt,
+      minimum size=0.52cm, font=\montserrat\bfseries\scriptsize},
+    textofalso/.style={fill=linea, rounded corners=1pt},
+  ]
+  % Marco
+  \draw[linea, line width=1pt, fill=nube, rounded corners=4pt] (0,0) rectangle (15.6,8.8);
+  % Barra lateral
+  \fill[azul, rounded corners=4pt] (0,0) rectangle (3.6,8.8);
+  \fill[azul] (3.0,0) rectangle (3.6,8.8);
+  \node[anchor=north west, inner sep=0pt] at (0.35,8.45) {\includegraphics[width=1.5cm]{imagenes/logo-blanco.png}};
+  \node[menu, font=\montserrat\bfseries\fontsize{6}{7}\selectfont] at (0.35,7.45) {Panel de cotizaciones};
+  \node[grupomenu] at (0.35,6.95) {Operación};
+  \fill[white, rounded corners=1.5pt] (0.22,6.42) rectangle (3.38,6.74);
+  \node[menu, text=azul] at (0.38,6.58) {\ico{F70E}\hspace{0.4em}Cotizaciones};
+  \node[menu] at (0.38,6.18) {\ico{F2B9}\hspace{0.4em}Clientes};
+  \node[grupomenu] at (0.35,5.7) {Catálogo};
+  \node[menu] at (0.38,5.32) {\ico{F0B1}\hspace{0.4em}Unidades de negocio};
+  \node[menu] at (0.38,4.98) {\ico{F126}\hspace{0.4em}Líneas de gestión};
+  \node[menu] at (0.38,4.64) {\ico{F0AD}\hspace{0.4em}Servicios};
+  \node[menu] at (0.38,4.30) {\ico{F0E8}\hspace{0.4em}Árbol de decisión};
+  \node[grupomenu] at (0.35,3.82) {Sistema};
+  \node[menu] at (0.38,3.44) {\ico{F0C0}\hspace{0.4em}Usuarios};
+  \node[menu] at (0.38,3.10) {\ico{F0E0}\hspace{0.4em}Correos de bienvenida};
+  \node[menu] at (0.38,2.76) {\ico{F013}\hspace{0.4em}Configuración};
+  \draw[white!60!azul, line width=0.5pt] (0.22,1.35) -- (3.38,1.35);
+  \node[menu] at (0.38,1.05) {\ico{F08E}\hspace{0.4em}Ver sitio público};
+  \node[menu] at (0.38,0.62) {\ico{F2F5}\hspace{0.4em}Cerrar sesión};
+  \node[menu, font=\fontsize{5}{6}\selectfont, text=white!80!azul] at (0.75,0.36) {usuario@empresa.com};
+  % Aviso
+  \draw[azul, fill=white, line width=0.8pt, rounded corners=2pt] (4.2,7.75) rectangle (15.0,8.3);
+  \node[anchor=west, inner sep=0pt, font=\fontsize{6.5}{7}\selectfont, text=tinta] at (4.4,8.02)
+    {{\color{azul}\ico{F058}}\hspace{0.5em}Servicio creado correctamente.};
+  \node[anchor=east, inner sep=0pt, font=\fontsize{6.5}{7}\selectfont, text=pizarra] at (14.8,8.02) {\ico{F00D}};
+  % Encabezado de la pantalla
+  \node[anchor=west, inner sep=0pt, font=\montserrat\fontseries{eb}\selectfont\fontsize{13}{14}\selectfont, text=azul] at (4.2,7.2) {Título de la pantalla};
+  \fill[textofalso] (4.2,6.62) rectangle (10.4,6.78);
+  \node[fill=azul, text=white, font=\montserrat\bfseries\fontsize{6.5}{7}\selectfont, rounded corners=2pt,
+    inner xsep=6pt, inner ysep=4pt, anchor=east] at (15.0,7.05) {\ico{2B}\hspace{0.4em}Nuevo};
+  % Búsqueda
+  \draw[grismarca, fill=white, line width=0.7pt, rounded corners=2pt] (4.2,5.75) rectangle (10.6,6.25);
+  \node[anchor=west, inner sep=0pt, font=\fontsize{6.5}{7}\selectfont, text=pizarra] at (4.4,6.0) {\ico{F002}\hspace{0.5em}Buscar…};
+  \draw[azul, line width=0.8pt, rounded corners=2pt] (10.75,5.75) rectangle (11.95,6.25);
+  \node[font=\montserrat\bfseries\fontsize{6.5}{7}\selectfont, text=azul] at (11.35,6.0) {Buscar};
+  % Tabla
+  \draw[linea, fill=white, line width=0.8pt, rounded corners=3pt] (4.2,1.55) rectangle (15.0,5.4);
+  \fill[nube] (4.25,4.85) rectangle (14.95,5.35);
+  \foreach \y in {4.85, 4.15, 3.45, 2.75, 2.05} { \draw[linea, line width=0.5pt] (4.2,\y) -- (15.0,\y); }
+  \foreach \y in {4.5, 3.8, 3.1, 2.4, 1.8} {
+    \fill[textofalso] (4.5,\y-0.06) rectangle (5.0,\y+0.06);
+    \fill[textofalso] (5.6,\y-0.06) rectangle (8.6,\y+0.06);
+    \fill[textofalso] (9.2,\y-0.06) rectangle (11.4,\y+0.06);
+  }
+  \foreach \y in {4.5, 3.8, 3.1, 2.4, 1.8} {
+    \node[font=\fontsize{6.5}{7}\selectfont, text=pizarra] at (13.2,\y) {\ico{F06E}};
+    \node[font=\fontsize{6.5}{7}\selectfont, text=azul] at (13.75,\y) {\ico{F303}};
+    \node[font=\fontsize{6.5}{7}\selectfont, text=error] at (14.3,\y) {\ico{F2ED}};
+  }
+  % Paginación y pie
+  \node[anchor=west, inner sep=0pt, font=\fontsize{6}{7}\selectfont, text=pizarra] at (4.2,1.2) {Mostrando 1–15 de 40};
+  \node[anchor=east, inner sep=0pt, font=\fontsize{6}{7}\selectfont, text=pizarra] at (15.0,1.2)
+    {\ico{F053}\hspace{0.3em}Anterior\hspace{1.2em}1 / 3\hspace{1.2em}Siguiente\hspace{0.3em}\ico{F054}};
+  \draw[linea, line width=0.6pt] (3.6,0.62) -- (15.6,0.62);
+  \node[font=\fontsize{5.5}{6}\selectfont, text=pizarra] at (9.6,0.33) {© 2026 Training Corporation. Todos los derechos reservados.};
+  % Marcas
+  \node[marca] at (3.6,5.0) {A};
+  \node[marca] at (3.6,1.05) {B};
+  \node[marca] at (15.0,8.3) {C};
+  \node[marca] at (15.6,6.95) {D};
+  \node[marca] at (12.25,6.0) {E};
+  \node[marca] at (15.0,3.45) {F};
+  \node[marca] at (9.6,1.2) {G};
+\end{tikzpicture}
+\caption{Esquema de una pantalla del panel.}\label{fig:esquema-pantalla}
+\end{figure}
+
+\begin{zonas}
+  \item \textbf{Barra lateral.} Contiene el logo, el texto \textbf{Panel de cotizaciones} y los
+        módulos agrupados en \textbf{Operación}, \textbf{Catálogo} y \textbf{Sistema}. El módulo
+        donde se encuentra aparece resaltado en blanco.
+  \item \textbf{Pie de la barra lateral.} \textbf{Ver sitio público} abre Trainova en otra
+        pestaña y \textbf{Cerrar sesión} termina su sesión. Debajo aparece el correo de la cuenta
+        con la que entró.
+  \item \textbf{Aviso del sistema.} Confirma el resultado de la última acción
+        (\seccion{sec:avisos}).
+  \item \textbf{Encabezado.} Título azul de la pantalla, una descripción en gris y, a la
+        derecha, los botones de acción, como \boton{\icMas\ Nuevo servicio}.
+  \item \textbf{Búsqueda y filtros} (\seccion{sec:busqueda}).
+  \item \textbf{Tabla} con los registros y los íconos de acción de cada fila
+        (\seccion{sec:acciones-fila}).
+  \item \textbf{Paginación} y pie de página con el aviso de derechos de Training Corporation.
+\end{zonas}
+
+\capturaconnotas[11.5cm]{02-05-barra-lateral}{/dashboard}{Barra lateral del panel.}
+  {un recorte vertical de la barra lateral azul completa, desde el logo hasta «Cerrar sesión»,
+   con algún módulo seleccionado.}
+  {\textbf{Cómo moverse por el panel}
+
+   \begin{itemize}
+     \item Haga clic en el nombre de un módulo para abrirlo.
+     \item El módulo activo se resalta con fondo blanco y letra azul.
+     \item Los grupos solo organizan los módulos: no se pueden abrir ni cerrar.
+     \item Si la pantalla es baja, la barra lateral se desplaza sola con la rueda del ratón.
+     \item \textbf{Ver sitio público} se abre en otra pestaña; el panel sigue abierto en la
+           pestaña actual.
+   \end{itemize}}
+
+\section{Elementos comunes}\label{sec:comunes}
+
+Las herramientas de esta sección se repiten en casi todos los módulos. Una vez las conozca,
+podrá usarlas igual en cualquier pantalla.
+
+\subsection{Avisos del sistema}\label{sec:avisos}
+
+Después de guardar, eliminar o enviar algo, aparece un aviso en la parte superior del contenido:
+
+\begin{itemize}
+  \item \textbf{Éxito:} borde azul con un ícono \icono{\icOk}. Por ejemplo,
+        \msg{Línea de gestión creada correctamente.}
+  \item \textbf{Error:} recuadro rojo con un ícono de alerta. Por ejemplo,
+        \msg{No puedes eliminar tu propio usuario.}
+\end{itemize}
+
+El aviso desaparece solo a los 8 segundos. Para cerrarlo antes, haga clic en la \icono[pizarra]{\icCerrar}
+de la derecha.
+
+\captura[3.2cm]{02-06-aviso}{/dashboard/lineas-gestion}{Aviso de confirmación después de guardar.}
+  {un recorte de la parte superior del contenido justo después de crear o editar un registro,
+   con el aviso azul de éxito visible.}
+
+\subsection{Búsqueda}\label{sec:busqueda}
+
+\begin{pasos}
+  \item Escriba en la caja de búsqueda (la que tiene el ícono \icono[pizarra]{\icBuscar}). El texto gris
+        de la caja indica qué datos puede buscar en esa pantalla.
+  \item Presione \tecla{Enter} o haga clic en \botonsec{Buscar}.
+  \item Para quitar la búsqueda, haga clic en la \icono[pizarra]{\icCerrar} \textbf{Limpiar búsqueda}
+        que aparece junto a la caja.
+\end{pasos}
+
+\begin{nota}
+La búsqueda encuentra textos parciales y no distingue mayúsculas de minúsculas. Si escribe
+solo números, también busca por el número de identificación (ID) del registro. La búsqueda no
+se ejecuta mientras escribe: debe presionar \tecla{Enter} o \botonsec{Buscar}.
+\end{nota}
+
+\subsection{Filtros}\label{sec:filtros}
+
+Algunas pantallas tienen listas desplegables junto a la búsqueda, por ejemplo
+\campo{Unidad de negocio} o \campo{Empresa}. El filtro se aplica en cuanto elige una opción.
+Elija \textbf{Todas} para quitarlo.
+
+\subsection{Tablas y paginación}\label{sec:paginacion}
+
+Las tablas muestran 15 registros por página. Debajo de la tabla verá el texto
+\msg{Mostrando \var{desde}–\var{hasta} de \var{total}} y, si hay más de una página, los botones
+\botonsec{\icAnterior\ Anterior} y \botonsec{Siguiente\ \icSiguiente} con la página actual
+(por ejemplo, \textbf{1 / 3}). Al cambiar la búsqueda o un filtro, la tabla vuelve a la
+primera página.
+
+\begin{consejo}
+La dirección de la página guarda la búsqueda, los filtros y la página. Puede guardarla como
+favorito en el navegador o enviársela a otro administrador para que vea exactamente la misma
+lista.
+\end{consejo}
+
+En pantallas angostas, las tablas se desplazan hacia los lados. Una sombra en el borde indica
+que hay más columnas por ver.
+
+\subsection{Acciones de cada fila}\label{sec:acciones-fila}
+
+La columna \campo{Acciones} muestra íconos. Si pasa el ratón sobre uno, aparece su nombre.
+
+\begin{tabla}{colspec={Q[1.6cm,c,m] Q[3cm,l,m] X[l,m]}}
+  Ícono & Nombre & Qué hace \\
+  {\color{pizarra}\fontsize{12}{12}\selectfont\icVer} & Ver detalle & Abre la ficha completa del registro. \\
+  {\color{azul}\fontsize{12}{12}\selectfont\icEditar} & Editar & Abre el formulario para modificar el registro. \\
+  {\color{error}\fontsize{12}{12}\selectfont\icEliminar} & Eliminar & Borra el registro, previa confirmación. \\
+  {\color{azul}\fontsize{12}{12}\selectfont\icExterno} & Abrir propuesta & Solo en Cotizaciones: abre la propuesta enviada en una pestaña nueva. \\
+\end{tabla}
+
+\captura{02-07-lista-tipica}{/dashboard/unidad-negocio}{Una lista típica: búsqueda, tabla, acciones y paginación.}
+  {la pantalla de Unidades de negocio completa, con el encabezado, el botón «Nueva unidad»,
+   la caja de búsqueda, la tabla y los íconos de acción de cada fila.}
+
+\subsection{Confirmar una eliminación}\label{sec:confirmar}
+
+Antes de borrar algo, el navegador muestra un cuadro de confirmación con un mensaje propio de
+cada módulo, por ejemplo \msg{¿Eliminar el servicio «Trabajo en Alturas»?}
+
+\begin{itemize}
+  \item Haga clic en \textbf{Aceptar} para eliminar.
+  \item Haga clic en \textbf{Cancelar} para conservar el registro.
+\end{itemize}
+Los botones los dibuja el navegador, no Trainova: en un navegador en español dicen
+\textbf{Aceptar} y \textbf{Cancelar}; en uno en inglés, como el de la captura, dicen
+\textbf{OK} y \textbf{Cancel}. El cuadro también muestra la dirección \ruta{\dominio}.
+
+\captura[4.5cm]{02-08-confirmar-eliminar}{/dashboard/servicios}{Cuadro de confirmación antes de eliminar.}
+  {el cuadro de confirmación del navegador que aparece al hacer clic en el ícono rojo de
+   eliminar de cualquier fila. Haga clic en «Cancelar» después de capturarlo.}
+
+\begin{importante}
+Las eliminaciones no se pueden deshacer. Si borró algo por error, tendrá que crearlo de nuevo.
+\end{importante}
+
+\subsection{Formularios}\label{sec:formularios}
+
+Los formularios para crear y editar registros funcionan igual en todo el panel:
+
+\begin{itemize}
+  \item Arriba a la izquierda hay un botón de regreso, \botonsec{\icAtras\ Volver a \var{módulo}}
+        (por ejemplo, \textbf{Volver a cotizaciones}), que lleva a la lista.
+  \item Los campos obligatorios no llevan marca. Los opcionales muestran
+        \textbf{(opcional)} junto al nombre.
+  \item El texto gris bajo el nombre de un campo explica qué escribir.
+  \item Al guardar, el sistema revisa los datos. Si algo falta o está mal, el mensaje aparece en
+        rojo debajo del campo y no se guarda nada hasta corregirlo.
+  \item \botonsec{Cancelar} vuelve a la lista sin guardar.
+  \item El botón principal, por ejemplo \boton{Crear servicio} o \boton{Guardar cambios},
+        guarda los datos. Mientras procesa, muestra \textbf{Guardando…}.
+\end{itemize}
+
+\subsection{Fechas y valores vacíos}
+
+Las fechas se muestran en formato día/mes/año (\texttt{27/10/2026}). Cuando un dato no fue
+diligenciado, el panel muestra una raya (\textbf{—}).
+
+\section{Usar el panel desde el celular}\label{sec:movil}
+
+En pantallas angostas, como celulares o tabletas en vertical, la barra lateral se oculta para
+dejar espacio al contenido.
+
+\begin{pasos}
+  \item Toque el botón \textbf{\icMenu} (\textbf{Abrir menú}), arriba a la izquierda, junto al
+        texto \textbf{Panel de cotizaciones}.
+  \item Se despliega la barra lateral. Toque el módulo que necesita.
+  \item Para cerrarla sin elegir nada, toque la \textbf{\icCerrar} o cualquier punto fuera de la barra.
+\end{pasos}
+
+\begin{nota}
+En pantallas angostas, algunas tablas ocultan columnas para que quepan. En
+\menu{Operación}{Cotizaciones}, la unidad de negocio y la fecha pasan a mostrarse debajo del
+código; en \menu{Operación}{Clientes} se ocultan las columnas \campo{Teléfono} y \campo{Última}.
+Abra la ficha del registro para ver todos los datos.
+\end{nota}
+
+\capturamovil{02-09-menu-movil}{Menú del panel abierto en un celular.}
+  {el panel en vista de celular con el menú lateral abierto. En Chrome puede simularlo con
+   F12 y el ícono de dispositivo móvil (Ctrl + Shift + M).}

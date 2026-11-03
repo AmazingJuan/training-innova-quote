@@ -1,0 +1,145 @@
+% =====================================================================
+%  Apéndices
+% =====================================================================
+\chapter{Mensajes del sistema}\label{ap:mensajes}
+
+\entradilla{Referencia rápida de los avisos que muestra el panel después de cada acción,
+agrupados por módulo.}
+
+\begin{longtblr}{colspec={Q[3.1cm,l] X[l] Q[4.2cm,l]}}
+  Módulo & Mensaje & Cuándo aparece \\
+  Cotizaciones & \msg{URL de cotización subida exitosamente.} & Al enviar la propuesta. \\
+  Cotizaciones & \msg{La URL de la cotización es obligatoria.} & Al enviar sin enlace. \\
+  Cotizaciones & \msg{La URL debe ser una dirección válida.} & El enlace no tiene formato de dirección web. \\
+  Clientes & \msg{No se pudo iniciar la exportación. Intente nuevamente.} & Falla al iniciar el Excel. \\
+  Clientes & \msg{No se pudo generar el archivo. Intente nuevamente.} & Falla al generar el Excel. \\
+  Clientes & \msg{Se perdió la conexión durante la exportación.} & Se cortó internet mientras se generaba. \\
+  Clientes & \msg{La generación está tardando demasiado. Verifique que el worker de la cola esté en ejecución.} & El proceso en segundo plano no responde. \\
+  Unidades de negocio & \msg{La unidad de negocio «\var{nombre}» ha sido creada exitosamente.} & Al crear. \\
+  Unidades de negocio & \msg{La unidad de negocio «\var{nombre}» ha sido actualizada exitosamente.} & Al editar. \\
+  Unidades de negocio & \msg{La unidad de negocio «\var{nombre}» ha sido eliminada exitosamente.} & Al eliminar. \\
+  Unidades de negocio & \msg{No se puede eliminar la unidad de negocio «\var{nombre}» porque tiene servicios asociados.} & Al eliminar una unidad con servicios. \\
+  Líneas de gestión & \msg{Línea de gestión creada correctamente.} & Al crear. \\
+  Líneas de gestión & \msg{Línea de gestión actualizada exitosamente.} & Al editar. \\
+  Líneas de gestión & \msg{Línea de gestión eliminada exitosamente.} & Al eliminar. \\
+  Líneas de gestión & \msg{No se puede eliminar la línea de gestión «\var{nombre}» porque tiene servicios asociados.} & Al eliminar una línea con servicios. \\
+  Servicios & \msg{Servicio creado correctamente.} & Al crear. \\
+  Servicios & \msg{Servicio actualizado exitosamente.} & Al editar. \\
+  Servicios & \msg{Servicio eliminado exitosamente.} & Al eliminar. \\
+  Servicios & \msg{No existen unidades de negocio con las cuales usted pueda asociar un servicio.} & Al crear un servicio sin unidades. \\
+  Servicios & \msg{No existen líneas de gestión con las cuales usted pueda asociar un servicio.} & Al crear un servicio sin líneas. \\
+  Árbol de decisión & \msg{Pregunta «\var{pregunta}» creada.} & Al crear una pregunta. \\
+  Árbol de decisión & \msg{Pregunta «\var{pregunta}» guardada.} & Al editar una pregunta. \\
+  Árbol de decisión & \msg{Pregunta «\var{pregunta}» eliminada.} & Al eliminar una pregunta. \\
+  Árbol de decisión & \msg{Preguntas copiadas desde «\var{unidad}».} & Al copiar un cuestionario. \\
+  Árbol de decisión & \msg{Tiene cambios sin guardar en la pregunta que está editando. ¿Desea descartarlos?} & Al salir de una pregunta con cambios. \\
+  Usuarios & \msg{Usuario creado correctamente.} & Al crear. \\
+  Usuarios & \msg{Usuario actualizado correctamente.} & Al editar. \\
+  Usuarios & \msg{Usuario eliminado correctamente.} & Al eliminar. \\
+  Usuarios & \msg{No puedes eliminar tu propio usuario.} & Al intentar borrar la cuenta propia. \\
+  Correos de bienvenida & \msg{Se pusieron en cola \var{N} correos de bienvenida.} & Al enviar la lista. \\
+  Correos de bienvenida & \msg{Se omitieron \var{X} líneas sin correo válido (ej.: …).} & Si la lista tenía líneas inválidas. \\
+  Correos de bienvenida & \msg{Máximo 500 correos por envío. Reduzca la lista e intente nuevamente.} & Lista de más de 500 correos. \\
+  Configuración & \msg{Configuración actualizada exitosamente.} & Al guardar. \\
+\end{longtblr}
+
+% ---------------------------------------------------------------------
+\chapter{Preguntas frecuentes}\label{ap:faq}
+
+\entradilla{Respuestas a las situaciones más comunes y qué hacer en cada caso.}
+
+\newcommand{\faq}[2]{%
+  \begin{tcolorbox}[enhanced, colback=white, colframe=linea, boxrule=0.8pt, arc=6pt,
+      left=12pt, right=12pt, top=9pt, bottom=9pt, before skip=8pt, after skip=8pt]
+    {\montserrat\bfseries\color{azul}{\iconos\char"F059}\hspace{0.5em}#1}\par\vspace{3pt}
+    #2
+  \end{tcolorbox}}
+
+\faq{Creé una unidad de negocio, pero no aparece en Trainova.}
+  {Una unidad solo se muestra a los clientes cuando su árbol de decisión tiene al menos una
+   pregunta. Cree sus preguntas o copie las de otra unidad (\seccion{sec:copiar-arbol}).}
+
+\faq{No puedo eliminar una unidad de negocio o una línea de gestión.}
+  {Tiene servicios asociados. Elimine esos servicios o asígnelos a otra unidad o línea
+   (\seccion{sec:servicios}) e intente de nuevo.}
+
+\faq{Envié la propuesta con un enlace equivocado.}
+  {El panel no permite cambiar el enlace después de enviarlo. Envíe al cliente el enlace
+   correcto por correo y pida al equipo técnico que corrija el registro, indicando el código de
+   la cotización.}
+
+\faq{El cliente dice que no recibió el correo con la propuesta.}
+  {Pídale que revise la carpeta de correo no deseado. Verifique en la ficha del cliente que su
+   correo esté bien escrito (\seccion{sec:clientes}). Los correos se envían en segundo plano y
+   pueden tardar unos minutos; si no llegan, avise al equipo técnico.}
+
+\faq{No recibo los avisos de nuevas solicitudes.}
+  {Revise que el \campo{Correo de notificaciones} esté diligenciado en
+   \menu{Sistema}{Configuración} (\seccion{sec:configuracion}) y revise la carpeta de correo no
+   deseado de ese buzón.}
+
+\faq{El cliente dice que adjuntó documentos, pero no los encuentro en el panel.}
+  {El panel no guarda los archivos: solo muestra sus nombres en la respuesta \campo{Adjuntar
+   documentos}. Los archivos viajan adjuntos en el correo \msg{Nueva solicitud de cotización
+   \var{código}} que llega al \campo{Correo de notificaciones}. Búsquelo en ese buzón
+   (\seccion{sec:documentos-cliente}). Si ese correo estaba vacío cuando llegó la solicitud,
+   los documentos se descartaron y hay que pedírselos de nuevo al cliente.}
+
+\faq{La exportación a Excel se queda en «Generando…».}
+  {El archivo se genera con un proceso en segundo plano del servidor. Si después de unos
+   minutos aparece \msg{La generación está tardando demasiado…}, avise al equipo técnico para
+   que revise ese proceso.}
+
+\faq{El botón «Crear pregunta» o «Guardar pregunta» está desactivado.}
+  {Hay un problema en la pregunta o no ha hecho cambios. Revise el recuadro rojo dentro de la
+   tarjeta: indica lo que debe corregir (\seccion{sec:validaciones-arbol}).}
+
+\faq{Una pregunta de rama tiene el borde ámbar.}
+  {Ninguna opción lleva a ella, así que el cliente no la verá. Conéctela desde una opción con
+   \campo{Al elegirla} o elimínela (\seccion{sec:ramas}).}
+
+\faq{Olvidé mi contraseña.}
+  {Use \textbf{¿Olvidó su contraseña?} en la pantalla de inicio de sesión
+   (\seccion{sec:recuperar}) o pida a otro administrador que le asigne una nueva
+   (\seccion{sec:usuario-editar}).}
+
+\faq{Necesito retirar el acceso a una persona.}
+  {Elimine su cuenta en \menu{Sistema}{Usuarios}. Si la cuenta es la suya, pídaselo a otro
+   administrador.}
+
+% ---------------------------------------------------------------------
+\chapter{Glosario}\label{ap:glosario}
+
+\entradilla{Términos que se usan en el panel y en este manual.}
+
+\begin{tabla}{colspec={Q[4.2cm,l] X[l]}}
+  Término & Definición \\
+  Abreviado & Letras y números que identifican a una unidad de negocio y forman el inicio de
+    sus códigos de cotización, por ejemplo \textbf{EO}. \\
+  Árbol de decisión & El conjunto de preguntas que responde el cliente de una unidad al cotizar,
+    con sus opciones y ramas. \\
+    Bloque del formulario & Cada uno de los cuatro grupos temáticos en que se organizan las
+    preguntas del formulario. \\
+  Cliente & Persona que ha enviado al menos una solicitud desde Trainova. Se identifica por
+    su correo. \\
+  Código de cotización & Identificador único de cada solicitud, con la forma
+    \textbf{ABREVIADO-V-AAnn}, por ejemplo \textbf{EO-V-2601}. \\
+  Correo de notificaciones & Buzón interno que recibe un aviso con cada solicitud nueva y cada
+    propuesta enviada. \\
+    Formulario de solicitud & El formulario que diligencia el cliente al solicitar una cotización.
+    Se configura en el árbol de decisión. \\
+  Línea de gestión & Agrupación temática de los servicios, por ejemplo HSEQ. \\
+  Orden principal & La secuencia numerada de preguntas que todos los clientes responden. \\
+    Panel de cotizaciones & La parte privada de Trainova, donde trabaja el administrador. \\
+  
+  Pregunta de rama & Pregunta que solo aparece cuando el cliente elige cierta opción. \\
+  Propuesta & El documento con la oferta comercial que se envía al cliente mediante un enlace. \\
+  
+  Servicio & Un servicio de la oferta de una unidad de negocio, clasificado en una línea de
+    gestión. \\
+    Trainova & Nombre de la plataforma web de cotizaciones de Training Corporation, disponible en
+    \ruta{\dominio}. \\
+  Unidad de negocio & Tipo de servicio que el cliente elige al cotizar, por ejemplo Auditoría,
+    Consultoría o Formación. \\
+  Usuarios simultáneos & Personas que usan Trainova al mismo tiempo. \\
+\end{tabla}

@@ -1,0 +1,57 @@
+% =====================================================================
+%  Capítulo 7 — Capacidad de la aplicación
+% =====================================================================
+\chapter{Capacidad de la aplicación}\label{cap:capacidad}
+
+\entradilla{Cuántas personas pueden usar Trainova al mismo tiempo manteniendo una buena
+experiencia.}
+
+Los \textbf{usuarios simultáneos} son las personas que están usando Trainova en el mismo
+momento, por ejemplo navegando por el sitio o llenando el formulario de solicitud. No es lo
+mismo que el total de visitas del día.
+
+\begin{tcolorbox}[enhanced, colback=nube, colframe=nube, arc=6pt, left=16pt, right=16pt,
+    top=13pt, bottom=13pt, before skip=12pt, after skip=14pt, borderline west={3.5pt}{0pt}{azul}]
+  {\montserrat\bfseries\color{azul}{\iconos\char"F0C0\relax}\hspace{0.55em}En resumen}\par\vspace{5pt}
+  Con \textbf{50 usuarios simultáneos} navegando y llenando el formulario, Trainova responde en
+  \textbf{menos de 0,35 segundos el 95 \% de las veces} y sin errores. Mantiene una buena
+  experiencia hasta unos \textbf{100 usuarios}, empieza a ponerse lenta cerca de \textbf{200} y se
+  satura sobre los \textbf{300}.
+
+  \vspace{4pt}
+  Funciona en una máquina de \textbf{2 vCPU y 4 GB de memoria}. Si se necesita más capacidad, se
+  amplía subiendo el tamaño de la máquina.
+\end{tcolorbox}
+
+\definecolor{ambarvivo}{HTML}{E8A317}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    marca/.style={circle, fill=white, draw=noche, line width=1.4pt, minimum size=0.38cm, inner sep=0pt},
+    cifra/.style={font=\montserrat\fontseries{eb}\selectfont\large, text=noche},
+    texto/.style={font=\footnotesize, text=pizarra, text width=3.2cm, align=center},
+  ]
+  % Barra: de 0 a 350 usuarios en 15 cm
+  \begin{scope}
+    \clip[rounded corners=0.22cm] (0,-0.22) rectangle (15,0.22);
+    \shade[left color=verde, right color=ambarvivo] (0,-0.22) rectangle (8.57,0.22);
+    \shade[left color=ambarvivo, right color=error] (8.57,-0.22) rectangle (15,0.22);
+  \end{scope}
+  \foreach \x/\n/\desc in {2.14/50/{Responde en menos de 0,35 s, sin errores}, 8.57/200/{Empieza a ponerse lenta}} {
+    \node[marca] at (\x,0) {};
+    \node[cifra, anchor=north] (c) at (\x,-0.42) {\n};
+    \node[texto, anchor=north] at (c.south) {\desc};
+  }
+  \foreach \x/\n/\desc in {4.29/100/{Buena experiencia hasta aquí}, 12.86/300/{Se satura}} {
+    \node[marca] at (\x,0) {};
+    \node[cifra, anchor=south] (c) at (\x,0.42) {\n};
+    \node[texto, anchor=south] at (c.north) {\desc};
+  }
+  \node[font=\scriptsize, text=pizarra, anchor=north east] at (15,-0.35) {usuarios simultáneos};
+\end{tikzpicture}
+\caption{Comportamiento de Trainova según el número de usuarios simultáneos.}\label{fig:capacidad}
+\end{figure}
+
+\begin{resultado}[Conclusión]
+Trainova atiende \textbf{50 usuarios simultáneos} con una holgura de unas \textbf{2 a 3 veces}.
+\end{resultado}

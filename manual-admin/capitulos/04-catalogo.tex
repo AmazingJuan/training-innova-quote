@@ -1,0 +1,703 @@
+% =====================================================================
+%  Capítulo 4 — Catálogo
+% =====================================================================
+\chapter{Catálogo}\label{cap:catalogo}
+
+\entradilla{Lo que el cliente encuentra al cotizar: las unidades de negocio, su formulario de
+preguntas y el catálogo de líneas de gestión y servicios.}
+
+Los cuatro módulos del grupo \textbf{Catálogo} están relacionados entre sí, como muestra la
+\figref{fig:relaciones}. Por eso conviene crearlos en este orden: primero las unidades de
+negocio y las líneas de gestión, después los servicios y, por último, las preguntas de cada
+unidad en el árbol de decisión.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    entidad/.style={tarjeta, minimum width=4.4cm, minimum height=1.35cm, text width=3.8cm, align=center},
+    rel/.style={font=\scriptsize, text=pizarra, fill=white, inner sep=2pt},
+  ]
+  \node[entidad, draw=azul, line width=1.4pt] (u) at (0,0)
+    {{\color{azul}\ico{F0B1}}\hspace{0.4em}\textbf{Unidad de negocio}\\{\scriptsize\color{pizarra}Tipo de servicio que elige el cliente}};
+  \node[entidad] (a) at (-5.6,0)
+    {{\color{azul}\ico{F0E8}}\hspace{0.4em}\textbf{Árbol de decisión}\\{\scriptsize\color{pizarra}Preguntas que responde el cliente}};
+  \node[entidad] (s) at (5.6,0)
+    {{\color{azul}\ico{F0AD}}\hspace{0.4em}\textbf{Servicios}\\{\scriptsize\color{pizarra}Oferta de cada unidad}};
+  \node[entidad] (l) at (5.6,-2.4)
+    {{\color{azul}\ico{F126}}\hspace{0.4em}\textbf{Línea de gestión}\\{\scriptsize\color{pizarra}Agrupa los servicios}};
+  \draw[flecha] (u) -- node[rel, above=3pt] {tiene su propio} (a);
+  \draw[flecha] (u) -- node[rel, above=3pt] {ofrece} (s);
+  \draw[flecha] (l) -- node[rel, right=3pt] {clasifica} (s);
+\end{tikzpicture}
+\caption{Relación entre los módulos del catálogo.}\label{fig:relaciones}
+\end{figure}
+
+% ---------------------------------------------------------------------
+\section{Unidades de negocio}\label{sec:unidades}
+
+\ficha{F0B1}{\menu{Catálogo}{Unidades de negocio}}{/dashboard/unidad-negocio}
+  {Crear, consultar, editar y eliminar las unidades de negocio.}
+
+Cada unidad de negocio es un \textbf{tipo de servicio} que el cliente elige al entrar a Trainova, por ejemplo Auditoría, Consultoría o Formación. Cada unidad tiene su propio
+formulario de preguntas y su propio consecutivo de códigos de cotización.
+
+\begin{importante}
+Una unidad solo aparece en Trainova cuando su árbol de decisión tiene al menos una
+pregunta. Después de crear una unidad, configure sus preguntas (\seccion{sec:arbol}).
+\end{importante}
+
+\subsection{La lista de unidades}
+
+La pantalla \textbf{Unidades de negocio} (\msg{Primer paso del cotizador. Cada unidad tiene su
+propio árbol de decisión.}) muestra estas columnas:
+
+\begin{tabla}{colspec={Q[3cm,l] X[l]}}
+  Columna & Qué muestra \\
+  ID & Número interno de la unidad. \\
+  Nombre & Nombre de la unidad. Haga clic en él para ver su detalle. \\
+  Abreviado & Prefijo de sus códigos de cotización, por ejemplo \textbf{EO}. \\
+  Último código & El último código emitido, por ejemplo \textbf{EO-V-2603}, o
+    \msg{sin cotizaciones aún}. \\
+  Acciones & \icono[pizarra]{\icVer}\ Ver detalle, \icono{\icEditar}\ Editar y
+    \icono[error]{\icEliminar}\ Eliminar. \\
+\end{tabla}
+
+La búsqueda (\msg{Nombre o abreviado…}) encuentra unidades por su nombre o por su abreviado.
+
+\captura{04-01-unidades-lista}{/dashboard/unidad-negocio}{Lista de unidades de negocio.}
+  {la pantalla Unidades de negocio con las unidades registradas y la columna «Último código».}
+
+\subsection{Crear una unidad}\label{sec:unidad-crear}
+
+\begin{pasos}
+  \item Haga clic en \boton{\icMas\ Nueva unidad}.
+  \item En \campo{Nombre}, escriba el nombre tal como lo verá el cliente, por ejemplo
+        \textbf{Consultoría}.
+  \item En \campo{Abreviado}, escriba entre 2 y 32 letras o números, sin espacios, por ejemplo
+        \textbf{GA}. Las letras se convierten solas a mayúsculas.
+  \item Haga clic en \boton{Crear unidad}.
+\end{pasos}
+
+\captura[7.5cm]{04-02-unidad-crear}{/dashboard/unidad-negocio/crear}{Formulario para crear una unidad de negocio.}
+  {el formulario «Crear unidad de negocio» con los campos «Nombre» y «Abreviado» diligenciados
+   con un ejemplo, antes de hacer clic en «Crear unidad».}
+
+\begin{resultado}
+Vuelve a la lista con el aviso \msg{La unidad de negocio «\var{nombre}» ha sido creada
+exitosamente.} Para que los clientes puedan cotizarla, cree sus preguntas en el árbol de
+decisión (\seccion{sec:arbol}).
+\end{resultado}
+
+\begin{tabla}{colspec={X[l] Q[6cm,l]}}
+  Mensaje de error & Cómo resolverlo \\
+  \msg{El nombre es obligatorio.} & Escriba un nombre. \\
+  \msg{El nombre debe contener al menos una letra o número.} & El nombre no puede tener solo
+    símbolos. \\
+  \msg{Ya existe una unidad de negocio con un nombre equivalente.} & Ya hay una unidad con ese
+    nombre, aunque cambien las tildes o las mayúsculas (por ejemplo, «Consultoría» y
+    «consultoria»). Use otro nombre. \\
+  \msg{El abreviado es obligatorio.} & Escriba un abreviado. \\
+  \msg{Use al menos 2 caracteres en el abreviado.} & Alargue el abreviado. \\
+  \msg{El abreviado solo puede incluir letras mayúsculas y números, sin espacios.} & Quite
+    tildes, eñes, guiones y otros símbolos. \\
+  \msg{Ese abreviado ya está en uso por otra unidad de negocio.} & Elija otro abreviado. \\
+\end{tabla}
+
+\subsection{Editar una unidad}\label{sec:unidad-editar}
+
+\begin{pasos}
+  \item En la fila de la unidad, haga clic en \icono{\icEditar} \textbf{Editar}.
+  \item Cambie el \campo{Nombre} o el \campo{Abreviado}. Debajo de los campos verá, solo para
+        consulta, el \textbf{Correlativo actual}, es decir, el último código emitido.
+  \item Haga clic en \boton{Guardar cambios}.
+\end{pasos}
+
+\captura[7.5cm]{04-03-unidad-editar}{/dashboard/unidad-negocio/.../editar}{Edición de una unidad de negocio.}
+  {el formulario «Editar unidad de negocio» de una unidad que ya tenga cotizaciones, para que
+   se vea el recuadro «Correlativo actual».}
+
+\begin{resultado}
+Vuelve a la lista con el aviso \msg{La unidad de negocio «\var{nombre}» ha sido actualizada
+exitosamente.}
+\end{resultado}
+
+\begin{importante}
+\begin{itemize}
+  \item \textbf{Cambiar el nombre cambia la dirección pública} del formulario de esa unidad. Si
+        compartió con clientes un enlace directo al formulario, ese enlace dejará de funcionar.
+  \item Evite renombrar una unidad mientras haya clientes llenando su formulario: la solicitud
+        en curso podría fallar al enviarse.
+  \item \textbf{Cambiar el abreviado solo afecta los códigos nuevos.} Las solicitudes anteriores
+        conservan su código.
+\end{itemize}
+\end{importante}
+
+\subsection{Ver el detalle de una unidad}
+
+Haga clic en el nombre de la unidad o en \icono[pizarra]{\icVer} \textbf{Ver detalle}. La
+pantalla muestra:
+
+\begin{itemize}
+  \item El nombre como título y, debajo, \textbf{Abreviado \var{ABREV} · último código
+        \var{código}}.
+  \item El botón \botonsec{\icEditar\ Editar}.
+  \item La sección \textbf{Servicios (\var{N})}, con los servicios de la unidad. Haga clic en un
+        servicio para editarlo. Si no tiene, verá \msg{Esta unidad no tiene servicios asociados.}
+\end{itemize}
+
+\captura[7cm]{04-04-unidad-detalle}{/dashboard/unidad-negocio/...}{Detalle de una unidad de negocio.}
+  {la pantalla de detalle de una unidad con varios servicios en la tabla «Servicios».}
+
+\subsection{Eliminar una unidad}
+
+\begin{pasos}
+  \item En la fila de la unidad, haga clic en \icono[error]{\icEliminar} \textbf{Eliminar}.
+  \item Confirme el mensaje \msg{¿Eliminar la unidad «\var{nombre}»? También se borrará su árbol
+        de decisión.}
+\end{pasos}
+
+Si la unidad tiene servicios, el sistema no la elimina y muestra \msg{No se puede eliminar la
+unidad de negocio «\var{nombre}» porque tiene servicios asociados.} Elimine esos servicios o
+asígnelos a otra unidad (\seccion{sec:servicios}) e intente de nuevo.
+
+\begin{importante}
+Al eliminar una unidad se borran también todas las preguntas de su árbol de decisión, y esto
+no se puede deshacer. Las solicitudes que ya llegaron de esa unidad se conservan.
+\end{importante}
+
+% ---------------------------------------------------------------------
+\section{Líneas de gestión}\label{sec:lineas}
+
+\ficha{F126}{\menu{Catálogo}{Líneas de gestión}}{/dashboard/lineas-gestion}
+  {Crear, editar y eliminar las líneas que agrupan los servicios.}
+
+Las líneas de gestión agrupan los servicios por tema, por ejemplo HSEQ, Seguridad y Salud en
+el Trabajo o Gestión Ambiental.
+
+\subsection{La lista de líneas}
+
+La tabla muestra \campo{ID}, \campo{Nombre} y \campo{Acciones} (\icono{\icEditar}\ Editar y
+\icono[error]{\icEliminar}\ Eliminar). La búsqueda (\msg{Nombre o ID…}) encuentra líneas por
+su nombre o número.
+
+\captura[7cm]{04-05-lineas-lista}{/dashboard/lineas-gestion}{Lista de líneas de gestión.}
+  {la pantalla Líneas de gestión con las líneas registradas.}
+
+\subsection{Crear y editar una línea}
+
+\begin{pasos}
+  \item Haga clic en \boton{\icMas\ Nueva línea} o, para modificar una existente, en
+        \icono{\icEditar} \textbf{Editar}.
+  \item En \campo{Nombre}, escriba el nombre de la línea, por ejemplo \textbf{Calidad}. Debe ser
+        único.
+  \item Haga clic en \boton{Crear línea} o en \boton{Guardar cambios}.
+\end{pasos}
+
+\captura[5.5cm]{04-06-linea-crear}{/dashboard/lineas-gestion/crear}{Formulario para crear una línea de gestión.}
+  {el formulario «Crear línea de gestión» con un nombre de ejemplo escrito.}
+
+\begin{resultado}
+Vuelve a la lista con el aviso \msg{Línea de gestión creada correctamente.} o
+\msg{Línea de gestión actualizada exitosamente.}
+\end{resultado}
+
+Si el nombre ya existe, verá \msg{Ya existe una línea de gestión con ese nombre.}
+
+\subsection{Eliminar una línea}
+
+Haga clic en \icono[error]{\icEliminar} \textbf{Eliminar} y confirme
+\msg{¿Eliminar la línea de gestión «\var{nombre}»?} Si la línea tiene servicios, el sistema no
+la elimina y muestra \msg{No se puede eliminar la línea de gestión «\var{nombre}» porque tiene
+servicios asociados.} Si se elimina, verá \msg{Línea de gestión eliminada exitosamente.}
+
+% ---------------------------------------------------------------------
+\section{Servicios}\label{sec:servicios}
+
+\ficha{F0AD}{\menu{Catálogo}{Servicios}}{/dashboard/servicios}
+  {Crear, editar y eliminar los servicios de cada unidad y línea de gestión.}
+
+Cada servicio pertenece a una unidad de negocio y a una línea de gestión.
+
+\begin{nota}
+El catálogo de servicios sirve como referencia de la oferta de cada unidad. En la versión
+actual de Trainova, el cliente describe su necesidad en el formulario de solicitud
+(\seccion{sec:arbol}) y no elige servicios de esta lista. Las solicitudes antiguas que sí
+incluían servicios los muestran en su detalle.
+\end{nota}
+
+\subsection{La lista de servicios}
+
+La tabla muestra \campo{ID}, \campo{Nombre}, \campo{Unidad de negocio}, \campo{Línea de gestión}
+y \campo{Acciones}. Puede combinar:
+
+\begin{itemize}
+  \item La búsqueda (\msg{Servicio o ID…}), que busca solo en el nombre del servicio o en su número.
+  \item El filtro \campo{Unidad de negocio}, para ver los servicios de una sola unidad.
+\end{itemize}
+
+\captura[8cm]{04-07-servicios-lista}{/dashboard/servicios}{Lista de servicios filtrada por unidad.}
+  {la pantalla Servicios con el filtro «Unidad de negocio» aplicado a una unidad.}
+
+\subsection{Crear y editar un servicio}
+
+\begin{pasos}
+  \item Haga clic en \boton{\icMas\ Nuevo servicio} o, para modificar uno existente, en
+        \icono{\icEditar} \textbf{Editar}.
+  \item En \campo{Nombre}, escriba el nombre del servicio. No puede repetirse en ninguna otra
+        unidad.
+  \item En \campo{Unidad de negocio}, elija la unidad a la que pertenece.
+  \item En \campo{Línea de gestión}, elija la línea que lo agrupa.
+  \item Haga clic en \boton{Crear servicio} o en \boton{Guardar cambios}.
+\end{pasos}
+
+\captura[7cm]{04-08-servicio-crear}{/dashboard/servicios/crear}{Formulario para crear un servicio.}
+  {el formulario «Crear servicio» con el nombre escrito y las listas «Unidad de negocio» y
+   «Línea de gestión» con una opción elegida.}
+
+\begin{resultado}
+Vuelve a la lista con el aviso \msg{Servicio creado correctamente.} o
+\msg{Servicio actualizado exitosamente.}
+\end{resultado}
+
+\begin{tabla}{colspec={X[l] Q[6cm,l]}}
+  Mensaje & Cómo resolverlo \\
+  \msg{Ya existe un servicio con ese nombre.} & Los nombres son únicos en todo el sistema. Use
+    un nombre distinto. \\
+  \msg{La unidad de negocio es obligatoria.} & Elija una unidad en la lista. \\
+  \msg{La línea de gestión es obligatoria.} & Elija una línea en la lista. \\
+  \msg{No existen unidades de negocio con las cuales usted pueda asociar un servicio.} & Cree
+    primero una unidad (\seccion{sec:unidad-crear}). \\
+  \msg{No existen líneas de gestión con las cuales usted pueda asociar un servicio.} & Cree
+    primero una línea de gestión (\seccion{sec:lineas}). \\
+\end{tabla}
+
+\begin{consejo}
+Para pasar un servicio a otra unidad o línea, edítelo y cambie la opción de la lista. Así puede
+vaciar una unidad o una línea antes de eliminarla.
+\end{consejo}
+
+\subsection{Eliminar un servicio}
+
+Haga clic en \icono[error]{\icEliminar} \textbf{Eliminar} y confirme
+\msg{¿Eliminar el servicio «\var{nombre}»?} Verá el aviso \msg{Servicio eliminado exitosamente.}
+
+% ---------------------------------------------------------------------
+\section{Árbol de decisión}\label{sec:arbol}
+
+\ficha{F0E8}{\menu{Catálogo}{Árbol de decisión}}{/dashboard/arbol-decision}
+  {Diseñar el formulario de preguntas (formulario de solicitud) que responde el cliente de cada
+   unidad.}
+
+El árbol de decisión es el formulario que responde el cliente al cotizar: \msg{Las preguntas
+que responde el cliente al cotizar, en el orden en que las verá.} Cada unidad de negocio tiene
+el suyo.
+
+\begin{importante}
+Los cambios se aplican en Trainova apenas los guarda: no existe un paso de publicación.
+Cada vez que guarda, el sistema comprueba que el cuestionario siga funcionando. Después de
+cambios importantes, pruebe el formulario con \botonsec{\icPlay\ Probar como cliente}
+(\seccion{sec:probar}).
+\end{importante}
+
+\subsection{Conceptos clave}\label{sec:conceptos-arbol}
+
+\begin{tabla}{colspec={Q[3.4cm,l] X[l]}}
+  Concepto & Qué es \\
+  Pregunta & Cada campo que diligencia el cliente. \\
+  Tipo de respuesta & Cómo responde el cliente: texto, número, fecha, documentos, una o
+    varias opciones, o un rango (\seccion{sec:tipos-respuesta}). \\
+  Opción & Cada alternativa de una pregunta de selección, por ejemplo «Presencial». \\
+  Orden principal & La lista numerada de preguntas que todos los clientes recorren de arriba
+    abajo. \\
+  Pregunta de rama & Una pregunta adicional que solo aparece si el cliente elige cierta
+    opción. Después, el cliente vuelve al orden principal. \\
+  Bloque del formulario & El grupo temático en el que el cliente ve la pregunta. \\
+\end{tabla}
+
+La \figref{fig:ejemplo-arbol} muestra un ejemplo: la pregunta de sedes solo aparece cuando el
+cliente elige una modalidad presencial o mixta.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    numero/.style={circle, fill=azul, text=white, minimum size=0.62cm, inner sep=0pt,
+      font=\montserrat\bfseries\scriptsize},
+    numerorama/.style={circle, draw=azulvivo, dashed, line width=1pt, text=azul, fill=white,
+      minimum size=0.62cm, inner sep=0pt, font=\scriptsize},
+    preg/.style={tarjeta, text width=6.4cm, font=\small},
+    rama/.style={tarjeta, text width=5.2cm, font=\small, draw=azulvivo, dashed},
+    etq/.style={font=\scriptsize, text=azulhondo, fill=white, inner sep=2pt},
+  ]
+  \node[preg, anchor=west] (q1) at (0.6,0)
+    {\textbf{Modalidad de prestación del servicio}\\{\scriptsize\color{pizarra}Una opción: Presencial, Virtual, Mixto}};
+  \node[numero] at (0,0) {1};
+  \node[preg, anchor=west] (q2) at (0.6,-3.0)
+    {\textbf{Descripción de horarios para la prestación del servicio}\\{\scriptsize\color{pizarra}Texto corto}};
+  \node[numero] at (0,-3.0) {2};
+  \node[preg, anchor=west] (q3) at (0.6,-4.8)
+    {\textbf{Fecha estimada para la prestación del servicio}\\{\scriptsize\color{pizarra}Fecha}};
+  \node[numero] at (0,-4.8) {3};
+  \node[rama, anchor=west] (r1) at (9.9,-1.5)
+    {\textbf{Descripción de sedes (lugar y dirección)}\\{\scriptsize\color{pizarra}Texto largo · pregunta de rama}};
+  \node[numerorama] at (9.3,-1.5) {\ico{F149}};
+  \draw[flecha] (q1.south) ++(-1.2,0) -- node[etq, left=2pt] {Virtual: sigue normal} ([xshift=-1.2cm]q2.north);
+  \draw[flecha] (q1.east) -| node[etq, pos=0.25, above=2pt] {Presencial o Mixto} (9.3,-1.18);
+  \draw[flecha] (r1.south) |- node[etq, pos=0.75, below=2pt] {después continúa en la 2} (q2.east);
+  \draw[flecha] (q2.south) ++(-1.2,0) -- ([xshift=-1.2cm]q3.north);
+\end{tikzpicture}
+\caption{Ejemplo de árbol con una pregunta de rama.}\label{fig:ejemplo-arbol}
+\end{figure}
+
+El esquema está simplificado. En el formulario real, quien elige \textbf{Mixto} responde antes
+dos preguntas sobre el tiempo del servicio en cada modalidad (presencial y virtual) y después
+llega a la pregunta de sedes.
+
+Los bloques del formulario agrupan las preguntas que ve el cliente. Son estos cuatro,
+en este orden:
+
+\begin{tabla}{colspec={Q[0.7cm,c] Q[5.4cm,l] X[l]}}
+  N.º & Bloque & Lo que verá el cliente debajo del título \\
+  1 & Identificación de la necesidad & Qué servicio requiere y cuáles son sus características. \\
+  2 & Condiciones de prestación del servicio & Modalidad, lugar, horario, fecha y logística. \\
+  3 & Información para la cotización & Insumos técnicos y económicos para estructurar la oferta. \\
+    4 & Validación y cierre de la solicitud & Cómo resolver dudas antes de preparar la propuesta y cuándo espera recibirla. \\
+\end{tabla}
+
+Las preguntas sin bloque se muestran al cliente en un grupo llamado \textbf{Otras preguntas}.
+
+\subsection{Elegir la unidad y leer el árbol}\label{sec:leer-arbol}
+
+En la parte superior de la pantalla hay una pestaña por cada unidad de negocio, con su nombre y
+el número de preguntas (por ejemplo, \textbf{24 preguntas}). Haga clic en una pestaña para ver
+el árbol de esa unidad.
+
+\captura[9.5cm]{04-09-arbol-vista-general}{/dashboard/arbol-decision}{Árbol de decisión de una unidad.}
+  {la pantalla Árbol de decisión con las pestañas de las unidades arriba, el botón «Probar
+   como cliente» y las primeras tarjetas de «Preguntas en orden», con los títulos azules de
+   los bloques.}
+
+La sección \textbf{Preguntas en orden} muestra el orden principal como una lista de tarjetas.
+Cada tarjeta indica:
+
+\begin{itemize}
+  \item El número de la pregunta, en un círculo azul.
+  \item El texto de la pregunta, en negrita, y debajo el tipo de respuesta y sus opciones.
+  \item La etiqueta \insignianeutra{Opcional} si el cliente puede dejarla en blanco.
+  \item Si alguna opción lleva a otra pregunta, líneas como \textbf{\icFlechaRama\ Si elige
+        «Presencial» va a «Descripción de sedes…»} y \textbf{\icFlechaRama\ Con las demás
+        opciones va a la pregunta 7}.
+  \item A la derecha, los botones \icono{\icSubir} \textbf{Subir}, \icono{\icBajar}
+        \textbf{Bajar} e \icono{\icEditar} \textbf{Editar}.
+\end{itemize}
+
+Si hay preguntas de rama, aparecen al final en la sección \textbf{Preguntas de rama}, sin número
+y con el ícono \icono{\icFlechaRama}. Cada una indica cuándo aparece, por ejemplo
+\msg{Aparece al elegir «Presencial» en la pregunta 9.}
+
+El color del borde de cada tarjeta también informa:
+
+\begin{tabla}{colspec={Q[3cm,l] X[l]}}
+  Borde & Significado \\
+  {\color{azul}\textbf{Azul}} & Es la pregunta que está editando. \\
+  {\color{error}\textbf{Rojo}} & La pregunta tiene un problema, que se explica en rojo dentro de
+    la tarjeta (\seccion{sec:validaciones-arbol}). \\
+  {\color{ambartexto}\textbf{Ámbar}} & Es una pregunta de rama a la que ninguna opción lleva:
+    \msg{Ninguna opción lleva aquí: el cliente no la verá.} \\
+\end{tabla}
+
+\subsection{Unidad sin preguntas: empezar o copiar}\label{sec:copiar-arbol}
+
+Si la unidad aún no tiene preguntas verá \msg{«\var{unidad}» aún no tiene preguntas} y el
+texto \msg{Sin preguntas, los clientes no pueden cotizar esta unidad. Empiece con la primera o
+copie las de otra unidad.} Tiene dos caminos:
+
+\begin{itemize}
+  \item \boton{\icMas\ Crear la primera pregunta}: empieza un cuestionario desde cero
+        (\seccion{sec:agregar-pregunta}).
+  \item La lista \campo{Copiar las preguntas de…}: elija otra unidad y se copia de inmediato
+        todo su cuestionario, con opciones, ramas y bloques. Verá el aviso
+        \msg{Preguntas copiadas desde «\var{unidad}».}
+\end{itemize}
+
+\captura[6cm]{04-10-arbol-unidad-vacia}{/dashboard/arbol-decision}{Unidad sin preguntas, con la opción de copiar.}
+  {la pestaña de una unidad sin preguntas, con el botón «Crear la primera pregunta» y la lista
+   «Copiar las preguntas de…». Si todas las unidades tienen preguntas, cree una unidad de
+   prueba para la captura y elimínela después.}
+
+\begin{consejo}
+Para crear el cuestionario de una unidad nueva, copie el de la unidad más parecida y ajústelo.
+La copia solo está disponible mientras la unidad no tenga preguntas, así que nunca reemplaza un
+cuestionario existente.
+\end{consejo}
+
+\subsection{Agregar una pregunta}\label{sec:agregar-pregunta}
+
+Puede agregar preguntas en tres lugares de la lista:
+
+\begin{itemize}
+  \item \textbf{Insertar al inicio}, sobre la primera tarjeta.
+  \item \textbf{Insertar pregunta aquí}, entre dos tarjetas. El botón se ve tenue y se resalta al
+        pasar el ratón por el espacio entre ellas.
+  \item \textbf{Añadir pregunta al final}, el botón punteado debajo de la última tarjeta.
+\end{itemize}
+
+\begin{pasos}
+  \item Haga clic en el lugar donde quiere la pregunta. Se abre una tarjeta
+        \textbf{Nueva pregunta}.
+  \item Escriba el texto en \campo{Pregunta}.
+  \item Complete los demás campos (ver la tabla siguiente).
+  \item En \campo{¿Cómo responde el cliente?}, elija el tipo de respuesta
+        (\seccion{sec:tipos-respuesta}).
+  \item Si elige \textbf{Una opción} o \textbf{Varias opciones}, escriba las opciones
+        (\seccion{sec:opciones}).
+  \item Haga clic en \boton{Crear pregunta}.
+\end{pasos}
+
+\begin{tabla}{colspec={Q[4.4cm,l] X[l]}}
+  Campo & Para qué sirve \\
+  Pregunta & El texto que lee el cliente, por ejemplo \textit{¿Cuántos empleados tiene la
+    empresa?} \\
+  Ayuda para el cliente (opcional) & Una aclaración en letra pequeña que aparece debajo de la
+    pregunta. \\
+    Bloque del formulario & El bloque en el que aparecerá. Por defecto toma el de la pregunta vecina.
+    Elija \textbf{Sin bloque} si no aplica. \\
+  Opcional & Márquelo si el cliente puede dejar la pregunta en blanco y seguir. Sin marcar, la
+    pregunta es obligatoria. \\
+  ¿Cómo responde el cliente? & El tipo de respuesta. \\
+  Ejemplo dentro del campo (opcional) & El texto gris de ejemplo dentro de la casilla, que
+    desaparece al escribir. Solo para texto, número y fecha. \\
+  Opciones & Las alternativas de las preguntas de selección. \\
+\end{tabla}
+
+\captura[10cm]{04-11-arbol-editar-pregunta}{/dashboard/arbol-decision}{Tarjeta de una pregunta abierta para editar.}
+  {una tarjeta abierta en modo edición (borde azul), con los campos «Pregunta», «Ayuda para el
+   cliente», «Bloque del formulario», «Opcional» y el inicio de «¿Cómo responde el cliente?».}
+
+\begin{resultado}
+La tarjeta se cierra, la pregunta aparece en su lugar y se muestra el aviso
+\msg{Pregunta «\var{pregunta}» creada.}
+\end{resultado}
+
+\begin{nota}
+Solo puede tener una pregunta abierta a la vez. El botón \boton{Crear pregunta} se mantiene
+desactivado hasta que la pregunta esté completa; mientras tanto, un recuadro rojo dentro de la
+tarjeta indica lo que falta.
+\end{nota}
+
+\subsection{Tipos de respuesta}\label{sec:tipos-respuesta}
+
+\begin{tabla}{colspec={Q[3.3cm,l] Q[4.4cm,l] X[l]}}
+  Tipo & Ejemplo en pantalla & Úselo para \\
+  Una opción & Sí / No & Elegir una sola alternativa. Es el único tipo que permite ramas. \\
+  Varias opciones & Marque todas las que apliquen & Marcar varias alternativas. \\
+  Texto corto & Ente certificador & Respuestas de una línea. \\
+  Texto largo & Descripción del servicio & Descripciones de varias líneas. \\
+  Número & Cantidad de empleados & Cantidades. Solo admite números. \\
+  Fecha & Fecha de inicio & Una fecha del calendario. \\
+  Documentos & Adjuntar mapa de procesos & Archivos adjuntos: hasta 5, de máximo 10 MB cada uno. \\
+  Rango de números & De 10 a 50 personas & Un valor inicial y uno final. \\
+  Rango de fechas & Del 1 al 15 de marzo & Un periodo con fecha inicial y final. \\
+\end{tabla}
+
+\begin{nota}
+En las preguntas de \textbf{Texto corto} y \textbf{Texto largo}, el cliente ve debajo de la
+casilla un contador, por ejemplo \textbf{120 / 5.000 caracteres}: cada respuesta de texto admite
+hasta 5.000 caracteres.
+\end{nota}
+
+\captura[6cm]{04-12-arbol-tipos-respuesta}{/dashboard/arbol-decision}{Selector del tipo de respuesta.}
+  {un recorte de la cuadrícula «¿Cómo responde el cliente?» con los nueve tipos de respuesta.}
+
+\subsection{Opciones de respuesta}\label{sec:opciones}
+
+En las preguntas de tipo \textbf{Una opción} y \textbf{Varias opciones} aparece el editor de
+\campo{Opciones}:
+
+\begin{itemize}
+  \item Escriba cada opción en su casilla. Presione \tecla{Enter} para crear la siguiente, o
+        haga clic en \botonsec{Añadir opción}.
+  \item Cambie el orden con \icono{\icSubir} \textbf{Subir opción} y \icono{\icBajar}
+        \textbf{Bajar opción}.
+  \item Quite una opción con \icono[error]{\icEliminar}. También puede presionar
+        \tecla{Retroceso} en una opción vacía. Siempre debe quedar al menos una.
+  \item Marque \campo{Incluir «Otro» para que escriba su respuesta} si quiere ofrecer una
+        alternativa abierta. Se agrega la opción \textbf{Otro} al final; si el cliente la elige,
+        aparece una casilla de texto con el ejemplo \msg{Especifique}.
+\end{itemize}
+
+\captura[8cm]{04-13-arbol-opciones}{/dashboard/arbol-decision}{Editor de opciones con ramas.}
+  {el editor «Opciones» de una pregunta de tipo «Una opción» ya guardada, con varias opciones y
+   la lista «Al elegirla» visible debajo de cada una.}
+
+\subsection{Ramas: preguntas según la respuesta}\label{sec:ramas}
+
+En las preguntas de \textbf{Una opción}, cada opción tiene debajo la lista \campo{Al elegirla},
+que define a dónde va el cliente si la elige:
+
+\begin{tabla}{colspec={Q[6.2cm,l] X[l]}}
+  Opción de la lista & Qué hace \\
+  Sigue normal (va a la pregunta \var{N}) & El cliente continúa con la siguiente pregunta del
+    orden principal. Es la opción por defecto. \\
+  Ir a: \var{N. pregunta} o Ir a: (rama) \var{pregunta} & Lleva al cliente a otra pregunta
+    del orden principal o a una pregunta de rama ya creada. \\
+  + Crear una pregunta solo para esta opción & Crea una pregunta de rama nueva que solo verá
+    quien elija esta opción. \\
+\end{tabla}
+
+\subsubsection{Crear una pregunta de rama}
+
+\begin{pasos}
+  \item Guarde primero la pregunta con sus opciones. Mientras no esté guardada, la opción de
+        crear aparece desactivada con el texto \msg{(guarde primero esta pregunta)} o
+        \msg{(guarde primero los cambios)}.
+  \item Abra de nuevo la pregunta haciendo clic en su tarjeta.
+  \item Debajo de la opción, en \campo{Al elegirla}, elija
+        \textbf{+ Crear una pregunta solo para esta opción}.
+  \item Se abre la tarjeta \textbf{Nueva pregunta de rama} en la sección \textbf{Preguntas de
+        rama}. Complétela como cualquier otra pregunta.
+  \item Haga clic en \boton{Crear pregunta}.
+\end{pasos}
+
+\begin{resultado}
+Quien elija esa opción verá la pregunta de rama y luego seguirá con la pregunta que venía
+después en el orden principal.
+\end{resultado}
+
+\captura[8cm]{04-14-arbol-preguntas-rama}{/dashboard/arbol-decision}{Sección de preguntas de rama.}
+  {la sección «Preguntas de rama» con al menos una tarjeta que muestre el texto «Aparece al
+   elegir … en la pregunta …».}
+
+Otras posibilidades de las ramas:
+
+\begin{itemize}
+  \item Varias opciones pueden llevar a la misma pregunta de rama. Por ejemplo, «Presencial» y
+        «Mixto» pueden llevar a la pregunta de sedes eligiendo
+        \textbf{Ir a: (rama) Descripción de sedes…}
+  \item En una pregunta de rama ya creada, el campo \campo{Después de esta pregunta} define a
+        dónde sigue el cliente: \textbf{Termina el cuestionario} o
+        \textbf{Continúa en: \var{pregunta}}.
+  \item Las preguntas de \textbf{Varias opciones} no pueden abrir ramas.
+\end{itemize}
+
+\begin{importante}
+No envíe al cliente a una pregunta anterior: se formaría un ciclo del que el cliente nunca
+saldría. El sistema lo detecta, muestra \msg{Se forma un ciclo: …} y no le deja guardar.
+\end{importante}
+
+\subsection{Editar, reordenar, duplicar y eliminar}\label{sec:editar-pregunta}
+
+\subsubsection{Editar}
+
+Haga clic en la tarjeta o en \icono{\icEditar} \textbf{Editar}, haga los cambios y luego clic en
+\boton{Guardar pregunta}. Verá \msg{Pregunta «\var{pregunta}» guardada.} Para descartar los
+cambios, haga clic en \botonsec{Cancelar}.
+
+\subsubsection{Cambiar el orden}
+
+Use \icono{\icSubir} \textbf{Subir} e \icono{\icBajar} \textbf{Bajar} en las tarjetas del
+orden principal. La pregunta cambia de lugar con su vecina. No aparece un aviso: la lista se
+actualiza sola. Las preguntas de rama no se reordenan, y las flechas se desactivan mientras
+haya una pregunta abierta.
+
+\subsubsection{Duplicar}
+
+Con la pregunta abierta, haga clic en \botonsec{\icDuplicar\ Duplicar}. Se abre una copia
+debajo, con el texto \textbf{\var{pregunta} (copia)} y las mismas opciones. Las ramas de las
+opciones vuelven a \textbf{Sigue normal}. La copia no se guarda hasta que haga clic en
+\boton{Crear pregunta}.
+
+\begin{nota}
+\botonsec{Duplicar} solo está disponible en el orden principal y sin cambios pendientes. Si
+tiene cambios sin guardar, el botón muestra \msg{Guarde o cancele los cambios primero}.
+\end{nota}
+
+\subsubsection{Eliminar}
+
+\begin{pasos}
+  \item Abra la pregunta.
+  \item Haga clic en \botonrojo{\icEliminar\ Eliminar}, abajo a la izquierda de la tarjeta.
+  \item Confirme el mensaje \msg{¿Eliminar «\var{pregunta}»? Las preguntas siguientes se
+        mantienen conectadas.}
+\end{pasos}
+
+Verá \msg{Pregunta «\var{pregunta}» eliminada.} El flujo no se rompe: lo que llevaba a la
+pregunta eliminada ahora lleva a la siguiente.
+
+\begin{importante}
+Si la pregunta eliminada tenía opciones que abrían preguntas de rama, esas ramas no se borran:
+quedan con borde ámbar y el mensaje \msg{Ninguna opción lleva aquí: el cliente no la verá.}
+Vuelva a conectarlas desde una opción o elimínelas.
+\end{importante}
+
+\subsubsection{Cambios sin guardar}
+
+Si tiene una pregunta abierta con cambios y trata de abrir otra, cambiar de pestaña o salir
+de la pantalla, el sistema pregunta \msg{Tiene cambios sin guardar en la pregunta que está
+editando. ¿Desea descartarlos?} Haga clic en \textbf{Cancelar} para volver y guardar, o en
+\textbf{Aceptar} para descartar.
+
+\subsection{Probar como cliente}\label{sec:probar}
+
+\begin{pasos}
+  \item Elija la pestaña de la unidad.
+  \item Haga clic en \botonsec{\icPlay\ Probar como cliente}, arriba a la derecha.
+  \item Se abre la ventana \textbf{Prueba: \var{unidad}}, con el aviso \msg{Así verá el cliente
+        el formulario de solicitud. Nada de lo que responda aquí se guarda.}
+  \item Responda el formulario como lo haría un cliente. Elija distintas opciones para comprobar
+        que aparecen las preguntas de rama.
+  \item Haga clic en \botonsec{Validar como al enviar}. Verá \msg{Todo listo para enviar.} o
+        \msg{\var{N} campos por corregir.}, con el error en cada campo.
+  \item Revise la sección \textbf{Así quedarán las respuestas en la cotización}: es lo que usted
+        verá en el detalle de la solicitud.
+  \item Cierre la ventana con la \textbf{\icCerrar}, la tecla \tecla{Esc} o haciendo clic fuera de ella.
+\end{pasos}
+
+\captura[9cm]{04-15-arbol-probar}{/dashboard/arbol-decision}{Ventana «Probar como cliente».}
+  {la ventana «Prueba: …» abierta, con algunas respuestas diligenciadas y, si es posible, el
+   resultado de «Validar como al enviar».}
+
+\begin{nota}
+La prueba usa la versión guardada del cuestionario. Si tiene una pregunta abierta con cambios,
+guárdela antes de probar.
+\end{nota}
+
+\subsection{Mensajes de validación}\label{sec:validaciones-arbol}
+
+Estos mensajes aparecen en rojo dentro de la tarjeta, o como alerta general sobre la lista:
+
+\begin{tabla}{colspec={Q[5.4cm,l] X[l]}}
+  Mensaje & Qué significa y cómo resolverlo \\
+  \msg{Escriba la pregunta.} & El texto de la pregunta está vacío. Escríbalo. \\
+  \msg{Agregue al menos una opción.} & La pregunta de selección no tiene opciones. La opción
+    «Otro» sola no cuenta. \\
+  \msg{Hay opciones sin texto: escríbalas o quítelas.} & Alguna casilla de opción está vacía. \\
+  \msg{Lleva a una pregunta que ya no existe.} & Una opción o el campo «Después de esta
+    pregunta» apunta a una pregunta eliminada. Elija otro destino. \\
+  \msg{Se forma un ciclo: «A» → «B» → «A». El cliente nunca terminaría.} & Un destino devuelve
+    al cliente a una pregunta anterior. Elija una pregunta posterior o \textbf{Sigue normal}. \\
+  \msg{El cuestionario no tiene una primera pregunta.} & El cuestionario perdió su punto de
+    inicio. Agregue una pregunta con \textbf{Insertar al inicio}; si el mensaje no desaparece,
+    avise al equipo técnico. \\
+  \msg{Ninguna opción lleva aquí: el cliente no la verá.} & Pregunta de rama sin uso.
+    Conéctela desde una opción o elimínela. \\
+\end{tabla}
+
+\captura[6cm]{04-16-arbol-validacion}{/dashboard/arbol-decision}{Recuadro con los problemas de una pregunta.}
+  {una tarjeta abierta con el recuadro rojo de problemas, por ejemplo una pregunta nueva de
+   tipo «Una opción» con una opción vacía. Haga clic en «Cancelar» después de capturarla.}
+
+\subsection{Buenas prácticas}
+
+\begin{itemize}
+  \item Escriba preguntas cortas y claras. Use \campo{Ayuda para el cliente} para las
+        aclaraciones y \campo{Ejemplo dentro del campo} para mostrar el formato esperado.
+  \item Asigne cada pregunta a su bloque, para que el cliente vea un formulario ordenado.
+  \item Marque como \campo{Opcional} solo lo que de verdad no es necesario para cotizar.
+  \item Después de cada cambio importante, use \botonsec{\icPlay\ Probar como cliente}.
+  \item Haga los cambios grandes en horarios de poco movimiento: se aplican de inmediato.
+  \item Revise que no queden preguntas de rama con borde ámbar.
+  \item Auditoría y Consultoría deben mantener el mismo formulario (solo cambian los ejemplos
+        dentro de los campos). Si cambia una pregunta, sus opciones, su orden o si es
+        obligatoria en una de las dos unidades, haga el mismo cambio en la otra. Formación no
+        sigue esta regla.
+\end{itemize}

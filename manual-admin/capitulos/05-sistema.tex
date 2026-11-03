@@ -1,0 +1,240 @@
+% =====================================================================
+%  Capítulo 5 — Sistema
+% =====================================================================
+\chapter{Sistema: usuarios, correos y configuración}\label{cap:sistema}
+
+\entradilla{Las cuentas con acceso al panel, las invitaciones a clientes y los datos que
+acompañan los correos de la plataforma.}
+
+% ---------------------------------------------------------------------
+\section{Usuarios}\label{sec:usuarios}
+
+\ficha{F0C0}{\menu{Sistema}{Usuarios}}{/dashboard/usuarios}
+  {Crear, editar y eliminar las cuentas con acceso al panel.}
+
+\begin{importante}
+Todas las cuentas tienen acceso completo al panel, como se explica en la
+\seccion{sec:quien}. Antes de crear una cuenta, asegúrese de que la persona deba administrar
+Trainova.
+\end{importante}
+
+\subsection{La lista de usuarios}
+
+La pantalla \textbf{Usuarios} (\msg{Cuentas con acceso al panel de administración.}) muestra
+\campo{ID}, \campo{Nombre}, \campo{Correo}, \campo{Teléfono} y \campo{Acciones}. Su propia
+cuenta aparece marcada con \textbf{(usted)} junto al nombre y no tiene ícono de eliminar. La búsqueda (\msg{Nombre o correo…}) encuentra usuarios por su nombre o su correo.
+
+\captura[7cm]{05-01-usuarios-lista}{/dashboard/usuarios}{Lista de usuarios del panel.}
+  {la pantalla Usuarios con al menos dos cuentas, en la que se vea la marca «(usted)» en su fila.}
+
+\subsection{Crear un usuario}\label{sec:usuario-crear}
+
+\begin{pasos}
+  \item Haga clic en \boton{\icMas\ Nuevo usuario}. Se abre \textbf{Crear usuario}, con el aviso
+        \msg{Las cuentas de usuario tienen acceso completo al panel.}
+  \item Complete los campos:
+\end{pasos}
+
+\begin{tabla}{colspec={Q[3.8cm,l] X[l]}}
+  Campo & Qué escribir \\
+  Nombre & Nombre completo de la persona. El Panel de inicio la saludará por el primer nombre. \\
+  Correo electrónico & El correo con el que iniciará sesión. No puede estar registrado en otra
+    cuenta. \\
+  Teléfono & Entre 10 y 15 caracteres, por ejemplo \texttt{3001234567}. \\
+  Contraseña & Mínimo 8 caracteres. \\
+\end{tabla}
+
+\begin{pasos}[resume]
+  \item Haga clic en \boton{Crear usuario}.
+\end{pasos}
+
+\captura[7.5cm]{05-02-usuario-crear}{/dashboard/usuarios/crear}{Formulario para crear un usuario.}
+  {el formulario «Crear usuario» con datos de ejemplo. No muestre una contraseña real: el
+   campo la oculta, pero use una de prueba.}
+
+\begin{resultado}
+Vuelve a la lista con el aviso \msg{Usuario creado correctamente.} La persona ya puede iniciar
+sesión (\seccion{sec:iniciar-sesion}).
+\end{resultado}
+
+\begin{consejo}
+Entregue la contraseña inicial por un medio seguro, nunca en el mismo mensaje que el correo de
+acceso, y pídale a la persona que la cambie en su primer ingreso. Cada usuario puede cambiar su
+propia contraseña editando su fila en \menu{Sistema}{Usuarios}.
+\end{consejo}
+
+\begin{tabla}{colspec={X[l] Q[6cm,l]}}
+  Mensaje & Cómo resolverlo \\
+  \msg{El nombre es obligatorio} & Escriba el nombre. \\
+  \msg{El correo es obligatorio} / \msg{El correo debe ser válido} & Escriba un correo con la
+    forma \texttt{nombre@empresa.com}. \\
+  \msg{Este correo ya está registrado} & Ya existe una cuenta con ese correo. Búsquela en la
+    lista. \\
+  \msg{La contraseña es obligatoria} / \msg{La contraseña debe tener al menos 8 caracteres} &
+    Escriba una contraseña más larga. \\
+  \msg{El teléfono es obligatorio} / \msg{El teléfono debe tener al menos 10 dígitos} /
+    \msg{El teléfono no puede tener más de 15 dígitos} & Revise la longitud del teléfono. \\
+\end{tabla}
+
+\subsection{Editar un usuario y cambiar su contraseña}\label{sec:usuario-editar}
+
+\begin{pasos}
+  \item En la fila del usuario, haga clic en \icono{\icEditar} \textbf{Editar}. El título es
+        \textbf{Editar usuario} y debajo aparece su correo.
+  \item Cambie los datos que necesite.
+  \item Para asignar una contraseña nueva, escríbala en \campo{Nueva contraseña}. Si deja el
+        campo vacío, se conserva la actual (\msg{Déjela en blanco para conservar la actual.}).
+  \item Haga clic en \boton{Guardar cambios}.
+\end{pasos}
+
+\captura[7.5cm]{05-03-usuario-editar}{/dashboard/usuarios/.../editar}{Edición de un usuario.}
+  {el formulario «Editar usuario», en el que se vea el campo «Nueva contraseña (opcional)» con
+   su texto de ayuda.}
+
+\begin{resultado}
+Vuelve a la lista con el aviso \msg{Usuario actualizado correctamente.}
+\end{resultado}
+
+\subsection{Eliminar un usuario}
+
+\begin{pasos}
+  \item En la fila del usuario, haga clic en \icono[error]{\icEliminar} \textbf{Eliminar}.
+  \item Confirme el mensaje \msg{¿Eliminar al usuario \var{nombre}?}
+\end{pasos}
+
+Verá el aviso \msg{Usuario eliminado correctamente.} La persona pierde el acceso al panel de
+inmediato.
+
+\begin{nota}
+No puede eliminar su propia cuenta: su fila no tiene el ícono y, si lo intentara, el sistema
+respondería \msg{No puedes eliminar tu propio usuario.} Si necesita retirar su acceso, pídaselo
+a otro administrador.
+\end{nota}
+
+% ---------------------------------------------------------------------
+\section{Correos de bienvenida}\label{sec:bienvenida}
+
+\ficha{F0E0}{\menu{Sistema}{Correos de bienvenida}}{/dashboard/correos-bienvenida}
+  {Invitar clientes a usar la plataforma con un correo de bienvenida.}
+
+Este módulo envía un correo que presenta Trainova a una lista de direcciones. El subtítulo de
+la pantalla indica a dónde lleva el botón del correo: \msg{Invite a sus clientes a la
+plataforma. El botón del correo lleva a la página para solicitar una cotización:
+\var{dirección}.} Esa dirección es la de la página de solicitud, \ruta{\dominio\allowbreak/cotizar}.
+
+\begin{pasos}
+  \item Prepare la lista de correos. Puede copiar directamente la columna de correos de una hoja
+        de cálculo.
+  \item Pegue la lista en \campo{Lista de correos}. Separe las direcciones con un salto de
+        línea, una coma (,), un punto y coma (;) o una barra vertical (\textbar).
+  \item Revise el contador debajo de la caja: \msg{\var{N} correos únicos detectados · máximo
+        500 por envío}. Los correos repetidos se cuentan una sola vez. Si pasa de 500, el número
+        se pone en rojo.
+  \item Haga clic en \boton{\icEnviar\ Poner en cola el envío}.
+\end{pasos}
+
+\captura[8cm]{05-04-correos-bienvenida}{/dashboard/correos-bienvenida}{Envío de correos de bienvenida.}
+  {la pantalla Correos de bienvenida con dos o tres correos de prueba escritos en «Lista de
+   correos» y el contador de correos detectados. Use correos de prueba, no de clientes reales.}
+
+\begin{resultado}
+Verá el aviso \msg{Se pusieron en cola \var{N} correos de bienvenida.} Si algunas líneas no
+eran correos válidos, el aviso agrega \msg{Se omitieron \var{X} líneas sin correo válido (ej.:
+…).} La caja se vacía sola para que no envíe la misma lista dos veces.
+\end{resultado}
+
+\begin{tabla}{colspec={Q[6.2cm,l] Q[2.2cm,c] X[l]}}
+  Ejemplo de línea & ¿Sirve? & Observación \\
+  \texttt{cliente@empresa.com} & Sí & Formato correcto. \\
+  \texttt{Cliente@Empresa.COM} & Sí & Se convierte a minúsculas. \\
+  \texttt{a@empresa.com; b@empresa.com} & Sí & Separados por punto y coma. \\
+  \texttt{a@empresa.com b@empresa.com} & No & El espacio no separa direcciones. \\
+  \texttt{Ana Pérez <ana@empresa.com>} & No & No incluya el nombre junto al correo. \\
+\end{tabla}
+
+El correo que recibe cada persona:
+
+\begin{itemize}
+  \item \textbf{Asunto:} \msg{Hemos lanzado una nueva plataforma para cotizaciones}.
+  \item \textbf{Título:} \msg{Cotice en línea con Training Corporation}.
+  \item \textbf{Saludo:} \msg{Estimado/a cliente:}, seguido de un texto que explica que ahora
+        puede elegir el servicio, diligenciar el formulario de solicitud y recibir la propuesta
+        en su correo.
+  \item \textbf{Botón:} \textbf{Solicitar una cotización}, que lleva a la página de solicitud de
+        Trainova.
+  \item \textbf{Cierre:} la firma \msg{Cordialmente, Equipo de Training Corporation} y, al pie,
+        los datos de contacto definidos en \menu{Sistema}{Configuración}.
+\end{itemize}
+
+\begin{importante}
+Cada envío manda un correo a cada dirección de la lista, aunque ya la haya invitado antes. Lleve
+un control de a quién invitó. Los correos se envían en segundo plano y pueden tardar unos
+minutos en llegar.
+\end{importante}
+
+\begin{tabla}{colspec={X[l] Q[5.6cm,l]}}
+  Mensaje de error & Cómo resolverlo \\
+  \msg{Indique al menos una dirección de correo electrónico.} & La caja está vacía. \\
+  \msg{No se encontró ningún correo válido. Verifique el formato (ejemplo: nombre@empresa.com).}
+    & Revise los separadores y quite los nombres. \\
+  \msg{Máximo 500 correos por envío. Reduzca la lista e intente nuevamente.} & Divida la lista
+    en grupos de 500 o menos. \\
+\end{tabla}
+
+% ---------------------------------------------------------------------
+\section{Configuración}\label{sec:configuracion}
+
+\ficha{F013}{\menu{Sistema}{Configuración}}{/dashboard/configuraciones}
+  {Definir quién recibe las notificaciones y los datos de contacto de los correos.}
+
+La pantalla \textbf{Configuración} (\msg{Destinatario de las notificaciones y datos de contacto
+que aparecen en los correos al cliente.}) tiene dos secciones. Todos los campos son opcionales.
+
+\begin{tabla}{colspec={Q[4.2cm,l] X[l]}}
+  Campo & Para qué sirve \\
+  \SetCell[c=2]{l, bg=nube} \textbf{Notificaciones} & \\
+  Correo de notificaciones & Recibe el aviso \msg{Nueva solicitud de cotización \var{código}}
+    con cada solicitud, \textbf{junto con los documentos que adjuntó el cliente}, y el aviso
+    \msg{Cotización \var{código} generada (cliente notificado)} con cada propuesta enviada. Si
+    lo deja vacío, no se envían estos avisos y los documentos del cliente se pierden
+    (\seccion{sec:documentos-cliente}). \\
+  \SetCell[c=2]{l, bg=nube} \textbf{Datos de contacto (pie de los correos)} & \\
+  Correo de contacto & El correo al que pueden escribir los clientes. \\
+  Teléfono & El teléfono de contacto. \\
+  URL del sitio web & La dirección del sitio web, completa, por ejemplo
+    \texttt{https://www.trainingcorporation.com.co}. \\
+  Texto del enlace & El texto visible del enlace al sitio web. Si lo deja vacío, se muestra la
+    dirección. \\
+  Dirección & La dirección física de la empresa. \\
+\end{tabla}
+
+Los datos de contacto aparecen al pie de todos los correos que recibe el cliente (solicitud
+pendiente, propuesta lista y bienvenida), bajo el texto \msg{¿Tiene preguntas? Llame o escriba}. Los campos vacíos no se muestran.
+
+\begin{pasos}
+  \item Complete o cambie los campos.
+  \item Haga clic en \boton{Guardar configuración}.
+\end{pasos}
+
+\captura[9cm]{05-05-configuracion}{/dashboard/configuraciones}{Pantalla de configuración.}
+  {la pantalla Configuración completa, con las secciones «Notificaciones» y «Datos de contacto
+   (pie de los correos)» diligenciadas.}
+
+\begin{resultado}
+Verá el aviso \msg{Configuración actualizada exitosamente.} Los cambios se aplican a los
+correos que salgan desde ese momento.
+\end{resultado}
+
+\begin{nota}
+Esta pantalla no tiene botón \botonsec{Cancelar}. Si no quiere guardar lo que cambió, salga de
+la pantalla sin hacer clic en \boton{Guardar configuración}.
+\end{nota}
+
+\begin{tabla}{colspec={X[l] Q[5.6cm,l]}}
+  Mensaje de error & Cómo resolverlo \\
+  \msg{El correo de notificaciones debe ser una dirección válida.} & Revise el formato del
+    correo. \\
+  \msg{El correo de contacto debe ser una dirección válida.} & Revise el formato del correo. \\
+  \msg{La URL del sitio web debe ser una dirección válida (https://…).} & Escriba la dirección
+    completa, empezando por \texttt{https://}. \\
+\end{tabla}

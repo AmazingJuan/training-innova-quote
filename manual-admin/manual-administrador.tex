@@ -1,0 +1,84 @@
+% !TEX program = lualatex
+% =====================================================================
+%  Manual de usuario — Administrador del panel de cotizaciones
+%  Training Corporation
+%
+%  Compilar (dos veces, para portada, índice y referencias):
+%      lualatex manual-administrador.tex
+%      lualatex manual-administrador.tex
+%
+%  Capturas de pantalla:
+%      Guarde cada imagen en la carpeta capturas/ con el nombre que indica
+%      su espacio en el PDF (por ejemplo capturas/02-01-login.png).
+%      Se aceptan .png y .jpg. Al compilar de nuevo, la imagen reemplaza
+%      el espacio automáticamente, ya enmarcada en la ventana del navegador.
+% =====================================================================
+\documentclass[11pt, a4paper, oneside]{report}
+
+% ---------- Datos editables del documento ----------
+\newcommand{\versiondoc}{1.0}
+\newcommand{\fechadoc}{Noviembre de 2026}
+\newcommand{\elaboradopor}{Equipo de desarrollo de Trainova}
+% Dirección final de la aplicación: aparece en la barra del navegador de las capturas
+% y en todas las direcciones del manual.
+\newcommand{\dominio}{cotizaciones.\allowbreak trainingcorporation.\allowbreak com.\allowbreak co}
+
+\input{estilo}
+
+\begin{document}
+
+\portada
+
+\pagenumbering{roman}
+
+\chapter*{Acerca de este manual}
+\markboth{Acerca de este manual}{}
+
+\entradilla{Este documento guía al usuario administrador en el uso diario del panel de
+administración de Trainova, la plataforma de cotizaciones de Training Corporation. Cada tarea
+se explica paso a paso y va acompañada de la captura de la pantalla correspondiente.}
+
+\begin{tabla}{colspec={Q[4.2cm,l] X[l]}}
+  Dato & Detalle \\
+  Documento & Manual de usuario del administrador de Trainova \\
+  Dirigido a & Personas con una cuenta de acceso al panel de administración de Trainova \\
+  Aplicación & Trainova, plataforma de cotizaciones de Training Corporation (\ruta{\dominio}) \\
+  Versión & \versiondoc \\
+  Fecha & \fechadoc \\
+  Elaborado por & \elaboradopor \\
+\end{tabla}
+
+\section*{Control de cambios}
+
+\begin{tabla}{colspec={Q[2cm,c] Q[3.2cm,l] X[l]}}
+  Versión & Fecha & Descripción \\
+  1.0 & \fechadoc & Primera versión del manual: acceso, operación, catálogo, sistema, cierre de sesión y capacidad de la aplicación. \\
+\end{tabla}
+
+\begin{nota}[Sobre los textos de pantalla]
+Los nombres de botones, campos y mensajes que aparecen en este manual se copiaron de la
+aplicación tal como el usuario los ve. Si en una versión futura cambia algún texto en pantalla,
+actualice también este documento.
+\end{nota}
+
+\tableofcontents
+\listoffigures
+
+\clearpage
+\pagenumbering{arabic}
+
+\input{capitulos/01-introduccion}
+\input{capitulos/02-acceso}
+\input{capitulos/03-operacion}
+\input{capitulos/04-catalogo}
+\input{capitulos/05-sistema}
+\input{capitulos/06-salida}
+\input{capitulos/07-capacidad}
+
+\appendix
+\apendicestrue
+\input{capitulos/08-apendices}
+
+\contraportada
+
+\end{document}

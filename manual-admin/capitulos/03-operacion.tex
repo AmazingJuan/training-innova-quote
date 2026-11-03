@@ -1,0 +1,374 @@
+% =====================================================================
+%  Capítulo 3 — Operación: cotizaciones y clientes
+% =====================================================================
+\chapter{Operación: cotizaciones y clientes}\label{cap:operacion}
+
+\entradilla{El día a día del panel: recibir las solicitudes de cotización, enviar las
+propuestas a los clientes y consultar quién ha cotizado.}
+
+\section{Cotizaciones}\label{sec:cotizaciones}
+
+\ficha{F70E}{\menu{Operación}{Cotizaciones}}{/dashboard/ordenes-cotizacion}
+  {Revisar las solicitudes, descargar los documentos del cliente y enviarle la propuesta.}
+
+\subsection{Cómo llega una solicitud}\label{sec:ciclo}
+
+Cuando un cliente envía el formulario de solicitud desde Trainova, ocurre lo siguiente:
+
+\begin{itemize}
+  \item Se crea la solicitud con un \textbf{código único} y en estado \pendiente.
+  \item El cliente recibe un correo de confirmación con el asunto
+        \msg{Recibimos su solicitud de cotización \var{código}}, con el número de la solicitud y
+        el resumen de sus datos y respuestas.
+  \item Si hay un \textbf{Correo de notificaciones} configurado (\seccion{sec:configuracion}),
+        ese buzón recibe el aviso \msg{Nueva solicitud de cotización \var{código}}, con los datos
+        de la organización y de la persona de contacto, la fecha en que el cliente espera la
+        oferta y los documentos que adjuntó (\seccion{sec:documentos-cliente}).
+  \item El cliente queda registrado en \menu{Operación}{Clientes}, identificado por su correo.
+        Si ya existía, se actualizan sus datos.
+\end{itemize}
+
+La \figref{fig:ciclo} muestra el recorrido completo de una solicitud, desde que la envía el
+cliente hasta que abre la propuesta.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    titulo/.style={font=\montserrat\bfseries\small, text=noche, inner sep=0pt},
+    descr/.style={text width=3.1cm, align=center, font=\scriptsize, text=pizarra, inner sep=0pt},
+    icono/.style={circle, fill=azul, text=white, minimum size=0.85cm, inner sep=0pt,
+      font=\fontsize{11}{11}\selectfont},
+    amb/.style={pastilla={ambarborde}{ambarfondo}{ambartexto}},
+    ver/.style={pastilla={verdeborde}{verdefondo}{verdetexto}},
+    inf/.style={pastilla={linea}{nube}{azulhondo}},
+    neu/.style={pastilla={linea}{nube}{tinta}},
+  ]
+  \foreach \i in {0,1,2,3} {
+    \draw[linea, fill=white, line width=0.9pt, rounded corners=4pt]
+      (\i*4.1-1.75,-1.75) rectangle (\i*4.1+1.75,1.75);
+  }
+  \foreach \i in {0,1,2} { \draw[flecha] (\i*4.1+1.82,0) -- (\i*4.1+2.28,0); }
+  % 1
+  \node[icono] at (0,1.05) {\ico{F1D8}};
+  \node[titulo] at (0,0.3) {El cliente solicita};
+  \node[neu] at (0,-0.22) {Formulario de solicitud};
+  \node[descr] at (0,-1.05) {Envía la solicitud desde Trainova y se le asigna un código.};
+  % 2
+  \node[icono] at (4.1,1.05) {\ico{F70E}};
+  \node[titulo] at (4.1,0.3) {Usted la revisa};
+  \node[amb] at (4.1,-0.22) {Pendiente};
+  \node[descr] at (4.1,-1.05) {Aparece en Cotizaciones. Lea las respuestas y los adjuntos.};
+  % 3
+  \node[icono] at (8.2,1.05) {\ico{F093}};
+  \node[titulo] at (8.2,0.3) {Envía la propuesta};
+  \node[ver, anchor=east] at (8.15,-0.22) {Generada};
+  \node[neu, anchor=west] at (8.25,-0.22) {No vista};
+  \node[descr] at (8.2,-1.05) {Pega el enlace en «Enviar propuesta» y el cliente recibe un correo.};
+  % 4
+  \node[icono] at (12.3,1.05) {\ico{F06E}};
+  \node[titulo] at (12.3,0.3) {El cliente la abre};
+  \node[ver, anchor=east] at (12.25,-0.22) {Generada};
+  \node[inf, anchor=west] at (12.35,-0.22) {Vista};
+  \node[descr] at (12.3,-1.05) {Abre la propuesta con el botón del correo que recibió.};
+\end{tikzpicture}
+\caption{Ciclo de vida de una solicitud de cotización.}\label{fig:ciclo}
+\end{figure}
+
+\subsubsection{El código de cotización}
+
+Cada solicitud recibe automáticamente un código formado por el abreviado de la unidad de
+negocio, la letra V, el año y un consecutivo:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \node[font=\montserrat\fontseries{eb}\selectfont\fontsize{40}{40}\selectfont] (c)
+    {\textcolor{azul}{EO}\textcolor{grismarca}{-}\textcolor{azulhondo}{V}\textcolor{grismarca}{-}%
+     \textcolor{noche}{26}\textcolor{azulvivo}{01}};
+  \foreach \x/\col/\parte/\titulo/\texto in {
+      -5.7/azul/EO/Abreviado/de la unidad de negocio,
+      -1.9/azulhondo/V/Virtual/fija: la cotización se solicitó en línea,
+      1.9/noche/26/Año/en dos cifras (2026),
+      5.7/azulvivo/01/Consecutivo/de la unidad dentro del año} {
+    \node[tarjeta, draw=\col!55, text width=3.3cm, align=center, inner ysep=8pt] at (\x,-2.3)
+      {{\color{\col}\montserrat\fontseries{eb}\selectfont\Large\parte}\\[2pt]
+       {\fontseries{sb}\selectfont\color{\col}\titulo}\\[1pt]{\footnotesize\color{pizarra}\texto}};
+  }
+\end{tikzpicture}
+\caption{Partes del código de cotización.}\label{fig:codigo}
+\end{figure}
+
+\begin{nota}
+El consecutivo vuelve a empezar en 01 con la primera solicitud de cada año y tiene al menos
+dos cifras: después de \texttt{EO-V-2699} sigue \texttt{EO-V-26100}. El abreviado de cada unidad
+se define en \menu{Catálogo}{Unidades de negocio} (\seccion{sec:unidades}). En la instalación
+actual, Auditoría usa \textbf{EO}, Consultoría usa \textbf{CNN} y Formación usa \textbf{GC}.
+\end{nota}
+
+\subsection{La lista de cotizaciones}\label{sec:lista-cotizaciones}
+
+La pantalla \textbf{Cotizaciones} (\msg{Solicitudes recibidas desde el cotizador. Abra una para
+subir la propuesta.}) muestra todas las solicitudes, con las más recientes arriba.
+
+\begin{tabla}{colspec={Q[2.6cm,l] X[l]}}
+  Columna & Qué muestra \\
+  Código & El código de la solicitud. Haga clic en él para abrir el detalle. En pantallas
+    pequeñas, la unidad y la fecha se muestran debajo del código. \\
+  Cliente & Nombre del cliente y, debajo, su correo. \\
+  Empresa & Razón social del cliente. Se oculta en pantallas pequeñas. \\
+  Unidad & Unidad de negocio que eligió el cliente. \\
+  Fecha & Fecha en que se recibió la solicitud. \\
+  Estado & El estado de la solicitud (ver la tabla siguiente). \\
+  Acciones & \icono[pizarra]{\icVer}\ Ver detalle y, si ya se envió la propuesta,
+    \icono{\icExterno}\ Abrir propuesta. \\
+\end{tabla}
+
+\begin{tabla}{colspec={Q[3.2cm,l,m] X[l,m]}}
+  Estado & Significado \\
+  \pendiente & La solicitud llegó y todavía no se ha enviado la propuesta. \\
+  \generada & Ya se envió la propuesta al cliente. \\
+  \generada\ \novista & Se envió la propuesta, pero el cliente aún no la ha abierto. \\
+  \generada\ \vista & El cliente abrió la propuesta desde el botón del correo. \\
+\end{tabla}
+
+La caja de búsqueda (\msg{Código, cliente o empresa…}) también encuentra solicitudes por el
+correo, el NIT, el teléfono o el cargo del cliente, y por la unidad de negocio.
+
+\captura[8cm]{03-01-cotizaciones-lista}{/dashboard/ordenes-cotizacion}{Lista de cotizaciones.}
+  {la pantalla Cotizaciones con varias solicitudes, idealmente algunas en estado «Pendiente»
+   y otras «Generada» con las insignias «Vista» o «No vista».}
+
+\begin{consejo}
+La lista no tiene filtro por estado. Para encontrar rápido las pendientes, fíjese en la columna
+\campo{Estado}: las insignias \pendiente\ se distinguen por su color ámbar.
+\end{consejo}
+
+\subsection{Revisar una solicitud}\label{sec:detalle-cotizacion}
+
+\begin{pasos}
+  \item En la lista, haga clic en el \campo{Código} o en el ícono \icono[pizarra]{\icVer}
+        \textbf{Ver detalle}.
+  \item Se abre la pantalla \textbf{Cotización \var{código}}. Arriba a la izquierda está el
+        botón \botonsec{\icAtras\ Volver a cotizaciones}. Debajo del título verá la fecha
+        (\msg{Recibida el \var{dd/mm/aaaa}}) y el estado.
+  \item Revise las tarjetas de la pantalla:
+\end{pasos}
+
+\begin{tabla}{colspec={Q[3cm,l] X[l]}}
+  Tarjeta & Contenido \\
+  Solicitud & La \campo{Unidad de negocio}. Las solicitudes antiguas, hechas antes del
+    formulario de solicitud actual, muestran además la \campo{Línea de gestión} y los
+    \campo{Servicios}. \\
+  Respuestas (\var{N}) & Cada pregunta del formulario con la respuesta del cliente, en el
+    orden en que la respondió. Si el cliente adjuntó archivos, en \campo{Adjuntar documentos}
+    se ven solo sus nombres (\seccion{sec:documentos-cliente}). \\
+  Cliente & \campo{Nombre} (enlace a la ficha del cliente), \campo{Correo}, \campo{Teléfono},
+    \campo{Cargo}, \campo{Razón social}, \campo{NIT}, \campo{Actividad económica} y
+        \campo{Dirección}. \\
+\end{tabla}
+
+\captura[9cm]{03-02-cotizacion-detalle}{/dashboard/ordenes-cotizacion/...}{Detalle de una solicitud pendiente.}
+  {la pantalla de detalle de una solicitud en estado «Pendiente», con el botón «Enviar
+   propuesta» arriba a la derecha y las tarjetas Solicitud, Respuestas y Cliente.}
+
+\subsubsection{Documentos que adjunta el cliente}\label{sec:documentos-cliente}
+
+El cliente puede adjuntar hasta 5 archivos por solicitud, de máximo 10 MB cada uno, en formato
+PDF, Word, Excel, PowerPoint, JPG, PNG o ZIP. Trainova \textbf{no guarda esos archivos en el
+panel}: los envía como archivos adjuntos en el correo \msg{Nueva solicitud de cotización
+\var{código}} que recibe el \textbf{Correo de notificaciones} (\seccion{sec:configuracion}) y
+los borra del servidor en cuanto el correo sale. En el detalle de la solicitud solo verá los
+nombres de los archivos, en la respuesta \campo{Adjuntar documentos}.
+
+\begin{importante}
+Si el \campo{Correo de notificaciones} está vacío, los documentos del cliente se descartan y no
+se puede recuperar ninguno. Mantenga siempre ese correo diligenciado y guarde los adjuntos
+desde el buzón. Si el correo no llega a salir, los archivos pendientes se eliminan solos a las
+24 horas.
+\end{importante}
+
+\subsection{Enviar la propuesta al cliente}\label{sec:enviar-propuesta}
+
+La plataforma no guarda el archivo de la propuesta: guarda un \textbf{enlace} al documento.
+Antes de empezar, suba la propuesta a un servicio de almacenamiento (por ejemplo, Google Drive,
+OneDrive o SharePoint) y copie un enlace que el cliente pueda abrir sin iniciar sesión.
+
+\begin{pasos}
+  \item Abra la solicitud en estado \pendiente.
+  \item Haga clic en \boton{\icCargar\ Enviar propuesta}, arriba a la derecha.
+  \item Se abre la ventana \textbf{Enviar propuesta al cliente}, con el texto
+        \msg{Pegue el enlace público del documento. El cliente recibirá un correo con un acceso
+        seguro.}
+  \item Pegue el enlace en \campo{URL de la propuesta}. Debe empezar por \texttt{https://} o
+        \texttt{http://}.
+  \item Haga clic en \boton{Guardar y notificar}. El botón se activa cuando el campo tiene
+        texto y muestra \textbf{Enviando…} mientras procesa.
+\end{pasos}
+
+\captura[6.5cm]{03-03-enviar-propuesta}{/dashboard/ordenes-cotizacion/...}{Ventana para enviar la propuesta.}
+  {la ventana «Enviar propuesta al cliente» abierta sobre el detalle de la solicitud, con un
+   enlace de ejemplo pegado en «URL de la propuesta».}
+
+\begin{resultado}
+La ventana se cierra y aparece el aviso \msg{URL de cotización subida exitosamente.} El estado
+cambia a \generada\ \insignianeutra{Aún no vista} y el botón de la esquina pasa a ser
+\botonsec{\icExterno\ Abrir propuesta}.
+\end{resultado}
+
+\captura[8cm]{03-04-cotizacion-generada}{/dashboard/ordenes-cotizacion/...}{Solicitud después de enviar la propuesta.}
+  {el detalle de la misma solicitud justo después de guardar, con el aviso de éxito, las
+   insignias «Generada» y «Aún no vista», y el botón «Abrir propuesta».}
+
+Al guardar, el sistema envía dos correos:
+
+\begin{tabla}{colspec={Q[2.6cm,l] Q[5.2cm,l] X[l]}}
+  Destinatario & Asunto & Contenido \\
+  El cliente & \msg{Su cotización \var{código} está lista} & Le informa que la propuesta ya
+    está disponible y trae el botón \textbf{Ver la cotización}, que la abre. Termina con los
+    datos de contacto definidos en \seccion{sec:configuracion}. \\
+  Correo de notificaciones & \msg{Cotización \var{código} generada (cliente notificado)} &
+    Titulado \textbf{Cotización enviada al cliente}: confirma el envío con los datos del
+    cliente y el botón \textbf{Abrir el documento}. Solo se envía si ese correo está
+    configurado. \\
+\end{tabla}
+
+\begin{importante}
+Revise el enlace antes de hacer clic en \boton{Guardar y notificar}: ábralo en una ventana de
+incógnito para comprobar que el cliente podrá verlo. Una vez guardado, el panel no permite
+cambiar ni borrar el enlace, y el correo al cliente ya habrá salido. Si se equivocó, contacte
+al equipo técnico y envíe al cliente el enlace correcto por otro medio.
+\end{importante}
+
+Si el enlace no es válido, verá en rojo \msg{La URL de la cotización es obligatoria.} o
+\msg{La URL debe ser una dirección válida.}
+
+\subsection{Saber si el cliente vio la propuesta}\label{sec:vista}
+
+La insignia \insigniainfo{Vista por el cliente} aparece la primera vez que el cliente abre la
+propuesta con el botón \textbf{Ver la cotización} del correo. Mientras tanto, la solicitud
+muestra \insignianeutra{Aún no vista} en el detalle y \novista\ en la lista.
+
+\begin{nota}
+Cuando usted hace clic en \botonsec{\icExterno\ Abrir propuesta}, el cliente no queda marcado
+como si la hubiera visto. Tampoco cuenta si el cliente abre el documento por otro medio, por
+ejemplo con un enlace que usted le compartió directamente.
+\end{nota}
+
+\section{Clientes}\label{sec:clientes}
+
+\ficha{F2B9}{\menu{Operación}{Clientes}}{/dashboard/clientes}
+  {Consultar quién ha cotizado, ver su historial y exportar la lista a Excel.}
+
+Los clientes se registran solos cuando envían una solicitud desde Trainova. Cada cliente
+se identifica por su correo: si alguien vuelve a cotizar con el mismo correo, se actualizan sus
+datos y la nueva solicitud se suma a su historial.
+
+\begin{nota}
+Desde el panel no se pueden crear, editar ni eliminar clientes. Esta pantalla es de consulta.
+\end{nota}
+
+\subsection{La lista de clientes}
+
+La pantalla \textbf{Clientes} (\msg{Personas que han solicitado cotizaciones, con su
+historial.}) muestra primero a los clientes con la solicitud más reciente.
+
+\begin{tabla}{colspec={Q[2.8cm,l] X[l]}}
+  Columna & Qué muestra \\
+  Cliente & Nombre (enlace a su ficha) y correo. \\
+  Empresa & Razón social y, debajo, el cargo. \\
+  Teléfono & Teléfono de contacto (se oculta en pantallas pequeñas). \\
+  Cotizaciones & Total de solicitudes. Si tiene pendientes, aparece en ámbar
+    \textbf{\var{N} pendiente(s)}. \\
+  Última & Fecha de su solicitud más reciente (se oculta en pantallas pequeñas). \\
+\end{tabla}
+
+Para encontrar clientes puede combinar:
+
+\begin{itemize}
+  \item La búsqueda (\msg{Nombre, correo o empresa…}), que también encuentra por teléfono, NIT
+        y cargo.
+  \item El filtro \campo{Empresa}, con todas las razones sociales registradas.
+  \item El filtro \campo{Unidad de negocio}, que muestra a los clientes con al menos una
+        solicitud en esa unidad.
+\end{itemize}
+
+\captura[8cm]{03-05-clientes-lista}{/dashboard/clientes}{Lista de clientes con sus filtros.}
+  {la pantalla Clientes con la búsqueda, los filtros «Empresa» y «Unidad de negocio», el botón
+   verde «Exportar a Excel» y la tabla con varios clientes.}
+
+\subsection{La ficha del cliente}
+
+Haga clic en el nombre del cliente para abrir su ficha. Verá:
+
+\begin{itemize}
+  \item El nombre como título y, debajo, \textbf{\var{cargo} · \var{empresa}}.
+  \item La tarjeta \textbf{Contacto}: \campo{Correo}, \campo{Teléfono}, \campo{Razón social},
+        \campo{NIT}, \campo{Actividad económica}, \campo{Dirección}, \campo{Cargo} y
+        \campo{Cliente desde} (fecha de su primera solicitud). Al hacer clic en el correo o el
+        teléfono se abre su programa de correo o de llamadas.
+  \item Los contadores \textbf{Cotizaciones}, \textbf{Generadas} y \textbf{Pendientes}.
+  \item El \textbf{Historial de cotizaciones}, con las pestañas \textbf{Todas},
+        \textbf{Generadas} y \textbf{Pendientes}, y una tabla con \campo{Código},
+        \campo{Unidad}, \campo{Estado} y \campo{Fecha}. Haga clic en un código para abrir la
+        solicitud.
+\end{itemize}
+
+\captura[9cm]{03-06-cliente-detalle}{/dashboard/clientes/...}{Ficha de un cliente con su historial.}
+  {la ficha de un cliente que tenga más de una solicitud, mostrando la tarjeta Contacto, los
+   contadores y el historial con sus pestañas.}
+
+\subsection{Exportar los clientes a Excel}\label{sec:exportar}
+
+\begin{pasos}
+  \item Si solo quiere exportar una parte, aplique primero la búsqueda o los filtros. El archivo
+        incluirá únicamente los resultados de la lista.
+  \item Haga clic en \botonsec{{\color{verde}\icExcel}\ Exportar a Excel}, arriba a la
+        derecha. Con una búsqueda o un filtro activo, el botón dice \textbf{Exportar resultados}.
+  \item El botón muestra \textbf{Generando…} mientras se prepara el archivo. No cierre la
+        página.
+  \item Cuando el archivo está listo, el navegador lo descarga solo, con un nombre como
+        \texttt{clientes\_03-11-2026\_08-02AM.xlsx}.
+\end{pasos}
+
+\begin{nota}
+Si escribió algo en la búsqueda pero no presionó \tecla{Enter} ni \botonsec{Buscar}, ese texto
+no se tiene en cuenta en la exportación.
+\end{nota}
+
+El archivo tiene una hoja llamada \textbf{Clientes} con el título \textbf{REPORTE DE CLIENTES},
+la fecha de generación, el total de registros y el logo de Training Corporation. La tabla trae
+estas columnas, con filtros en la cabecera, la cabecera fija al desplazarse y filas de color
+alterno:
+
+\begin{center}
+\small
+\begin{tabular}{@{}lll@{}}
+  \textbullet\ ID & \textbullet\ Actividad económica & \textbullet\ Teléfono \\
+  \textbullet\ Nombre & \textbullet\ Cargo & \textbullet\ Cotizaciones \\
+  \textbullet\ Razón social & \textbullet\ Correo electrónico & \textbullet\ Última cotización \\
+  \textbullet\ NIT & & \\
+\end{tabular}
+\end{center}
+
+\capturaventana[7.5cm]{03-07-excel-clientes}{clientes\_03-11-2026\_08-02AM.xlsx}{Contenido del reporte de clientes exportado (hoja «Clientes»).}
+  {solo el contenido de la hoja del archivo descargado, abierto en Excel o LibreOffice Calc,
+   mostrando el título «REPORTE DE CLIENTES», el logo y las primeras filas.}
+
+\begin{importante}
+El enlace de descarga funciona una sola vez. Si necesita otra copia, vuelva a exportar. Los
+archivos que no se descargan se borran del servidor a las 2 horas.
+\end{importante}
+
+Si algo falla, aparece un recuadro rojo debajo del encabezado:
+
+\begin{tabla}{colspec={X[l] Q[5.6cm,l]}}
+  Mensaje & Qué hacer \\
+  \msg{No se pudo iniciar la exportación. Intente nuevamente.} & Vuelva a hacer clic en el botón. \\
+  \msg{No se pudo generar el archivo. Intente nuevamente.} & Vuelva a intentar. Si se repite,
+    avise al equipo técnico. \\
+  \msg{Se perdió la conexión durante la exportación.} & Revise su conexión a internet y
+    vuelva a exportar. \\
+  \msg{La generación está tardando demasiado. Verifique que el worker de la cola esté en
+    ejecución.} & El archivo se genera con un proceso en segundo plano del servidor. Avise al
+    equipo técnico para que lo revise. \\
+\end{tabla}

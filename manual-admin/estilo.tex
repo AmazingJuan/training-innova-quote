@@ -1,0 +1,605 @@
+% =====================================================================
+%  estilo.tex — Identidad visual del manual (Training Corporation)
+%  Colores, tipografías, cajas, botones, capturas y diagramas.
+%  Se carga desde manual-administrador.tex. Compilar con LuaLaTeX.
+% =====================================================================
+
+% ---------------------------------------------------------------------
+%  Página
+% ---------------------------------------------------------------------
+\usepackage[a4paper, top=3cm, bottom=2.7cm, left=2.5cm, right=2.5cm,
+            headheight=1.1cm, headsep=0.7cm, footskip=1.3cm]{geometry}
+
+% ---------------------------------------------------------------------
+%  Idioma y tipografías (las de la app: Montserrat + Source Sans 3)
+% ---------------------------------------------------------------------
+\usepackage{fontspec}
+\usepackage{babel}
+\babelprovide[import, main]{spanish}
+\setlocalecaption{spanish}{contents}{Contenido}
+\setlocalecaption{spanish}{listfigure}{Índice de figuras}
+\setlocalecaption{spanish}{figure}{Figura}
+\setlocalecaption{spanish}{table}{Tabla}
+\setlocalecaption{spanish}{chapter}{Capítulo}
+\setlocalecaption{spanish}{appendix}{Apéndice}
+
+\setmainfont{SourceSans3}[
+  Path           = fuentes/,
+  Extension      = .otf,
+  UprightFont    = *-Regular,
+  ItalicFont     = *-It,
+  BoldFont       = *-Bold,
+  BoldItalicFont = *-BoldIt,
+  FontFace       = {sb}{n}{*-Semibold},
+  FontFace       = {sb}{it}{*-SemiboldIt},
+]
+\newfontfamily\montserrat{Montserrat}[
+  Path        = fuentes/,
+  Extension   = .otf,
+  UprightFont = *-Regular,
+  ItalicFont  = *-Italic,
+  BoldFont    = *-Bold,
+  FontFace    = {sb}{n}{*-SemiBold},
+  FontFace    = {eb}{n}{*-ExtraBold},
+  FontFace    = {ub}{n}{*-Black},
+]
+\newfontfamily\iconos{fa-solid-900}[Path = fuentes/, Extension = .ttf,
+  BoldFont = *, ItalicFont = *, BoldItalicFont = *,
+  FontFace = {sb}{n}{*}, FontFace = {eb}{n}{*}, FontFace = {ub}{n}{*},
+  FontFace = {sb}{it}{*}, FontFace = {m}{it}{*}]
+
+\linespread{1.1}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em plus 0.15em}
+\setlength{\emergencystretch}{2.5em}
+
+% ---------------------------------------------------------------------
+%  Paquetes
+% ---------------------------------------------------------------------
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{tabularray}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{titletoc}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{calc, positioning, arrows.meta, shapes.symbols, shapes.misc,
+                decorations.pathreplacing, fit, backgrounds}
+\usepackage{microtype}
+
+% ---------------------------------------------------------------------
+%  Paleta (tailwind.config.js de la app)
+% ---------------------------------------------------------------------
+\definecolor{azul}{HTML}{0072AF}       % azul del logo
+\definecolor{azulhondo}{HTML}{005A8C}  % hover / enlaces
+\definecolor{azulvivo}{HTML}{1391DA}   % anillos y trazos
+\definecolor{cielo}{HTML}{7FD0F5}      % acentos sobre noche
+\definecolor{noche}{HTML}{0B2C47}      % azul marino de marca
+\definecolor{tinta}{HTML}{102A3F}      % texto
+\definecolor{pizarra}{HTML}{4A5A67}    % texto secundario
+\definecolor{grismarca}{HTML}{8F9392}  % gris del logo
+\definecolor{niebla}{HTML}{A9C6DC}     % texto secundario sobre noche
+\definecolor{nube}{HTML}{EEF4F8}       % fondo alterno
+\definecolor{linea}{HTML}{D5E2EB}      % bordes y reglas
+\definecolor{error}{HTML}{B3261E}
+% Insignias de estado (status-badge.tsx)
+\definecolor{ambarfondo}{HTML}{FFFBEB}
+\definecolor{ambarborde}{HTML}{FDE68A}
+\definecolor{ambartexto}{HTML}{78350F}
+\definecolor{verdefondo}{HTML}{ECFDF5}
+\definecolor{verdeborde}{HTML}{A7F3D0}
+\definecolor{verdetexto}{HTML}{065F46}
+\definecolor{verde}{HTML}{1E7B4E}
+\definecolor{errorfondo}{HTML}{FBEDEC}
+
+\AtBeginDocument{\color{tinta}}
+
+% ---------------------------------------------------------------------
+%  Íconos (Font Awesome 6 Free, equivalentes a los de la app)
+% ---------------------------------------------------------------------
+\newcommand{\ico}[1]{{\iconos\char"#1\relax}}
+\newcommand{\icVer}{\ico{F06E}}
+\newcommand{\icEditar}{\ico{F303}}
+\newcommand{\icEliminar}{\ico{F2ED}}
+\newcommand{\icMas}{\ico{2B}}
+\newcommand{\icBuscar}{\ico{F002}}
+\newcommand{\icCerrar}{\ico{F00D}}
+\newcommand{\icSubir}{\ico{F062}}
+\newcommand{\icBajar}{\ico{F063}}
+\newcommand{\icAtras}{\ico{F060}}
+\newcommand{\icAnterior}{\ico{F053}}
+\newcommand{\icSiguiente}{\ico{F054}}
+\newcommand{\icSalir}{\ico{F2F5}}
+\newcommand{\icExterno}{\ico{F08E}}
+\newcommand{\icExcel}{\ico{F1C3}}
+\newcommand{\icCargar}{\ico{F093}}
+\newcommand{\icDescargar}{\ico{F019}}
+\newcommand{\icPlay}{\ico{F04B}}
+\newcommand{\icCopiar}{\ico{F0C5}}
+\newcommand{\icCorreo}{\ico{F0E0}}
+\newcommand{\icEnviar}{\ico{F1D8}}
+\newcommand{\icAjustes}{\ico{F013}}
+\newcommand{\icUsuarios}{\ico{F0C0}}
+\newcommand{\icMaletin}{\ico{F0B1}}
+\newcommand{\icRama}{\ico{F126}}
+\newcommand{\icLlave}{\ico{F0AD}}
+\newcommand{\icArbol}{\ico{F0E8}}
+\newcommand{\icCotizacion}{\ico{F70E}}
+\newcommand{\icContactos}{\ico{F2B9}}
+\newcommand{\icMenu}{\ico{F0C9}}
+\newcommand{\icOk}{\ico{F058}}
+\newcommand{\icCandado}{\ico{F023}}
+\newcommand{\icCasa}{\ico{F015}}
+\newcommand{\icGlobo}{\ico{F0AC}}
+\newcommand{\icClave}{\ico{F084}}
+\newcommand{\icFlechaRama}{\ico{F149}}
+\newcommand{\icMovil}{\ico{F3CD}}
+\newcommand{\icDuplicar}{\ico{F24D}}
+
+% ---------------------------------------------------------------------
+%  Elementos de interfaz en el texto
+% ---------------------------------------------------------------------
+% Botón principal (azul), secundario (borde) y de peligro (rojo)
+\newtcbox{\boton}{on line, colback=azul, colframe=azul, coltext=white,
+  boxrule=0.6pt, arc=2.5pt, boxsep=0pt, left=4.5pt, right=4.5pt, top=1.8pt, bottom=1.8pt,
+  fontupper=\montserrat\bfseries\fontsize{8.4}{10}\selectfont}
+\newtcbox{\botonsec}{on line, colback=white, colframe=azul, coltext=azul,
+  boxrule=0.8pt, arc=2.5pt, boxsep=0pt, left=4.5pt, right=4.5pt, top=1.6pt, bottom=1.6pt,
+  fontupper=\montserrat\bfseries\fontsize{8.4}{10}\selectfont}
+\newtcbox{\botonrojo}{on line, colback=white, colframe=error, coltext=error,
+  boxrule=0.8pt, arc=2.5pt, boxsep=0pt, left=4.5pt, right=4.5pt, top=1.6pt, bottom=1.6pt,
+  fontupper=\montserrat\bfseries\fontsize{8.4}{10}\selectfont}
+% Nombre de un campo, columna o etiqueta de pantalla
+\newtcbox{\campo}{on line, colback=nube, colframe=linea, coltext=noche,
+  boxrule=0.5pt, arc=2pt, boxsep=0pt, left=3.5pt, right=3.5pt, top=1.2pt, bottom=1.2pt,
+  fontupper=\fontseries{sb}\selectfont\small}
+% Tecla del teclado
+\newtcbox{\tecla}{on line, enhanced, colback=white, colframe=grismarca, coltext=noche,
+  boxrule=0.6pt, bottomrule=1.6pt, arc=2pt, boxsep=0pt, left=3.5pt, right=3.5pt, top=1pt, bottom=1pt,
+  fontupper=\montserrat\fontseries{sb}\selectfont\footnotesize}
+% Insignias de estado
+\newtcbox{\insignia}[1][]{on line, arc=6pt, boxsep=0pt, left=5pt, right=5pt,
+  top=1pt, bottom=1.3pt, boxrule=0.6pt, fontupper=\fontseries{sb}\selectfont\footnotesize, #1}
+\newcommand{\pendiente}{\insignia[colback=ambarfondo, colframe=ambarborde, coltext=ambartexto]{Pendiente}}
+\newcommand{\generada}{\insignia[colback=verdefondo, colframe=verdeborde, coltext=verdetexto]{Generada}}
+\newcommand{\vista}{\insignia[colback=nube, colframe=linea, coltext=azulhondo]{Vista}}
+\newcommand{\novista}{\insignia[colback=nube, colframe=linea, coltext=tinta]{No vista}}
+\newcommand{\insigniainfo}[1]{\insignia[colback=nube, colframe=linea, coltext=azulhondo]{#1}}
+\newcommand{\insignianeutra}[1]{\insignia[colback=nube, colframe=linea, coltext=tinta]{#1}}
+
+% Ruta de la barra lateral: grupo › opción
+\newcommand{\menu}[2]{{\fontseries{sb}\selectfont\color{azulhondo}#1\hspace{0.35em}%
+  {\iconos\fontsize{6.5}{8}\selectfont\raisebox{0.12em}{\char"F054}}\hspace{0.35em}#2}}
+% Dirección (URL) de una pantalla
+\newcommand{\ruta}[1]{{\ttfamily\small\color{azulhondo}#1}}
+% Mensaje del sistema, copiado textualmente
+\newcommand{\msg}[1]{«\textit{#1}»}
+% Parte variable de un mensaje
+\newcommand{\var}[1]{{\upshape\color{azulvivo}‹#1›}}
+% Ícono de la app dentro del texto
+\newcommand{\icono}[2][azul]{{\color{#1}#2}}
+
+% Referencias cruzadas en color de enlace
+\newcommand{\seccion}[1]{\hyperref[#1]{\textcolor{azulhondo}{\fontseries{sb}\selectfont sección~\ref*{#1}}}}
+\newcommand{\capref}[1]{\hyperref[#1]{\textcolor{azulhondo}{\fontseries{sb}\selectfont capítulo~\ref*{#1}}}}
+\newcommand{\apref}[1]{\hyperref[#1]{\textcolor{azulhondo}{\fontseries{sb}\selectfont apéndice~\ref*{#1}}}}
+\newcommand{\Capref}[1]{\hyperref[#1]{\textcolor{azulhondo}{\fontseries{sb}\selectfont Capítulo~\ref*{#1}}}}
+\newcommand{\Apref}[1]{\hyperref[#1]{\textcolor{azulhondo}{\fontseries{sb}\selectfont Apéndice~\ref*{#1}}}}
+\newcommand{\figref}[1]{\hyperref[#1]{\textcolor{azulhondo}{\fontseries{sb}\selectfont figura~\ref*{#1}}}}
+\newcommand{\pag}[1]{\hyperref[#1]{\textcolor{azulhondo}{pág.~\pageref*{#1}}}}
+
+% Párrafo de entrada de cada capítulo
+\newcommand{\entradilla}[1]{%
+  {\fontsize{13}{19.5}\selectfont\color{pizarra}#1\par}\vspace{0.9em}}
+
+% ---------------------------------------------------------------------
+%  Listas: pasos numerados con el círculo azul de las tarjetas de la app
+% ---------------------------------------------------------------------
+\NewDocumentCommand{\circulopaso}{m}{\tikz[baseline=(n.base)]\node[circle, fill=azul, text=white,
+  inner sep=0pt, minimum size=1.45em, font=\montserrat\bfseries\footnotesize] (n) {#1};}
+\NewDocumentCommand{\circulozona}{m}{\tikz[baseline=(n.base)]\node[circle, fill=noche, text=white,
+  inner sep=0pt, minimum size=1.45em, font=\montserrat\bfseries\footnotesize] (n) {#1};}
+
+\newlist{pasos}{enumerate}{1}
+\setlist[pasos]{label=\circulopaso{\arabic*}, leftmargin=2.3em, labelsep=0.65em,
+  itemsep=0.45em, topsep=0.5em, parsep=0.25em}
+\newlist{zonas}{enumerate}{1}
+\setlist[zonas]{label=\circulozona{\Alph*}, leftmargin=2.3em, labelsep=0.65em,
+  itemsep=0.35em, topsep=0.3em, parsep=0.2em}
+\setlist[itemize,1]{label=\raisebox{0.18em}{\color{azul}\rule{0.38em}{0.38em}},
+  leftmargin=1.5em, itemsep=0.25em, topsep=0.4em}
+\setlist[itemize,2]{label=\raisebox{0.2em}{\color{azulvivo}\rule{0.3em}{0.3em}},
+  leftmargin=1.3em}
+
+% ---------------------------------------------------------------------
+%  Cajas de aviso
+% ---------------------------------------------------------------------
+\tcbset{
+  aviso/.style n args={4}{%  color, fondo, ícono, título
+    enhanced, breakable, colback=#2, colframe=#1, coltext=tinta,
+    boxrule=0pt, leftrule=3.5pt, arc=0pt, outer arc=0pt,
+    left=11pt, right=11pt, top=8pt, bottom=8pt, before skip=10pt, after skip=10pt,
+    before upper={{\color{#1}\iconos\char"#3\relax}\hspace{0.55em}%
+      {\montserrat\bfseries\color{#1}#4}\par\vspace{2pt}},
+  },
+}
+\newtcolorbox{nota}[1][Nota]{aviso={azul}{nube}{F05A}{#1}}
+\newtcolorbox{importante}[1][Importante]{aviso={error}{errorfondo}{F071}{#1}}
+\newtcolorbox{consejo}[1][Consejo]{aviso={azulvivo}{cielo!14!white}{F0EB}{#1}}
+\newtcolorbox{resultado}[1][Resultado]{aviso={verde}{verdefondo}{F058}{#1}}
+
+% Ficha de acceso al inicio de cada módulo
+\NewDocumentCommand{\ficha}{m m m m}{%
+  \begin{tcolorbox}[enhanced, colback=nube, colframe=linea, boxrule=0.6pt, arc=6pt,
+      left=10pt, right=12pt, top=9pt, bottom=9pt, sidebyside, sidebyside align=top seam,
+      lefthand width=1.2cm, sidebyside gap=12pt, segmentation hidden,
+      before skip=6pt, after skip=12pt]
+    \tikz\node[fill=azul, text=white, minimum size=1.2cm, inner sep=0pt, rounded corners=3pt,
+      font=\fontsize{17}{17}\selectfont]{\ico{#1}};
+    \tcblower
+    \small
+    \begin{tabularx}{\linewidth}{@{}l@{\hspace{10pt}}X@{}}
+      {\montserrat\bfseries\scriptsize\color{pizarra}UBICACIÓN} & #2\\[3pt]
+      {\montserrat\bfseries\scriptsize\color{pizarra}DIRECCIÓN} & \ruta{\dominio\allowbreak#3}\\[3pt]
+      {\montserrat\bfseries\scriptsize\color{pizarra}PERMITE} & #4
+    \end{tabularx}
+  \end{tcolorbox}}
+
+% ---------------------------------------------------------------------
+%  Tablas (cabecera azul y filas alternas, como el Excel de clientes)
+% ---------------------------------------------------------------------
+\NewTblrEnviron{tabla}
+\SetTblrInner[tabla]{
+  rowsep = 4.5pt, colsep = 7pt,
+  hlines = {fg=linea, wd=0.5pt},
+  cells = {font=\small},
+  row{even} = {bg=nube},
+  row{1} = {bg=azul, fg=white, font=\montserrat\bfseries\footnotesize},
+}
+\SetTblrInner[longtblr]{
+  rowsep = 4.5pt, colsep = 7pt,
+  hlines = {fg=linea, wd=0.5pt},
+  cells = {font=\small},
+  row{even} = {bg=nube},
+  row{1} = {bg=azul, fg=white, font=\montserrat\bfseries\footnotesize},
+  rowhead = 1,
+}
+\SetTblrTemplate{head}{empty}
+\SetTblrTemplate{foot}{empty}
+\SetTblrOuter[longtblr]{entry=none, label=none}
+
+% ---------------------------------------------------------------------
+%  Capturas de pantalla
+%  Si existe capturas/<archivo>.png (o .jpg) se muestra dentro de una
+%  ventana de navegador; si no, aparece un espacio con instrucciones.
+% ---------------------------------------------------------------------
+\newcommand{\puntosnavegador}{\tikz[baseline=-0.55ex]{%
+  \fill[error!75!white] (0,0) circle (0.085cm);
+  \fill[ambarborde!80!orange] (0.3,0) circle (0.085cm);
+  \fill[verdeborde!60!verde] (0.6,0) circle (0.085cm);}}
+\newcommand{\barraurl}[1]{\tikz[baseline=(u.base)]\node[draw=linea, fill=white,
+  rounded corners=6pt, text width=\dimexpr\linewidth-1.6cm\relax, align=left,
+  inner xsep=7pt, inner ysep=2.3pt, font=\scriptsize, text=pizarra] (u)
+  {{\iconos\fontsize{5.5}{6}\selectfont\char"F023}\hspace{0.5em}\dominio#1};}
+
+\tcbset{
+  navegador/.style={
+    enhanced, colback=white, colframe=linea, boxrule=0.9pt, arc=5pt, sharp corners=south,
+    colbacktitle=nube, coltitle=pizarra, titlerule=0.9pt, boxsep=0pt,
+    left=0pt, right=0pt, top=0pt, bottom=0pt, halign=center,
+    toptitle=4pt, bottomtitle=4pt, lefttitle=8pt, righttitle=8pt,
+    fonttitle=\scriptsize, title={\puntosnavegador\hspace{0.7em}\barraurl{#1}},
+  },
+  telefono/.style={
+    enhanced, center, width=6.4cm, colback=white, colframe=noche, boxrule=5pt, arc=16pt,
+    boxsep=0pt, left=0pt, right=0pt, top=13pt, bottom=9pt, halign=center,
+    overlay={\fill[grismarca!70, rounded corners=1pt]
+      ([xshift=-0.65cm, yshift=-7pt]frame.north) rectangle ([xshift=0.65cm, yshift=-9.5pt]frame.north);},
+  },
+}
+
+\newcommand{\espaciocaptura}[3]{% alto, archivo, qué capturar
+  \begin{tikzpicture}
+    \path[use as bounding box] (0,0) rectangle (\linewidth,#1);
+    \fill[nube!70] (0,0) rectangle (\linewidth,#1);
+    \draw[azulvivo!75, line width=0.9pt, dash pattern=on 5pt off 3pt, rounded corners=5pt]
+      (8pt,8pt) rectangle (\linewidth-8pt,#1-8pt);
+    \node[text width=0.8\linewidth, align=center, font=\small, text=pizarra]
+      at (0.5\linewidth,0.5*#1) {%
+        {\iconos\fontsize{24}{24}\selectfont\color{azulvivo}\char"F030}\\[6pt]
+        {\montserrat\bfseries\color{azul}Espacio para la captura}\\[2pt]
+        {\ttfamily\footnotesize\color{azulhondo}capturas/#2.png}\\[7pt]
+        {\color{tinta}\textbf{Qué capturar:}}~#3};
+  \end{tikzpicture}}
+
+% Todas las capturas se dibujan con la misma escala de texto: una captura de escritorio de
+% 892 px de ancho (CSS) llena el ancho del texto; las más angostas quedan proporcionalmente
+% más pequeñas y las más anchas se ajustan al margen. Las imágenes son de doble densidad.
+\newlength{\anchonatural}
+\newcommand{\escalacaptura}{0.2543}
+\newcommand{\incluircaptura}[1]{%
+  \settowidth{\anchonatural}{\includegraphics{#1}}%
+  \setlength{\anchonatural}{\escalacaptura\anchonatural}%
+  \ifdim\anchonatural>\linewidth \setlength{\anchonatural}{\linewidth}\fi
+  \includegraphics[width=\anchonatural, height=0.6\textheight, keepaspectratio]{#1}}
+
+\newcommand{\imagencaptura}[3]{% archivo, alto del espacio, qué capturar
+  \IfFileExists{capturas/#1.png}%
+    {\incluircaptura{capturas/#1.png}}%
+    {\IfFileExists{capturas/#1.jpg}%
+      {\incluircaptura{capturas/#1.jpg}}%
+      {\espaciocaptura{#2}{#1}{#3}}}}
+
+% \captura[alto del espacio]{archivo}{ruta}{pie de figura}{qué capturar}
+\NewDocumentCommand{\captura}{O{7cm} m m m m}{%
+  \begin{figure}[H]
+    \begin{tcolorbox}[navegador={#3}]
+      \imagencaptura{#2}{#1}{#5}
+    \end{tcolorbox}
+    \caption{#4}\label{fig:#2}
+  \end{figure}}
+
+% \capturaventana[alto]{archivo}{título de la ventana}{pie}{qué capturar}
+% Para capturas fuera del navegador (por ejemplo, un archivo de Excel).
+\NewDocumentCommand{\capturaventana}{O{7cm} m m m m}{%
+  \begin{figure}[H]
+    \begin{tcolorbox}[navegador={}, title={\puntosnavegador\hspace{0.9em}%
+        {\color{verde}\ico{F1C3}}\hspace{0.5em}{\fontseries{sb}\selectfont #3}}]
+      \imagencaptura{#2}{#1}{#5}
+    \end{tcolorbox}
+    \caption{#4}\label{fig:#2}
+  \end{figure}}
+
+
+% \capturaconnotas[alto]{archivo}{ruta}{pie}{qué capturar}{texto a la derecha}
+\NewDocumentCommand{\capturaconnotas}{O{10cm} m m m m +m}{%
+  \begin{figure}[H]
+    \begin{minipage}[t]{0.42\linewidth}\vspace{0pt}
+      \begin{tcolorbox}[navegador={#3}]
+        \imagencaptura{#2}{#1}{#5}
+      \end{tcolorbox}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.53\linewidth}\vspace{0pt}
+      \small #6
+    \end{minipage}
+    \caption{#4}\label{fig:#2}
+  \end{figure}}
+
+% \capturamovil[alto]{archivo}{pie}{qué capturar}
+\NewDocumentCommand{\capturamovil}{O{10.5cm} m m m}{%
+  \begin{figure}[H]
+        \begin{tcolorbox}[telefono]
+      \renewcommand{\escalacaptura}{1}%
+      \imagencaptura{#2}{#1}{#4}
+    \end{tcolorbox}
+    \caption{#3}\label{fig:#2}
+  \end{figure}}
+
+% ---------------------------------------------------------------------
+%  Pies de figura
+% ---------------------------------------------------------------------
+\DeclareCaptionFont{pizarra}{\color{pizarra}}
+\DeclareCaptionFont{azul}{\color{azul}}
+\DeclareCaptionFont{montserrat}{\montserrat}
+\DeclareCaptionLabelSeparator{punto}{.\enspace}
+\captionsetup{font={small,pizarra}, labelfont={montserrat,bf,azul}, labelsep=punto,
+  justification=centering, skip=7pt}
+\captionsetup[figure]{position=below}
+
+% ---------------------------------------------------------------------
+%  El anillo abierto del logo (brand-ring.tsx), como dibujo TikZ
+%  Uso: \pic at (x,y) {anillo={radio/grosor/color}};
+% ---------------------------------------------------------------------
+\tikzset{
+  pics/anillo/.style args={#1/#2/#3}{
+    code={
+      \draw[#3, line width=#2, line cap=round] (25:#1) arc[start angle=25, end angle=335, radius=#1];
+      \fill[#3] (90:#1) circle[radius=2.3*#2];
+    }
+  },
+  tarjeta/.style={draw=linea, line width=0.9pt, fill=white, rounded corners=4pt,
+    inner xsep=9pt, inner ysep=7pt, align=left},
+  pastilla/.style n args={3}{rounded corners=5pt, draw=#1, fill=#2, text=#3,
+    font=\fontseries{sb}\selectfont\scriptsize, inner xsep=5pt, inner ysep=1.6pt},
+  flecha/.style={-{Stealth[length=6pt, width=5pt]}, azulvivo, line width=1.1pt},
+}
+
+% ---------------------------------------------------------------------
+%  Títulos de capítulo: banda azul con número grande y anillos
+% ---------------------------------------------------------------------
+\newif\ifapendices
+\newcommand{\etiquetanumero}{\ifapendices\thechapter\else\ifnum\value{chapter}<10 0\fi\arabic{chapter}\fi}
+\newcommand{\etiquetacapitulo}{\ifapendices APÉNDICE\else CAPÍTULO\fi}
+
+\newcommand{\anillosbanda}{%
+  \begin{scope}
+    \clip (current page.north west) rectangle ([yshift=-7cm]current page.north east);
+    \pic[opacity=0.45] at ([xshift=-3.1cm, yshift=-2.7cm]current page.north east) {anillo={4.3cm/1.5pt/cielo}};
+    \pic[opacity=0.7] at ([xshift=-0.5cm, yshift=-6.5cm]current page.north east) {anillo={1.9cm/1.1pt/azulvivo}};
+  \end{scope}}
+
+\newcommand{\bandacapitulo}[1]{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \fill[azul] (current page.north west) rectangle ([yshift=-7cm]current page.north east);
+    \anillosbanda
+    \node[anchor=south west, inner sep=0pt, text=white,
+      font=\montserrat\fontseries{ub}\selectfont\fontsize{68}{68}\selectfont] (num)
+      at ([xshift=2.4cm, yshift=-5.85cm]current page.north west) {\etiquetanumero};
+    \node[anchor=south west, inner sep=0pt, text=cielo,
+      font=\montserrat\bfseries\fontsize{9.5}{11}\selectfont]
+      at ([yshift=0.38cm]num.north west) {\addfontfeatures{LetterSpace=20}\etiquetacapitulo};
+    \node[anchor=south west, inner sep=0pt, text width=10.6cm, align=left, text=white,
+      font=\montserrat\fontseries{eb}\selectfont\fontsize{24}{28}\selectfont]
+      at ([xshift=0.75cm, yshift=0.1cm]num.south east) {#1};
+  \end{tikzpicture}%
+  \par\vspace*{3.3cm}}
+
+\newcommand{\bandacapitulosin}[1]{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \fill[azul] (current page.north west) rectangle ([yshift=-7cm]current page.north east);
+    \anillosbanda
+    \node[anchor=south west, inner sep=0pt, text width=14cm, align=left, text=white,
+      font=\montserrat\fontseries{eb}\selectfont\fontsize{30}{34}\selectfont]
+      at ([xshift=2.4cm, yshift=-5.85cm]current page.north west) {#1};
+  \end{tikzpicture}%
+  \par\vspace*{3.3cm}}
+
+\titleformat{\chapter}[block]{}{}{0pt}{\bandacapitulo}
+\titleformat{name=\chapter, numberless}[block]{}{}{0pt}{\bandacapitulosin}
+\titlespacing*{\chapter}{0pt}{0pt}{0pt}
+
+\newcommand{\cajanumero}[1]{\tikz[baseline=(n.base)]\node[fill=azul, text=white, inner xsep=5pt,
+  inner ysep=3.5pt, font=\montserrat\bfseries\fontsize{11}{11}\selectfont] (n) {#1};}
+\titleformat{\section}{\montserrat\bfseries\fontsize{16}{20}\selectfont\color{azul}}
+  {\cajanumero{\thesection}}{0.55em}{}
+\titlespacing*{\section}{0pt}{1.9em plus 0.4em}{0.8em}
+\titleformat{\subsection}{\montserrat\fontseries{sb}\selectfont\fontsize{12.5}{16}\selectfont\color{noche}}
+  {\textcolor{azulvivo}{\thesubsection}}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{1.5em plus 0.3em}{0.5em}
+\titleformat{\subsubsection}{\montserrat\bfseries\fontsize{10.5}{13}\selectfont\color{azulhondo}}
+  {}{0pt}{}
+\titlespacing*{\subsubsection}{0pt}{1.1em}{0.3em}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{1}
+
+% ---------------------------------------------------------------------
+%  Índice
+% ---------------------------------------------------------------------
+\newcommand{\cajatoc}[1]{\tikz[baseline=(n.base)]\node[fill=azul, text=white, minimum width=1.9em,
+  minimum height=1.5em, inner sep=0pt, font=\montserrat\bfseries\small] (n) {#1};}
+\titlecontents{chapter}[3.1em]
+  {\addvspace{10pt}\montserrat\bfseries\fontsize{11.5}{14}\selectfont\color{noche}}
+  {\contentslabel[\cajatoc{\thecontentslabel}]{3.1em}}
+  {\hspace*{-3.1em}}
+  {\hfill\textcolor{azul}{\contentspage}}
+\titlecontents{section}[5.7em]
+  {\addvspace{1.5pt}\color{tinta}}
+  {\contentslabel[\textcolor{azulvivo}{\montserrat\fontseries{sb}\selectfont\small\thecontentslabel}]{2.6em}}
+  {\hspace*{-2.6em}}
+  {\titlerule*[0.7pc]{\textcolor{linea}{.}}\contentspage}
+\titlecontents{figure}[3.4em]
+  {\addvspace{1pt}\small\color{tinta}}
+  {\contentslabel[\textcolor{azul}{\montserrat\fontseries{sb}\selectfont\thecontentslabel}]{3.4em}}
+  {}
+  {\titlerule*[0.7pc]{\textcolor{linea}{.}}\contentspage}
+
+% ---------------------------------------------------------------------
+%  Encabezado y pie de página
+% ---------------------------------------------------------------------
+\newcommand{\numpagina}{\tikz[baseline=(p.base)]\node[fill=azul, text=white,
+  font=\montserrat\bfseries\footnotesize, minimum width=0.85cm, minimum height=0.6cm,
+  inner sep=2pt] (p) {\thepage};}
+\newcommand{\textopie}{{\footnotesize\color{pizarra}Manual del administrador
+  \textperiodcentered\ Trainova \textperiodcentered\ Versión \versiondoc}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\raisebox{-0.15cm}{\includegraphics[height=0.75cm]{imagenes/logo.png}}}
+\fancyhead[R]{{\montserrat\fontseries{sb}\selectfont\footnotesize\color{pizarra}\leftmark}}
+\fancyfoot[L]{\textopie}
+\fancyfoot[R]{\numpagina}
+\renewcommand{\headrulewidth}{0.8pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{linea}\leaders\hrule height\headrulewidth\hfill}}
+\renewcommand{\chaptermark}[1]{\markboth{\ifapendices Apéndice\else Capítulo\fi\ \thechapter
+  \ \textperiodcentered\ #1}{}}
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyfoot[L]{\textopie}
+  \fancyfoot[R]{\numpagina}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\headrule}{}}
+
+% ---------------------------------------------------------------------
+%  Portada
+% ---------------------------------------------------------------------
+\newcommand{\filaportada}[4]{% x, y, ícono, texto
+  \node[fill=azul, text=white, minimum size=0.72cm, inner sep=0pt, rounded corners=2pt,
+    font=\fontsize{10}{10}\selectfont] at (#1+0.36,#2) {\ico{#3}};
+  \node[anchor=west, text width=6.4cm, align=left, inner sep=0pt, text=noche,
+    font=\montserrat\fontseries{sb}\selectfont\fontsize{10.5}{13}\selectfont] at (#1+1.0,#2) {#4};}
+
+\newcommand{\portada}{%
+  \begin{titlepage}
+  \thispagestyle{empty}
+  \begin{tikzpicture}[remember picture, overlay, shift={(current page.south west)}]
+    % Campo azul desde el borde superior, con los anillos de la marca como trama
+    \fill[azul] (0,12.4) rectangle (21,29.7);
+    \begin{scope}
+      \clip (0,12.4) rectangle (21,29.7);
+      \pic[opacity=0.30] at (19.6,14.2) {anillo={6.0cm/1.7pt/cielo}};
+      \pic[opacity=0.65] at (20.6,27.0) {anillo={2.6cm/1.1pt/azulvivo}};
+    \end{scope}
+    % Título
+    \node[anchor=north west, inner sep=0pt, text=cielo, font=\montserrat\bfseries\fontsize{10.5}{12}\selectfont]
+      at (2.4,26.0) {\addfontfeatures{LetterSpace=18}MANUAL DE USUARIO};
+    \node[anchor=north west, inner sep=0pt, text=white,
+      font=\montserrat\fontseries{ub}\selectfont\fontsize{62}{66}\selectfont]
+      at (2.4,25.3) {Trainova};
+    \node[anchor=north west, inner sep=0pt, text width=16.2cm, align=left, text=white,
+      font=\montserrat\fontseries{eb}\selectfont\fontsize{26}{31}\selectfont]
+      at (2.4,22.75) {Administrador del\\panel de cotizaciones};
+    \fill[cielo] (2.4,19.85) rectangle (4.9,19.97);
+    \node[anchor=north west, inner sep=0pt, text width=13.8cm, align=left, text=white,
+      font=\fontsize{13.5}{19}\selectfont] at (2.4,19.45)
+      {Guía paso a paso, con capturas de pantalla, de todo lo que puede hacer el usuario
+       administrador: desde el inicio de sesión hasta el cierre de sesión.};
+    \node[anchor=north west, inner sep=0pt, text=cielo, font=\montserrat\fontseries{sb}\selectfont\fontsize{13}{16}\selectfont]
+      at (2.4,16.6) {\dominio};
+    % Contenido del manual, en dos columnas
+    \node[anchor=west, inner sep=0pt, text=pizarra, font=\montserrat\bfseries\fontsize{8}{10}\selectfont]
+      at (2.4,10.9) {\addfontfeatures{LetterSpace=18}EN ESTE MANUAL};
+    \filaportada{2.4}{9.7}{F084}{Acceso al panel}
+    \filaportada{2.4}{8.5}{F70E}{Cotizaciones y clientes}
+    \filaportada{2.4}{7.3}{F0E8}{Catálogo y árbol de decisión}
+    \filaportada{11.0}{9.7}{F013}{Usuarios, correos y configuración}
+    \filaportada{11.0}{8.5}{F2F5}{Ver el sitio y cerrar sesión}
+    \filaportada{11.0}{7.3}{F080}{Capacidad de la aplicación}
+    % Franja inferior
+    \fill[noche] (0,0) rectangle (21,2.7);
+    \node[anchor=west, inner sep=0pt] at (2.4,1.35) {\includegraphics[height=1.15cm]{imagenes/logo-blanco.png}};
+    \node[anchor=east, align=right, inner sep=0pt, text=niebla, font=\small] at (18.6,1.35)
+      {{\montserrat\bfseries\color{white}Versión \versiondoc}\\ \fechadoc};
+  \end{tikzpicture}
+  \end{titlepage}}
+
+% ---------------------------------------------------------------------
+%  Contraportada
+% ---------------------------------------------------------------------
+\newcommand{\contraportada}{%
+  \clearpage
+  \thispagestyle{empty}
+  \begin{tikzpicture}[remember picture, overlay, shift={(current page.south west)}]
+    \fill[noche] (0,0) rectangle (21,29.7);
+    \begin{scope}
+      \clip (0,0) rectangle (21,29.7);
+      \pic[opacity=0.35] at (10.5,15.6) {anillo={6.2cm/1.6pt/cielo}};
+      \pic[opacity=0.5] at (19.4,3.0) {anillo={3.2cm/1.1pt/azulvivo}};
+      \pic[opacity=0.5] at (1.4,26.8) {anillo={2.4cm/1.1pt/azulvivo}};
+    \end{scope}
+    \node at (10.5,15.6) {\includegraphics[width=6.4cm]{imagenes/logo-blanco.png}};
+    \node[text=niebla, font=\small, align=center] at (10.5,5.2)
+      {{\montserrat\bfseries\color{white}Training Corporation}\\[3pt]
+              \dominio};
+    \node[text=bruma, font=\footnotesize] at (10.5,3.9)
+      {Trainova \textperiodcentered\ Manual del administrador \textperiodcentered\ Versión \versiondoc\ \textperiodcentered\ \fechadoc};
+  \end{tikzpicture}
+  \null}
+
+\definecolor{bruma}{HTML}{93ABC0}
+
+% ---------------------------------------------------------------------
+%  Enlaces del PDF
+% ---------------------------------------------------------------------
+\usepackage[hidelinks, unicode, bookmarksnumbered]{hyperref}
+\hypersetup{
+  pdftitle   = {Trainova: manual de usuario del administrador},
+  pdfauthor  = {Training Corporation},
+  pdfsubject = {Guía paso a paso del panel de administración de Trainova},
+  pdfkeywords= {Trainova, cotizaciones, manual, administrador, Training Corporation},
+}
+\usepackage{bookmark}
