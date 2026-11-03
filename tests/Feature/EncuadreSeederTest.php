@@ -67,7 +67,7 @@ class EncuadreSeederTest extends TestCase
         sort($choices);
 
         $this->assertSame([
-            'En caso de precisar las necesidades del servicio, ¿estaría de acuerdo en realizar una reunión de enlace?',
+            'En caso de precisar las necesidades del servicio, ¿estaría de acuerdo en realizar una reunión de enlace de manera virtual?',
             'Modalidad de prestación del servicio',
             'Nivel de riesgo de la empresa ante la ARL',
             'Tipo de auditoría de tercera parte y/o acreditación',
@@ -169,8 +169,11 @@ class EncuadreSeederTest extends TestCase
         $this->assertSame('Valor del presupuesto establecido', Condition::find($budget->options()->where('label', 'Sí')->value('next_condition_id'))->label);
         $this->assertNull($budget->options()->where('label', 'No')->value('next_condition_id'));
 
-        $meeting = $this->question('consultoria', 'En caso de precisar las necesidades del servicio, ¿estaría de acuerdo en realizar una reunión de enlace?');
-        $this->assertSame('Disponibilidad para la reunión de enlace', Condition::find($meeting->options()->where('label', 'Sí')->value('next_condition_id'))->label);
+        $meeting = $this->question('consultoria', 'En caso de precisar las necesidades del servicio, ¿estaría de acuerdo en realizar una reunión de enlace de manera virtual?');
+        $date = Condition::find($meeting->options()->where('label', 'Sí')->value('next_condition_id'));
+        $this->assertSame('Fecha tentativa de la reunión de enlace', $date->label);
+        $this->assertSame('date', $date->getType());
+        $this->assertSame('Horario tentativo de la reunión de enlace', Condition::find($date->next_condition_id)->label);
         $this->assertNull($meeting->options()->where('label', 'No')->value('next_condition_id'));
     }
 

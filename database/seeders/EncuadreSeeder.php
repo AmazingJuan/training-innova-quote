@@ -228,7 +228,7 @@ class EncuadreSeeder extends Seeder
                 'necesidad',
                 ['Riesgo I', 'Riesgo II', 'Riesgo III', 'Riesgo IV', 'Riesgo V'],
                 'Clase de riesgo (I a V) en la que su ARL clasifica a la empresa. Es importante sobre todo si el servicio es de seguridad y salud en el trabajo.',
-                multiple: false,
+                multiple: true,
                 required: false,
             ),
         ];
@@ -321,7 +321,8 @@ class EncuadreSeeder extends Seeder
             ]),
             $this->choice('En caso de precisar las necesidades del servicio, ¿estaría de acuerdo en realizar una reunión de enlace de manera virtual?', 'cierre', [
                 $this->option('Sí', [
-                    $this->field('Disponibilidad para la reunión de enlace', 'text', 'cierre', 'Ej.: martes y jueves de 2:00 p. m. a 5:00 p. m.'),
+                    $this->field('Fecha tentativa de la reunión de enlace', 'date', 'cierre'),
+                    $this->field('Horario tentativo de la reunión de enlace', 'text', 'cierre', 'Ej.: de 2:00 p. m. a 5:00 p. m.'),
                     $this->longText(
                         'Correos de otras personas que deben participar en la reunión de enlace',
                         'cierre',

@@ -389,7 +389,7 @@ export function QuotationWizard({ viewData }: { viewData: QuoteViewData }) {
                                 </p>
                             )}
                             <p className="mt-5 text-white/85 print:text-pizarra">
-                                La confirmación y la propuesta llegarán a{' '}
+                                La confirmación y la propuesta se le enviarán al correo{' '}
                                 <strong className="font-semibold text-white [overflow-wrap:anywhere] print:text-tinta">{sent.email}</strong>.
                             </p>
 
