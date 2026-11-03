@@ -35,6 +35,10 @@
     'Teléfono' => $contact?->phone,
   ]])
 
+  @include('emails.partials.rows', ['title' => 'Plazo de la oferta', 'rows' => [
+    'Fecha estimada de entrega de la oferta comercial' => $offerDate,
+  ]])
+
   @if (!empty($attachedFiles))
     @include('emails.partials.rows', ['title' => 'Documentos adjuntos a este correo', 'rows' => [
       'Archivos' => implode(', ', $attachedFiles),

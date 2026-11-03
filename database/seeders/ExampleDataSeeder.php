@@ -21,19 +21,19 @@ class ExampleDataSeeder extends Seeder
         $auditoria = BusinessUnit::create([
             'name' => 'auditoria',
             'display_name' => 'Auditoría',
-            'abbreviation' => 'AUD',
+            'abbreviation' => 'EO',
         ]);
 
         $consultoria = BusinessUnit::create([
             'name' => 'consultoria',
             'display_name' => 'Consultoría',
-            'abbreviation' => 'CON',
+            'abbreviation' => 'CNN',
         ]);
 
         $formacion = BusinessUnit::create([
             'name' => 'formacion',
             'display_name' => 'Formación',
-            'abbreviation' => 'CNN',
+            'abbreviation' => 'GC',
         ]);
 
         // =============================================

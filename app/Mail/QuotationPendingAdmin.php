@@ -37,8 +37,27 @@ class QuotationPendingAdmin extends Mailable
     {
         return new Content(
             view: 'emails.admin.quotation-pending',
-            with: ['attachedFiles' => array_column($this->files, 'name')],
+            with: [
+                'attachedFiles' => array_column($this->files, 'name'),
+                'offerDate' => $this->offerDate(),
+            ],
         );
+    }
+
+    /**
+     * The date the client expects the commercial offer by, as answered in the
+     * request. Matched by the beginning of the question, which can be reworded
+     * in the admin, and absent when the client did not answer it.
+     */
+    private function offerDate(): ?string
+    {
+        foreach ($this->quotationOrder->getAnswers() as $question => $answer) {
+            if (str_starts_with(mb_strtolower((string) $question), 'fecha estimada de entrega')) {
+                return trim(is_array($answer) ? implode(', ', $answer) : (string) $answer);
+            }
+        }
+
+        return null;
     }
 
     /**
