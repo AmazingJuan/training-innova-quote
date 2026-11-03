@@ -85,7 +85,7 @@ class EncuadreSeederTest extends TestCase
         $formacion = $this->labels('formacion');
         $this->assertContains('Número de asistentes para formación', $formacion);
         $this->assertNotContains('Número de empleados de la empresa', $formacion);
-        $this->assertNotContains('Descripción del número de procesos y/o macroprocesos', $formacion);
+        $this->assertNotContains('Descripción del nombre de procesos y/o macroprocesos', $formacion);
         $this->assertNotContains('¿Su organización tiene un sistema de gestión certificado o acreditado?', $formacion);
         $this->assertContains('Documentos o información a tener en cuenta para la cotización', $formacion);
 
@@ -169,7 +169,7 @@ class EncuadreSeederTest extends TestCase
         $required = [
             'Descripción del servicio a solicitar',
             'Descripción del alcance actual del sistema de gestión',
-            'Descripción del número de procesos y/o macroprocesos',
+            'Descripción del nombre de procesos y/o macroprocesos',
             'Alcance certificado',
             'Perfil del equipo requerido para la prestación del servicio',
             'Modalidad de prestación del servicio',
