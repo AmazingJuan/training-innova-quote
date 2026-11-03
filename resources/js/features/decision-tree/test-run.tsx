@@ -1,5 +1,5 @@
 import { Modal } from '@/components/ui/modal';
-import { answerError, pathAnswers, visibleFields } from '@/features/quotation-wizard/answers';
+import { answerError, datePairErrors, pathAnswers, visibleFields } from '@/features/quotation-wizard/answers';
 import { EncuadreForm } from '@/features/quotation-wizard/encuadre-form';
 import type { Answer, PublicCondition } from '@/features/quotation-wizard/types';
 import { useMemo, useState } from 'react';
@@ -21,7 +21,7 @@ export function TestRun({ tree, open, onOpenChange }: TestRunProps) {
             const error = answerError(conditions[id], answers[id]);
             if (error) found[id] = error;
         }
-        return found;
+        return { ...found, ...datePairErrors(conditions, fields, answers) };
     }, [checked, fields, conditions, answers]);
     const result = pathAnswers(
         conditions,

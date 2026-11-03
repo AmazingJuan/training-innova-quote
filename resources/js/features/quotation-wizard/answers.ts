@@ -84,6 +84,33 @@ export function nextConditionId(condition: PublicCondition, answer: Answer | und
 /** A question shown in the form; `depth` > 0 when it opened from an option of another one. */
 export type VisibleField = { id: number; depth: number };
 
+const isDate = (condition: PublicCondition) => condition.interaction_type === 'input' && condition.type === 'date';
+
+/**
+ * Two date questions one after the other are a start and an end (that is also how
+ * they are drawn, side by side), so the second one has to come after the first.
+ * Each is still answered on its own: the problem is only reported once both are filled in.
+ */
+export function datePairErrors(
+    conditions: Record<string, PublicCondition>,
+    fields: VisibleField[],
+    answers: Record<number, Answer>,
+): Record<number, string> {
+    const errors: Record<number, string> = {};
+
+    for (let i = 1; i < fields.length; i++) {
+        const [start, end] = [fields[i - 1], fields[i]];
+        if (start.depth !== 0 || end.depth !== 0) continue;
+        if (!isDate(conditions[start.id]) || !isDate(conditions[end.id])) continue;
+
+        const [from, to] = [start, end].map((f) => new Date(`${String(answers[f.id] ?? '').trim()}T00:00:00`));
+        if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) continue;
+        if (to <= from) errors[end.id] = 'Debe ser posterior a la fecha de inicio.';
+    }
+
+    return errors;
+}
+
 /**
  * The questions the client sees with the current answers, in order: the main
  * order plus the branches opened by the chosen options (a branch rejoins the

@@ -292,7 +292,7 @@ class EncuadreSeeder extends Seeder
                 'Documentos o información a tener en cuenta para la cotización',
                 'cotizacion',
                 'Ej.: mapa de procesos, manual del sistema de gestión, organigrama, PEGA, ciclo de vida de los activos.',
-                'Indique cuáles tiene; puede adjuntarlos en el campo siguiente o se los pediremos por correo al revisar su solicitud.',
+                'Indique los documentos con los que cuenta. Puede adjuntarlos en el campo siguiente; de lo contrario, le serán solicitados por correo electrónico durante la revisión de su solicitud.',
                 required: false,
             ),
             $this->field(
@@ -313,12 +313,11 @@ class EncuadreSeeder extends Seeder
     private function closing(): array
     {
         return [
-            $this->choice('Presupuesto establecido para la prestación del servicio', 'cotizacion', [
-                $this->option('Definido', [
+            $this->choice('¿Cuenta con un presupuesto establecido para la prestación del servicio?', 'cotizacion', [
+                $this->option('Sí', [
                     $this->field('Valor del presupuesto establecido', 'number', 'cotizacion', 'Ej.: $15.000.000', 'En pesos colombianos (COP), antes de IVA.'),
                 ]),
-                'Por definir',
-                'No disponible',
+                'No',
             ]),
             $this->choice('En caso de precisar las necesidades del servicio, ¿estaría de acuerdo en realizar una reunión de enlace?', 'cierre', [
                 $this->option('Sí', [

@@ -157,9 +157,10 @@ class EncuadreSeederTest extends TestCase
 
     public function test_budget_and_liaison_meeting_ask_for_details_only_when_they_apply(): void
     {
-        $budget = $this->question('consultoria', 'Presupuesto establecido para la prestación del servicio');
-        $this->assertSame(['Definido', 'Por definir', 'No disponible'], $budget->options()->orderBy('id')->pluck('label')->all());
-        $this->assertSame('Valor del presupuesto establecido', Condition::find($budget->options()->where('label', 'Definido')->value('next_condition_id'))->label);
+        $budget = $this->question('consultoria', '¿Cuenta con un presupuesto establecido para la prestación del servicio?');
+        $this->assertSame(['Sí', 'No'], $budget->options()->orderBy('id')->pluck('label')->all());
+        $this->assertSame('Valor del presupuesto establecido', Condition::find($budget->options()->where('label', 'Sí')->value('next_condition_id'))->label);
+        $this->assertNull($budget->options()->where('label', 'No')->value('next_condition_id'));
 
         $meeting = $this->question('consultoria', 'En caso de precisar las necesidades del servicio, ¿estaría de acuerdo en realizar una reunión de enlace?');
         $this->assertSame('Disponibilidad para la reunión de enlace', Condition::find($meeting->options()->where('label', 'Sí')->value('next_condition_id'))->label);

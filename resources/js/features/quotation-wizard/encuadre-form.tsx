@@ -29,20 +29,25 @@ export function encuadreBlocks(conditions: Record<string, PublicCondition>, fiel
     return blocks;
 }
 
-/** A plain number box (e.g. "Número de empleados fijos"): short, so it can share its row with another one. */
-const isCompact = (condition: PublicCondition) => condition.interaction_type === 'input' && condition.type === 'number';
+/**
+ * Short boxes that can share a row ("Número de empleados fijos", "Fecha estimada de inicio…"),
+ * by kind: only boxes of the same kind pair up, so a date never sits next to a number.
+ */
+const compactKind = (condition: PublicCondition) =>
+    condition.interaction_type === 'input' && (condition.type === 'number' || condition.type === 'date') ? condition.type : null;
 
 /**
- * The fields as rows: consecutive number boxes that are not opened by an answer
- * go side by side (two per row on wide screens, stacked on narrow ones); every
- * other field takes its own row.
+ * The fields as rows: consecutive short boxes of the same kind that are not
+ * opened by an answer go side by side (two per row on wide screens, stacked on
+ * narrow ones); every other field takes its own row.
  */
 function rowsOf(conditions: Record<string, PublicCondition>, fields: VisibleField[]): VisibleField[][] {
-    const inRow = (field: VisibleField) => field.depth === 0 && isCompact(conditions[field.id]);
+    const kindOf = (field: VisibleField) => (field.depth === 0 ? compactKind(conditions[field.id]) : null);
     const rows: VisibleField[][] = [];
     for (const field of fields) {
         const last = rows[rows.length - 1];
-        if (last && inRow(field) && last.every(inRow)) last.push(field);
+        const kind = kindOf(field);
+        if (last && kind !== null && last.every((f) => kindOf(f) === kind)) last.push(field);
         else rows.push([field]);
     }
     return rows;

@@ -5,7 +5,7 @@ import type { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, CircleCheck, Printer, Send } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
-import { answeredPath, answerError, formatAnswer, pathAnswers, pathFiles, visibleFields, type VisibleField } from './answers';
+import { answeredPath, answerError, datePairErrors, formatAnswer, pathAnswers, pathFiles, visibleFields, type VisibleField } from './answers';
 import { fieldAnchor } from './condition-field';
 import { CONTACT_GROUPS, ContactFields, PrivacyConsent, validateContact, type ContactErrors } from './contact-fields';
 import { draft, treeSignature, type ReviewGroup, type SentRequest } from './draft';
@@ -25,7 +25,7 @@ function encuadreProblems(conditions: Record<string, PublicCondition>, fields: V
         const error = answerError(conditions[id], answers[id]);
         if (error) errors[id] = error;
     }
-    return errors;
+    return { ...errors, ...datePairErrors(conditions, fields, answers) };
 }
 
 const lowerFirst = (text: string) => text.charAt(0).toLowerCase() + text.slice(1);
