@@ -319,7 +319,7 @@ class EncuadreSeeder extends Seeder
                 ]),
                 'No',
             ]),
-            $this->choice('En caso de precisar las necesidades del servicio, ¿estaría de acuerdo en realizar una reunión de enlace?', 'cierre', [
+            $this->choice('En caso de precisar las necesidades del servicio, ¿estaría de acuerdo en realizar una reunión de enlace de manera virtual?', 'cierre', [
                 $this->option('Sí', [
                     $this->field('Disponibilidad para la reunión de enlace', 'text', 'cierre', 'Ej.: martes y jueves de 2:00 p. m. a 5:00 p. m.'),
                     $this->longText(
