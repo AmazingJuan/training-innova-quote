@@ -206,7 +206,7 @@ class QuotationDocumentsTest extends TestCase
     private function payload(array $documents = []): array
     {
         return [
-            'contact' => ['name' => 'Ana', 'email' => 'ana@empresa.com', 'phone' => '3001234567', 'company' => 'Clínica Sana', 'role' => 'Coordinadora HSEQ'],
+            'contact' => ['nit' => '900123456-7', 'economic_activity' => 'Servicios de salud', 'address' => 'Cra. 50 # 10-20, Medellín', 'name' => 'Ana', 'email' => 'ana@empresa.com', 'phone' => '3001234567', 'company' => 'Clínica Sana', 'role' => 'Coordinadora HSEQ'],
             'businessUnit' => 'Consultoría',
             'answers' => ['Sector' => 'Salud', ...($documents ? ['Adjuntar documentos' => implode(', ', array_map(fn ($f) => $f->getClientOriginalName(), $documents))] : [])],
             'documents' => array_map(fn ($file) => ['question' => 'Adjuntar documentos', 'file' => $file], $documents),

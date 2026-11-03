@@ -26,13 +26,13 @@ const ORGANIZATION: Field[] = [
         placeholder: 'Ej.: Construcciones Andinas S.A.S.',
         wide: true,
     },
-    { key: 'nit', label: 'NIT', type: 'text', autoComplete: 'off', required: false, placeholder: 'Ej.: 900123456-7' },
+    { key: 'nit', label: 'NIT', type: 'text', autoComplete: 'off', required: true, placeholder: 'Ej.: 900123456-7' },
     {
         key: 'economic_activity',
         label: 'Actividad económica',
         type: 'text',
         autoComplete: 'off',
-        required: false,
+        required: true,
         placeholder: 'Ej.: construcción de obras civiles',
     },
     {
@@ -40,7 +40,7 @@ const ORGANIZATION: Field[] = [
         label: 'Dirección',
         type: 'text',
         autoComplete: 'street-address',
-        required: false,
+        required: true,
         placeholder: 'Ej.: Cra. 50 # 10-20, Medellín',
         wide: true,
     },
@@ -161,6 +161,9 @@ const PHONE = /^[0-9+\s().-]{7,30}$/;
 export function validateContact(data: ContactData, privacyAccepted: boolean): ContactErrors {
     const errors: ContactErrors = {};
     if (!data.company.trim()) errors.company = 'Indique la razón social de la organización.';
+    if (!data.nit.trim()) errors.nit = 'Indique el NIT de la organización.';
+    if (!data.economic_activity.trim()) errors.economic_activity = 'Indique la actividad económica de la organización.';
+    if (!data.address.trim()) errors.address = 'Indique la dirección de la organización.';
     if (!data.name.trim()) errors.name = 'Indique el nombre del contacto.';
     if (!data.role.trim()) errors.role = 'Indique el cargo del contacto.';
     if (!data.email.trim()) errors.email = 'Indique el correo electrónico del contacto.';

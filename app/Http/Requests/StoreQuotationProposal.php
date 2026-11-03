@@ -28,9 +28,9 @@ class StoreQuotationProposal extends FormRequest
             'contact' => ['required', 'array'],
             'contact.name' => ['required', 'string', 'max:255'],
             'contact.company' => ['required', 'string', 'max:255'],
-            'contact.nit' => ['nullable', 'string', 'max:30'],
-            'contact.economic_activity' => ['nullable', 'string', 'max:255'],
-            'contact.address' => ['nullable', 'string', 'max:255'],
+            'contact.nit' => ['required', 'string', 'max:30'],
+            'contact.economic_activity' => ['required', 'string', 'max:255'],
+            'contact.address' => ['required', 'string', 'max:255'],
             'contact.email' => ['required', 'email', 'max:255'],
             'contact.phone' => ['required', 'string', 'max:30', 'regex:/^[0-9+\s().-]{7,30}$/'],
             'contact.role' => ['required', 'string', 'max:255'],
@@ -122,6 +122,9 @@ class StoreQuotationProposal extends FormRequest
             'contact.name.max' => 'El nombre del contacto no debe exceder :max caracteres.',
 
             'contact.company.required' => 'Indique la razón social de la organización.',
+            'contact.nit.required' => 'Indique el NIT de la organización.',
+            'contact.economic_activity.required' => 'Indique la actividad económica de la organización.',
+            'contact.address.required' => 'Indique la dirección de la organización.',
             'contact.role.required' => 'Indique el cargo del contacto.',
 
             'contact.email.required' => 'Indique el correo electrónico del contacto.',
