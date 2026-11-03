@@ -165,9 +165,8 @@ class EncuadreSeeder extends Seeder
     /** @return array<string, mixed> */
     private function processes(): array
     {
-        return $this->field(
+        return $this->longText(
             'Descripción del nombre de procesos y/o macroprocesos',
-            'text',
             'necesidad',
             'Ej.: 12 procesos agrupados en 4 macroprocesos (estratégicos, misionales, de apoyo y de evaluación).',
             'Describir los procesos que hacen parte de la cotización.',
