@@ -399,7 +399,7 @@ export function QuotationWizard({ viewData }: { viewData: QuoteViewData }) {
                                     {[
                                         'Revise su correo: allí está la confirmación con el número de su solicitud.',
                                         'Nuestro equipo revisa su solicitud y prepara la propuesta.',
-                                        'Le enviaremos la propuesta a ese correo lo más pronto posible, con un enlace seguro para descargarla.',
+                                        'La propuesta será enviada al correo electrónico registrado en el menor tiempo posible, con un enlace seguro para su descarga.',
                                     ].map((text, i) => (
                                         <li key={text} className="grid grid-cols-[1.75rem_1fr] gap-3 text-white/90">
                                             <span
