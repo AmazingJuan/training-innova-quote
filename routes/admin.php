@@ -53,7 +53,6 @@ Route::prefix('dashboard')
         Route::get('/ordenes-cotizacion', [AdminQuotationOrderController::class, 'index'])->name('dashboard.quotation-orders.index');
         Route::get('/ordenes-cotizacion/{quotationOrder}', [AdminQuotationOrderController::class, 'show'])->name('dashboard.quotation-orders.show');
         Route::post('/ordenes-cotizacion/{quotationOrder}/upload-quotation-url', [AdminQuotationOrderController::class, 'uploadQuotationUrl'])->name('dashboard.quotation-orders.upload-quotation-url');
-        Route::get('/ordenes-cotizacion/{quotationOrder}/documentos/{document}', [AdminQuotationOrderController::class, 'downloadDocument'])->scopeBindings()->name('dashboard.quotation-orders.documents.download');
 
         // Unidades de negocio
         Route::get('/unidad-negocio', [AdminBusinessUnitController::class, 'index'])->name('dashboard.business-unit.index');

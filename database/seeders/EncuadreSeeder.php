@@ -315,7 +315,7 @@ class EncuadreSeeder extends Seeder
         return [
             $this->choice('¿Cuenta con un presupuesto establecido para la prestación del servicio?', 'cotizacion', [
                 $this->option('Sí', [
-                    $this->field('Valor del presupuesto establecido', 'number', 'cotizacion', 'Ej.: $15.000.000', 'En pesos colombianos (COP), antes de IVA.'),
+                    $this->field('Valor del presupuesto establecido', 'number', 'cotizacion', 'Ej.: $15.000.000', 'En pesos colombianos (COP)'),
                 ]),
                 'No',
             ]),

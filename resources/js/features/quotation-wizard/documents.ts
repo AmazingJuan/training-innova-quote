@@ -1,4 +1,4 @@
-/** Same limits as the server (QuotationDocument), to tell the client before sending. */
+/** Same limits as the server (App\Support\QuotationAttachment), to tell the client before sending. */
 export const MAX_FILES = 5;
 export const MAX_BYTES = 10 * 1024 * 1024;
 export const EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'zip'];

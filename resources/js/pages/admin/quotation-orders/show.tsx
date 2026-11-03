@@ -5,36 +5,14 @@ import { FormField } from '@/components/admin/form';
 import { QuotationStatusBadge, StatusBadge } from '@/components/admin/status-badge';
 import { adminFieldInputClass, adminListShellClass, adminOutlineButtonClass, adminPrimaryButtonClass } from '@/components/admin/styles';
 import { Modal } from '@/components/ui/modal';
-import { formatSize } from '@/features/quotation-wizard/documents';
-import { quotationTitle, type QuotationDocument, type QuotationOrder } from '@/features/quotations/types';
+import { quotationTitle, type QuotationOrder } from '@/features/quotations/types';
 import AdminLayout from '@/layouts/admin-layout';
 import { formatDate, orDash } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import type { PageProps } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
-import { Download, ExternalLink, Upload } from 'lucide-react';
+import { ExternalLink, Upload } from 'lucide-react';
 import { useState } from 'react';
-
-/** The documents attached in a question, as download links in place of their names. */
-function DocumentLinks({ order, documents }: { order: QuotationOrder; documents: QuotationDocument[] }) {
-    return (
-        <ul className="space-y-2">
-            {documents.map((document) => (
-                <li key={document.id} className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <a
-                        href={route('dashboard.quotation-orders.documents.download', [order.id, document.id])}
-                        className="inline-flex min-w-0 items-start gap-2 font-medium text-azul-hondo hover:underline"
-                    >
-                        <Download className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-                        {/* Wraps between words, and inside one only when it does not fit. */}
-                        <span className="[overflow-wrap:anywhere]">{document.original_name}</span>
-                    </a>
-                    <span className="text-pizarra">{formatSize(document.size)}</span>
-                </li>
-            ))}
-        </ul>
-    );
-}
 
 function UploadProposalModal({ order, open, onOpenChange }: { order: QuotationOrder; open: boolean; onOpenChange: (open: boolean) => void }) {
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm({ quotation_url: '' });
@@ -88,7 +66,6 @@ export default function Show() {
     const [uploadOpen, setUploadOpen] = useState(false);
     const client = order.client;
     const answers = Object.entries(order.answers ?? {});
-    const documentsOf = (question: string) => (order.documents ?? []).filter((document) => document.question === question);
 
     return (
         <AdminLayout title={quotationTitle(order)}>
@@ -157,13 +134,7 @@ export default function Show() {
                             title={`Respuestas (${answers.length})`}
                             items={
                                 answers.length > 0
-                                    ? answers.map(([question, answer]) => {
-                                          const documents = documentsOf(question);
-                                          return {
-                                              label: question,
-                                              value: documents.length > 0 ? <DocumentLinks order={order} documents={documents} /> : answer,
-                                          };
-                                      })
+                                    ? answers.map(([question, answer]) => ({ label: question, value: answer }))
                                     : [{ label: 'Respuestas', value: <span className="text-pizarra">Sin respuestas registradas.</span> }]
                             }
                         />

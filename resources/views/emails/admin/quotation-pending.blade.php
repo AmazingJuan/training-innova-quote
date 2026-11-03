@@ -35,5 +35,11 @@
     'Teléfono' => $contact?->phone,
   ]])
 
+  @if (!empty($attachedFiles))
+    @include('emails.partials.rows', ['title' => 'Documentos adjuntos a este correo', 'rows' => [
+      'Archivos' => implode(', ', $attachedFiles),
+    ]])
+  @endif
+
   @include('emails.partials.button', ['url' => route('dashboard'), 'label' => 'Abrir el panel', 'margin' => '0'])
 @endsection

@@ -94,10 +94,10 @@ class QuotationFlowTest extends TestCase
 
         $this->from('/cotizar/consultoria')->post('/cotizar', $this->payload())
             ->assertRedirect('/cotizar/consultoria')
-            ->assertSessionHas('quotation_sent', ['code' => 'CON-'.now()->format('y').'01', 'email' => 'ana@empresa.com']);
+            ->assertSessionHas('quotation_sent', ['code' => 'CON-V-'.now()->format('y').'01', 'email' => 'ana@empresa.com']);
 
         $order = QuotationProposalOrder::sole();
-        $this->assertSame('CON-'.now()->format('y').'01', $order->getQuotationCode());
+        $this->assertSame('CON-V-'.now()->format('y').'01', $order->getQuotationCode());
         $this->assertSame(['Sector' => 'Salud', 'Empleados' => '40'], $order->getAnswers());
         $this->assertSame([], $order->getServices());
         $this->assertNull($order->getGestionLine());
@@ -105,7 +105,8 @@ class QuotationFlowTest extends TestCase
         $this->assertSame('3001234567', $order->getClient()->getPhone());
 
         Mail::assertQueued(QuotationPending::class, fn ($mail) => $mail->hasTo('ana@empresa.com'));
-        Mail::assertQueued(QuotationPendingAdmin::class, fn ($mail) => $mail->hasTo('admin@example.com'));
+        // Management's notice is sent by its own job, which carries the attachments.
+        Mail::assertSent(QuotationPendingAdmin::class, fn ($mail) => $mail->hasTo('admin@example.com'));
     }
 
     public function test_privacy_authorization_is_required(): void

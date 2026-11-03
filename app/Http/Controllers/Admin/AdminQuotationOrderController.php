@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdminUpdateQuotationUrlRequest;
 use App\Models\Client;
-use App\Models\QuotationDocument;
 use App\Models\QuotationProposalOrder;
 use App\Services\MailService;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,7 +12,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminQuotationOrderController extends Controller
 {
@@ -49,14 +47,9 @@ class AdminQuotationOrderController extends Controller
     {
         return Inertia::render('admin/quotation-orders/show', [
             'viewData' => [
-                'quotationOrder' => $quotationOrder->load('client', 'documents'),
+                'quotationOrder' => $quotationOrder->load('client'),
             ],
         ]);
-    }
-
-    public function downloadDocument(QuotationProposalOrder $quotationOrder, QuotationDocument $document): StreamedResponse
-    {
-        return $document->download();
     }
 
     public function uploadQuotationUrl(AdminUpdateQuotationUrlRequest $request, QuotationProposalOrder $quotationOrder): RedirectResponse

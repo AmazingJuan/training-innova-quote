@@ -28,4 +28,5 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule) {
         $schedule->command('exports:clean-clientes')->hourly();
+        $schedule->command('adjuntos:clean-cotizaciones')->hourly();
     })->create();

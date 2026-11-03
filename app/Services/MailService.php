@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use App\Jobs\NotifyManagementOfQuotation;
 use App\Mail\QuotationGenerated;
 use App\Mail\QuotationGeneratedAdmin;
 use App\Mail\QuotationPending;
-use App\Mail\QuotationPendingAdmin;
 use App\Mail\WelcomeEmail;
 use App\Models\Configuration;
 use App\Models\QuotationProposalOrder;
@@ -18,10 +18,15 @@ use Illuminate\Support\Facades\Mail;
  */
 class MailService
 {
-    public function sendQuotationPending(QuotationProposalOrder $order): void
+    /**
+     * @param  list<array{path: string, name: string, mime: string|null}>  $files
+     *                                                                             Documents attached by the client, which travel in the notice to management.
+     */
+    public function sendQuotationPending(QuotationProposalOrder $order, array $files = []): void
     {
         $this->notifyClient($order, new QuotationPending($order));
-        $this->notifyAdmin(new QuotationPendingAdmin($order));
+        // A job of its own: it carries the attachments and deletes them once sent.
+        NotifyManagementOfQuotation::dispatch($order->getId(), $files);
     }
 
     public function sendQuotationGenerated(QuotationProposalOrder $order): void

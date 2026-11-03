@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreQuotationProposal;
 use App\Models\BusinessUnit;
 use App\Models\Client;
-use App\Models\QuotationDocument;
 use App\Models\QuotationProposalOrder;
 use App\Services\DecisionTreeService;
 use App\Services\MailService;
+use App\Support\QuotationAttachment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -69,7 +69,7 @@ class QuotationController extends Controller
         $order = DB::transaction(function () use ($data) {
             $businessUnit = BusinessUnit::query()->where('display_name', $data['businessUnit'])->firstOrFail();
 
-            $order = QuotationProposalOrder::create([
+            return QuotationProposalOrder::create([
                 'quotation_code' => $businessUnit->lockAndAllocateNextQuotationCode(),
                 'client_id' => Client::upsertFromContact($data['contact'])->getId(),
                 // The client no longer picks services: the request is the encuadre (answers).
@@ -77,15 +77,10 @@ class QuotationController extends Controller
                 'business_unit' => $data['businessUnit'],
                 'answers' => $data['answers'],
             ]);
-
-            foreach ($data['documents'] ?? [] as $document) {
-                QuotationDocument::store($order, $document['question'], $document['file']);
-            }
-
-            return $order;
         });
 
-        $this->mail->sendQuotationPending($order);
+        // The attached documents are not kept: they only wait for the notice to management.
+        $this->mail->sendQuotationPending($order, QuotationAttachment::keep($data['documents'] ?? []));
 
         // The page itself confirms it (with the request's code), as the corporate contact form does.
         return $sent($order->getQuotationCode());

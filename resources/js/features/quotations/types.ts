@@ -10,15 +10,6 @@ export interface ClientSummary {
     address?: string | null;
 }
 
-export interface QuotationDocument {
-    id: number;
-    /** Key of the answer (question) it was attached in. */
-    question: string;
-    original_name: string;
-    mime_type: string | null;
-    size: number;
-}
-
 export interface QuotationOrder {
     id: string;
     quotation_code: string | null;
@@ -27,8 +18,6 @@ export interface QuotationOrder {
     gestion_line?: string | null;
     services?: string[];
     answers?: Record<string, string>;
-    /** Loaded in the detail page. */
-    documents?: QuotationDocument[];
     is_generated: boolean;
     viewed_by_client: boolean;
     quotation_url: string | null;

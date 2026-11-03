@@ -5,9 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
 
 class QuotationProposalOrder extends Model
@@ -63,18 +61,6 @@ class QuotationProposalOrder extends Model
     public function getClient(): ?Client
     {
         return $this->client;
-    }
-
-    /** Documents the client attached to the request. */
-    public function documents(): HasMany
-    {
-        return $this->hasMany(QuotationDocument::class);
-    }
-
-    /** @return Collection<int, QuotationDocument> */
-    public function getDocuments(): Collection
-    {
-        return $this->documents;
     }
 
     /*

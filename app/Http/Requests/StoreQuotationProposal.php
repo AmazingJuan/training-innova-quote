@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\QuotationDocument;
+use App\Support\QuotationAttachment;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -58,10 +58,10 @@ class StoreQuotationProposal extends FormRequest
             'answers.*' => ['required', 'string', 'max:5000'],
 
             // Documents attached in the encuadre's file questions, each with the answer it belongs to.
-            'documents' => ['nullable', 'array', 'max:'.QuotationDocument::MAX_FILES],
+            'documents' => ['nullable', 'array', 'max:'.QuotationAttachment::MAX_FILES],
             'documents.*' => ['array:question,file'],
             'documents.*.question' => ['required', 'string', Rule::in(array_keys((array) $this->input('answers', [])))],
-            'documents.*.file' => ['required', 'file', 'max:'.QuotationDocument::MAX_KILOBYTES, 'extensions:'.implode(',', QuotationDocument::EXTENSIONS)],
+            'documents.*.file' => ['required', 'file', 'max:'.QuotationAttachment::MAX_KILOBYTES, 'extensions:'.implode(',', QuotationAttachment::EXTENSIONS)],
         ];
     }
 
@@ -142,8 +142,8 @@ class StoreQuotationProposal extends FormRequest
             'documents.*.question.in' => 'Uno de los documentos no corresponde a ninguna pregunta de la solicitud.',
             'documents.*.file.required' => 'Uno de los documentos no se pudo subir. Inténtelo de nuevo.',
             'documents.*.file.file' => 'Uno de los documentos no se pudo subir. Inténtelo de nuevo.',
-            'documents.*.file.uploaded' => 'Uno de los documentos no se pudo subir: revise que pese menos de '.(QuotationDocument::MAX_KILOBYTES / 1024).' MB.',
-            'documents.*.file.max' => 'Cada documento debe pesar menos de '.(QuotationDocument::MAX_KILOBYTES / 1024).' MB.',
+            'documents.*.file.uploaded' => 'Uno de los documentos no se pudo subir: revise que pese menos de '.(QuotationAttachment::MAX_KILOBYTES / 1024).' MB.',
+            'documents.*.file.max' => 'Cada documento debe pesar menos de '.(QuotationAttachment::MAX_KILOBYTES / 1024).' MB.',
             'documents.*.file.extensions' => 'Adjunte documentos PDF, Word, Excel, PowerPoint, imágenes JPG o PNG, o ZIP.',
         ];
     }

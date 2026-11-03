@@ -69,8 +69,9 @@ class EncuadreSeederTest extends TestCase
         $this->assertSame([
             'En caso de precisar las necesidades del servicio, ¿estaría de acuerdo en realizar una reunión de enlace?',
             'Modalidad de prestación del servicio',
-            'Presupuesto establecido para la prestación del servicio',
+            'Nivel de riesgo de la empresa ante la ARL',
             'Tipo de auditoría de tercera parte y/o acreditación',
+            '¿Cuenta con un presupuesto establecido para la prestación del servicio?',
             '¿Los costos logísticos serán asumidos por el cliente?',
             '¿Su organización tiene un sistema de gestión certificado o acreditado?',
         ], $choices);
@@ -109,7 +110,7 @@ class EncuadreSeederTest extends TestCase
             $this->assertSame('file', $files->type);
             $this->assertSame('cotizacion', $files->getSection());
             $this->assertFalse($files->isRequired());
-            $this->assertSame('Presupuesto establecido para la prestación del servicio', $files->getNextCondition()->label);
+            $this->assertSame('¿Cuenta con un presupuesto establecido para la prestación del servicio?', $files->getNextCondition()->label);
         }
     }
 
@@ -140,10 +141,16 @@ class EncuadreSeederTest extends TestCase
 
             $this->assertSame($schedule->id, $modality->next_condition_id);
             $this->assertNull($options['Virtual']);
-            $this->assertSame($options['Presencial'], $options['Mixto']);
 
             $venue = Condition::find($options['Presencial']);
             $this->assertSame('Descripción de sedes (lugar y dirección)', $venue->label);
+
+            // "Mixto" first splits the time, and then joins the branch of "Presencial".
+            $onSite = Condition::find($options['Mixto']);
+            $this->assertSame('Tiempo del servicio en modalidad presencial', $onSite->label, $name);
+            $virtual = Condition::find($onSite->next_condition_id);
+            $this->assertSame('Tiempo del servicio en modalidad virtual', $virtual->label, $name);
+            $this->assertSame($venue->id, $virtual->next_condition_id, $name);
             $costs = Condition::find($venue->next_condition_id);
             $this->assertSame('¿Los costos logísticos serán asumidos por el cliente?', $costs->label);
             $this->assertSame($schedule->id, $costs->next_condition_id);
