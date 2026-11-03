@@ -99,8 +99,8 @@ class EncuadreSeeder extends Seeder
             $this->processes(),
             ...$this->employees(),
             $this->certification(),
-            $this->teamProfile('Ej.: auditor líder certificado en ISO 45001 con experiencia en el sector eléctrico.'),
-            $this->arl(),
+            $this->teamProfile('Ej.: auditor líder certificado en ISO 45001 con experiencia en el sector eléctrico.', 'Si necesita un perfil o una certificación específica, descríbalo.'),
+            ...$this->arl(),
             ...$this->conditions('Fecha estimada para la prestación del servicio'),
             ...$this->documents(),
             ...$this->closing(),
@@ -124,8 +124,8 @@ class EncuadreSeeder extends Seeder
             $this->processes(),
             ...$this->employees(),
             $this->certification(),
-            $this->teamProfile('Ej.: consultor con experiencia en el sector minero y en sistemas integrados de gestión.'),
-            $this->arl(),
+            $this->teamProfile('Ej.: consultor con experiencia en el sector minero y en sistemas integrados de gestión.', 'Si necesita un perfil o una certificación específica, descríbalo.'),
+            ...$this->arl(),
             ...$this->conditions('Fecha estimada para la prestación del servicio'),
             ...$this->documents(),
             ...$this->closing(),
@@ -149,7 +149,7 @@ class EncuadreSeeder extends Seeder
             ),
             $this->field('Número de asistentes para formación', 'number', 'necesidad', 'Ej.: 20', 'Número aproximado de participantes. Si serán varios grupos, indique el total.'),
             $this->teamProfile('Ej.: entrenador certificado en trabajo en alturas con licencia en SST vigente.'),
-            $this->arl(),
+            ...$this->arl(),
             ...$this->conditions('Fecha estimada para la prestación del servicio'),
             ...$this->documents(),
             ...$this->closing(),
@@ -204,20 +204,34 @@ class EncuadreSeeder extends Seeder
     }
 
     /** @return array<string, mixed> */
-    private function teamProfile(string $example): array
+    private function teamProfile(string $example, string $observation = 'Si necesita un perfil o una certificación específica, descríbalo; si no, escriba «Sin requisito específico».'): array
     {
         return $this->longText(
             'Perfil del equipo requerido para la prestación del servicio',
             'necesidad',
             $example,
-            'Si necesita un perfil o una certificación específica, descríbalo; si no, escriba «Sin requisito específico».',
+            $observation,
         );
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * The ARL: its name and, right after, the company's risk class.
+     *
+     * @return list<array<string, mixed>>
+     */
     private function arl(): array
     {
-        return $this->field('Nivel de riesgo de la empresa ante la ARL', 'text', 'necesidad', 'Ej.: Riesgo III', 'Clase de riesgo (I a V) en la que su ARL clasifica a la empresa. Es importante sobre todo si el servicio es de seguridad y salud en el trabajo.', required: false);
+        return [
+            $this->field('ARL de la empresa', 'text', 'necesidad', 'Ej.: Positiva, Sura, Colmena', 'Describa el nivel de riesgo para la prestación del servicio, especialmente si el servicio es de seguridad y salud en el trabajo.', required: false),
+            $this->choice(
+                'Nivel de riesgo de la empresa ante la ARL',
+                'necesidad',
+                ['Riesgo I', 'Riesgo II', 'Riesgo III', 'Riesgo IV', 'Riesgo V'],
+                'Clase de riesgo (I a V) en la que su ARL clasifica a la empresa. Es importante sobre todo si el servicio es de seguridad y salud en el trabajo.',
+                multiple: false,
+                required: false,
+            ),
+        ];
     }
 
     /**

@@ -18,8 +18,15 @@ export type ReviewGroup = { title: string; short?: boolean; items: { question: s
 /** A request just sent, kept for this tab so a reload still shows its confirmation instead of an empty form. */
 export type SentRequest = { code: string | null; email: string; review: ReviewGroup[] };
 
-/** Changes whenever the questions of the unit change (ids are recreated by the seeder). */
-export const treeSignature = (conditions: Record<string, PublicCondition>) => Object.keys(conditions).sort().join(',');
+/**
+ * Changes whenever the questions of the unit change: ids are recreated by the seeder, and
+ * a question can change kind (e.g. from text to options), which changes the shape of its saved answer.
+ */
+export const treeSignature = (conditions: Record<string, PublicCondition>) =>
+    Object.entries(conditions)
+        .sort(([a], [b]) => Number(a) - Number(b))
+        .map(([id, c]) => `${id}:${c.interaction_type}:${c.type}:${c.multiple ? 1 : 0}`)
+        .join(',');
 
 const local = () => window.localStorage;
 const session = () => window.sessionStorage;
