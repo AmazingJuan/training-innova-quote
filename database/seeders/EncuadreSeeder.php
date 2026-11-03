@@ -322,10 +322,17 @@ class EncuadreSeeder extends Seeder
             $this->choice('En caso de precisar las necesidades del servicio, ¿estaría de acuerdo en realizar una reunión de enlace?', 'cierre', [
                 $this->option('Sí', [
                     $this->field('Disponibilidad para la reunión de enlace', 'text', 'cierre', 'Ej.: martes y jueves de 2:00 p. m. a 5:00 p. m.'),
+                    $this->longText(
+                        'Correos de otras personas que deben participar en la reunión de enlace',
+                        'cierre',
+                        'Ej.: calidad@empresa.com, gerencia@empresa.com',
+                        'La persona de contacto de esta solicitud ya queda invitada. Si otras personas deben participar, escriba sus correos.',
+                        required: false,
+                    ),
                 ]),
                 'No',
             ]),
-            $this->field('Fecha estimada de entrega de la oferta comercial', 'date', 'cierre', observation: 'Haremos lo posible por enviársela antes de esa fecha.'),
+            $this->field('Fecha estimada de entrega de la oferta comercial', 'date', 'cierre', observation: 'Seleccione un día hábil. Haremos lo posible por enviársela antes de esa fecha.'),
         ];
     }
 
