@@ -175,7 +175,8 @@ class EncuadreSeederTest extends TestCase
             'Alcance certificado',
             'Perfil del equipo requerido para la prestación del servicio',
             'Modalidad de prestación del servicio',
-            'Fecha estimada para la prestación del servicio',
+            'Fecha estimada de inicio para la prestación del servicio',
+            'Fecha estimada final para la prestación del servicio',
             'Fecha estimada de entrega de la oferta comercial',
         ];
         foreach (['auditoria', 'consultoria'] as $name) {

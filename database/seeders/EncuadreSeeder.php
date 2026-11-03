@@ -101,7 +101,7 @@ class EncuadreSeeder extends Seeder
             $this->certification(),
             $this->teamProfile('Ej.: auditor líder certificado en ISO 45001 con experiencia en el sector eléctrico.', 'Si necesita un perfil o una certificación específica, descríbalo.'),
             ...$this->arl(),
-            ...$this->conditions('Fecha estimada para la prestación del servicio'),
+            ...$this->conditions('Fecha estimada de inicio para la prestación del servicio'),
             ...$this->documents(),
             ...$this->closing(),
         ];
@@ -126,7 +126,7 @@ class EncuadreSeeder extends Seeder
             $this->certification(),
             $this->teamProfile('Ej.: consultor con experiencia en el sector minero y en sistemas integrados de gestión.', 'Si necesita un perfil o una certificación específica, descríbalo.'),
             ...$this->arl(),
-            ...$this->conditions('Fecha estimada para la prestación del servicio'),
+            ...$this->conditions('Fecha estimada de inicio para la prestación del servicio'),
             ...$this->documents(),
             ...$this->closing(),
         ];
@@ -150,7 +150,7 @@ class EncuadreSeeder extends Seeder
             $this->field('Número de asistentes para formación', 'number', 'necesidad', 'Ej.: 20', 'Número aproximado de participantes. Si serán varios grupos, indique el total.'),
             $this->teamProfile('Ej.: entrenador certificado en trabajo en alturas con licencia en SST vigente.'),
             ...$this->arl(),
-            ...$this->conditions('Fecha estimada para la prestación del servicio'),
+            ...$this->conditions('Fecha estimada de inicio para la prestación del servicio'),
             ...$this->documents(),
             ...$this->closing(),
         ];
@@ -256,11 +256,17 @@ class EncuadreSeeder extends Seeder
             ], 'Desplazamiento, alojamiento, alimentación, salón… Lo que no asuma se incluirá en la cotización.'),
         ];
 
+        // Only "Mixto" splits the service in two: how much of it is on site and how much is virtual.
+        $mixed = [
+            $this->field('Tiempo del servicio en modalidad presencial', 'text', 'condiciones', 'Ej.: 3 días (24 horas) en sede'),
+            $this->field('Tiempo del servicio en modalidad virtual', 'text', 'condiciones', 'Ej.: 2 días (16 horas) por videoconferencia'),
+        ];
+
         return [
             $this->choice('Modalidad de prestación del servicio', 'condiciones', [
                 $this->option('Presencial', $onSite),
                 'Virtual',
-                $this->option('Mixto', sameAs: 'Presencial'),
+                $this->option('Mixto', $mixed, sameAs: 'Presencial'),
             ]),
             $this->field(
                 'Descripción de horarios para la prestación del servicio (lunes a viernes)',
@@ -269,6 +275,7 @@ class EncuadreSeeder extends Seeder
                 'Ej.: de 7:00 a. m. a 4:00 p. m., con almuerzo de 12:00 m. a 1:00 p. m.',
             ),
             $this->field($date, 'date', 'condiciones', observation: 'Fecha aproximada de inicio.'),
+            $this->field('Fecha estimada final para la prestación del servicio', 'date', 'condiciones', observation: 'Fecha aproximada de finalización.'),
         ];
     }
 
@@ -360,7 +367,8 @@ class EncuadreSeeder extends Seeder
     /**
      * An option, optionally opening a branch of fields (after which the client
      * continues with what follows the parent), or leading to the same branch
-     * as a sibling option.
+     * as a sibling option. With both, its own fields come first and then the
+     * sibling's branch.
      *
      * @param  list<array<string, mixed>>  $branch
      * @return array<string, mixed>
@@ -420,9 +428,13 @@ class EncuadreSeeder extends Seeder
                     throw new RuntimeException("«{$spec['label']}»: las preguntas de varias opciones no pueden abrir ramas.");
                 }
 
-                $target = $option['same_as'] !== null
+                // Where this option's own fields rejoin: a sibling's branch, or what follows the question.
+                $join = $option['same_as'] !== null
                     ? ($branchStarts[$option['same_as']] ?? throw new RuntimeException("«{$option['label']}» remite a una opción que no existe o va después."))
-                    : ($option['branch'] !== [] ? $this->build($unit, $option['branch'], $next) : null);
+                    : null;
+                $target = $option['branch'] !== []
+                    ? $this->build($unit, $option['branch'], $join ?? $next)
+                    : $join;
                 $branchStarts[$option['label']] = $target;
 
                 ConditionOption::create([
