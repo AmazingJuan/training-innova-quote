@@ -1,4 +1,4 @@
-# Manual del administrador de Trainova
+# Manual del administrador de Training InnovaQuote
 
 Documento LaTeX del manual de usuario del administrador. Se compila con **LuaLaTeX** y produce
 `manual-administrador.pdf`. La carpeta está en el `.gitignore` del proyecto.

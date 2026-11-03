@@ -8,11 +8,11 @@ cómo está organizado este manual.}
 
 \section{¿Qué es el panel de cotizaciones?}\label{sec:que-es}
 
-\textbf{Trainova} es la plataforma web donde los clientes de Training Corporation solicitan
+\textbf{Training~InnovaQuote} es la plataforma web donde los clientes de Training Corporation solicitan
 cotizaciones. Está disponible en \ruta{\dominio}. El cliente elige el tipo de servicio (la
 \emph{unidad de negocio}), diligencia el \emph{formulario de solicitud} y envía su solicitud.
 
-El \textbf{panel de cotizaciones} es la parte privada de Trainova. Desde allí el equipo de
+El \textbf{panel de cotizaciones} es la parte privada de Training~InnovaQuote. Desde allí el equipo de
 Training Corporation recibe las solicitudes, envía las propuestas comerciales y mantiene al día
 la información que ve el cliente. En el panel usted puede:
 
@@ -25,6 +25,36 @@ la información que ve el cliente. En el panel usted puede:
   \item Enviar correos de bienvenida para invitar clientes a la plataforma.
   \item Definir quién recibe las notificaciones y los datos de contacto que llevan los correos.
 \end{itemize}
+
+\section{El nombre Training InnovaQuote}\label{sec:nombre}
+
+El nombre de la aplicación une tres palabras, y cada una expresa una parte de lo que es:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \node[font=\montserrat\fontseries{ub}\selectfont\fontsize{38}{38}\selectfont, inner sep=0pt] (n)
+    {\textcolor{noche}{Training}\hspace{0.28em}\textcolor{azul}{Innova}\textcolor{azulvivo}{Quote}};
+  \foreach \x/\col/\parte/\icono/\texto in {
+      -5.1/noche/Training/F19C/{Respaldo e identidad de Training Corporation},
+      0/azul/Innova/F0EB/{Innovación y transformación},
+      5.1/azulvivo/Quote/F70E/{Cotizaciones y propuestas comerciales}} {
+    \node[tarjeta, draw=\col!60, line width=1.2pt, text width=4.1cm, minimum height=2.9cm,
+        align=center, inner ysep=9pt] at (\x,-2.75)
+      {{\color{\col}\fontsize{15}{15}\selectfont\ico{\icono}}\\[5pt]
+       {\montserrat\fontseries{eb}\selectfont\Large\color{\col}\parte}\\[4pt]
+       {\small\color{tinta}\texto}};
+  }
+\end{tikzpicture}
+\caption{Significado del nombre Training InnovaQuote.}\label{fig:nombre}
+\end{figure}
+
+\begin{tabla}{colspec={Q[3.2cm,l] X[l]}}
+  Palabra & Significado \\
+  \textbf{Training} & Respaldo e identidad de Training Corporation. \\
+  \textbf{Innova} & Innovación y transformación. \\
+  \textbf{Quote} & Cotizaciones y propuestas comerciales. \\
+\end{tabla}
 
 \section{¿Quién es el usuario administrador?}\label{sec:quien}
 
@@ -44,7 +74,7 @@ alguien deje de necesitarlo (ver \seccion{sec:usuarios}).
   \item Un computador con un navegador web actualizado: Google Chrome, Microsoft Edge,
         Mozilla Firefox o Safari.
   \item Conexión a internet.
-  \item La dirección web de Trainova (\ruta{\dominio}) y una cuenta de usuario (correo y
+  \item La dirección web de Training~InnovaQuote (\ruta{\dominio}) y una cuenta de usuario (correo y
         contraseña) creada por otro administrador.
   \item Acceso al buzón de correo de su cuenta, por si necesita recuperar la contraseña.
 \end{itemize}
@@ -63,7 +93,7 @@ tablas largas y con el árbol de decisión es más cómodo usar una pantalla amp
   \Capref{cap:catalogo} & Unidades de negocio, líneas de gestión, servicios y el árbol de decisión. \\
   \Capref{cap:sistema} & Usuarios, correos de bienvenida y configuración. \\
   \Capref{cap:salida} & Cómo ver el sitio público y cerrar sesión. \\
-  \Capref{cap:capacidad} & Cuántos usuarios simultáneos soporta Trainova. \\
+  \Capref{cap:capacidad} & Cuántos usuarios simultáneos soporta Training~InnovaQuote. \\
   \Apref{ap:mensajes} a \Apref{ap:glosario} & Mensajes del sistema, preguntas frecuentes y glosario. \\
 \end{tabla}
 
