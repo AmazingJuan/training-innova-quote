@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { FileText, Paperclip, X } from 'lucide-react';
-import { useState, type InputHTMLAttributes } from 'react';
+import { useState, type InputHTMLAttributes, type ReactNode } from 'react';
 import { emptyAnswer, formatNumber, MAX_ANSWER_LENGTH, onlyDigits } from './answers';
 import { ACCEPT, formatSize } from './documents';
 import type { Answer, FilesAnswer, OptionsAnswer, PublicCondition, RangeAnswer } from './types';
@@ -80,16 +80,18 @@ function Control({ anchor, condition, value, onChange, aria, invalid }: ControlP
         }
         if (condition.type === 'text' && condition.multiline) {
             return (
-                <textarea
-                    id={`${anchor}-input`}
-                    value={value as string}
-                    onChange={(e) => onChange(e.target.value)}
-                    placeholder={placeholder}
-                    rows={5}
-                    maxLength={MAX_ANSWER_LENGTH}
-                    className="control resize-y"
-                    {...aria}
-                />
+                <WithCharCount id={`${anchor}-count`} length={(value as string).length}>
+                    <textarea
+                        id={`${anchor}-input`}
+                        value={value as string}
+                        onChange={(e) => onChange(e.target.value)}
+                        placeholder={placeholder}
+                        rows={5}
+                        maxLength={MAX_ANSWER_LENGTH}
+                        className="control resize-y"
+                        {...withCount(aria, `${anchor}-count`)}
+                    />
+                </WithCharCount>
             );
         }
         if (condition.type === 'number') {
@@ -104,6 +106,7 @@ function Control({ anchor, condition, value, onChange, aria, invalid }: ControlP
                 />
             );
         }
+        const isText = condition.type === 'text';
         const input = (
             <input
                 id={`${anchor}-input`}
@@ -111,11 +114,18 @@ function Control({ anchor, condition, value, onChange, aria, invalid }: ControlP
                 value={value as string}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
-                maxLength={condition.type === 'text' ? MAX_ANSWER_LENGTH : undefined}
-                className={cn('control', condition.type !== 'text' && 'sm:max-w-xs')}
-                {...aria}
+                maxLength={isText ? MAX_ANSWER_LENGTH : undefined}
+                className={cn('control', !isText && 'sm:max-w-xs')}
+                {...(isText ? withCount(aria, `${anchor}-count`) : aria)}
             />
         );
+        if (isText) {
+            return (
+                <WithCharCount id={`${anchor}-count`} length={(value as string).length}>
+                    {input}
+                </WithCharCount>
+            );
+        }
         return condition.type === 'date' ? (
             <div className="grid gap-1.5">
                 {input}
@@ -199,15 +209,46 @@ function Control({ anchor, condition, value, onChange, aria, invalid }: ControlP
                 ))}
             </div>
             {otherChosen && (
-                <input
-                    value={options.other}
-                    onChange={(e) => onChange({ ...options, other: e.target.value })}
-                    className="control mt-2"
-                    placeholder="Especifique"
-                    maxLength={MAX_ANSWER_LENGTH}
-                    aria-label={`${condition.label}: especifique`}
-                />
+                <div className="mt-2">
+                    <WithCharCount id={`${anchor}-other-count`} length={options.other.length}>
+                        <input
+                            value={options.other}
+                            onChange={(e) => onChange({ ...options, other: e.target.value })}
+                            className="control"
+                            placeholder="Especifique"
+                            maxLength={MAX_ANSWER_LENGTH}
+                            aria-label={`${condition.label}: especifique`}
+                            aria-describedby={`${anchor}-other-count`}
+                        />
+                    </WithCharCount>
+                </div>
             )}
+        </div>
+    );
+}
+
+/** Adds the counter to the ids that describe the control. */
+const withCount = (aria: ControlProps['aria'], countId: string): ControlProps['aria'] => ({
+    ...aria,
+    'aria-describedby': [aria['aria-describedby'], countId].filter(Boolean).join(' '),
+});
+
+/**
+ * An open text answer with "120 / 5.000 caracteres" under it, so the person sees
+ * how much room is left. It is not a live region: announcing every keystroke
+ * would be noise; screen readers read it with the field (aria-describedby).
+ */
+function WithCharCount({ id, length, children }: { id: string; length: number; children: ReactNode }) {
+    const atLimit = length >= MAX_ANSWER_LENGTH;
+    const format = (n: number) => n.toLocaleString('es-CO');
+
+    return (
+        <div className="grid gap-1">
+            {children}
+            <p id={id} className={cn('text-right text-sm tabular-nums', atLimit ? 'font-bold text-error' : 'text-pizarra')}>
+                {format(length)} / {format(MAX_ANSWER_LENGTH)} caracteres
+                {atLimit && ' · límite alcanzado'}
+            </p>
         </div>
     );
 }
