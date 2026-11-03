@@ -24,3 +24,5 @@ yarn-error.log
 /.zed
 manual-admin/
 .kiro/
+/backups
+/load-tests/resultados
