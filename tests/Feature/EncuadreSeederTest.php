@@ -84,14 +84,16 @@ class EncuadreSeederTest extends TestCase
     {
         $formacion = $this->labels('formacion');
         $this->assertContains('Número de asistentes para formación', $formacion);
-        $this->assertNotContains('Número de empleados de la empresa', $formacion);
+        $this->assertNotContains('Número de empleados fijos', $formacion);
+        $this->assertNotContains('Número de contratistas', $formacion);
         $this->assertNotContains('Descripción del nombre de procesos y/o macroprocesos', $formacion);
         $this->assertNotContains('¿Su organización tiene un sistema de gestión certificado o acreditado?', $formacion);
         $this->assertContains('Documentos o información a tener en cuenta para la cotización', $formacion);
 
         foreach (['auditoria', 'consultoria'] as $name) {
             $labels = $this->labels($name);
-            $this->assertContains('Número de empleados de la empresa', $labels);
+            $this->assertContains('Número de empleados fijos', $labels);
+            $this->assertContains('Número de contratistas', $labels);
             $this->assertNotContains('Número de asistentes para formación', $labels);
         }
     }

@@ -29,6 +29,25 @@ export function encuadreBlocks(conditions: Record<string, PublicCondition>, fiel
     return blocks;
 }
 
+/** A plain number box (e.g. "Número de empleados fijos"): short, so it can share its row with another one. */
+const isCompact = (condition: PublicCondition) => condition.interaction_type === 'input' && condition.type === 'number';
+
+/**
+ * The fields as rows: consecutive number boxes that are not opened by an answer
+ * go side by side (two per row on wide screens, stacked on narrow ones); every
+ * other field takes its own row.
+ */
+function rowsOf(conditions: Record<string, PublicCondition>, fields: VisibleField[]): VisibleField[][] {
+    const inRow = (field: VisibleField) => field.depth === 0 && isCompact(conditions[field.id]);
+    const rows: VisibleField[][] = [];
+    for (const field of fields) {
+        const last = rows[rows.length - 1];
+        if (last && inRow(field) && last.every(inRow)) last.push(field);
+        else rows.push([field]);
+    }
+    return rows;
+}
+
 /** One screen of the form: a block, or a part of a long one. */
 export type FormPage = EncuadreBlock & { part: number; parts: number };
 
@@ -42,9 +61,10 @@ const weightOf = (condition: PublicCondition) => (condition.interaction_type ===
  */
 export function paginate(conditions: Record<string, PublicCondition>, block: EncuadreBlock, maxWeight = 4): FormPage[] {
     const groups: VisibleField[][] = [];
-    for (const field of block.fields) {
-        if (field.depth === 0 || groups.length === 0) groups.push([field]);
-        else groups[groups.length - 1].push(field);
+    // A row of number boxes counts as one group, so a pair is never split across two screens.
+    for (const row of rowsOf(conditions, block.fields)) {
+        if (row[0].depth === 0 || groups.length === 0) groups.push([...row]);
+        else groups[groups.length - 1].push(...row);
     }
 
     const parts: VisibleField[][] = [];
@@ -85,33 +105,43 @@ export function BlockFields({ fields, conditions, answers, onAnswer, errors }: F
         shown.current = ids;
     }, [fields]);
 
+    const renderField = ({ id, depth }: VisibleField) => (
+        <div
+            key={id}
+            className={cn(depth > 0 && 'border-l-2 border-linea pl-4 sm:pl-6', opening.has(id) && 'unfold')}
+            style={{ marginLeft: depth > 1 ? `${(depth - 1) * 1.5}rem` : undefined }}
+            onAnimationEnd={(event) => {
+                if (event.target !== event.currentTarget) return;
+                setOpening((current) => {
+                    const next = new Set(current);
+                    next.delete(id);
+                    return next;
+                });
+            }}
+        >
+            <div className={cn(opening.has(id) && 'min-h-0 overflow-hidden')}>
+                <ConditionField
+                    id={id}
+                    condition={conditions[id]}
+                    answer={answers[id]}
+                    onChange={(answer) => onAnswer(id, answer)}
+                    error={errors[id] ?? null}
+                />
+            </div>
+        </div>
+    );
+
     return (
         <>
-            {fields.map(({ id, depth }) => (
-                <div
-                    key={id}
-                    className={cn(depth > 0 && 'border-l-2 border-linea pl-4 sm:pl-6', opening.has(id) && 'unfold')}
-                    style={{ marginLeft: depth > 1 ? `${(depth - 1) * 1.5}rem` : undefined }}
-                    onAnimationEnd={(event) => {
-                        if (event.target !== event.currentTarget) return;
-                        setOpening((current) => {
-                            const next = new Set(current);
-                            next.delete(id);
-                            return next;
-                        });
-                    }}
-                >
-                    <div className={cn(opening.has(id) && 'min-h-0 overflow-hidden')}>
-                        <ConditionField
-                            id={id}
-                            condition={conditions[id]}
-                            answer={answers[id]}
-                            onChange={(answer) => onAnswer(id, answer)}
-                            error={errors[id] ?? null}
-                        />
+            {rowsOf(conditions, fields).map((row) =>
+                row.length > 1 ? (
+                    <div key={row[0].id} className="grid gap-7 sm:grid-cols-2">
+                        {row.map(renderField)}
                     </div>
-                </div>
-            ))}
+                ) : (
+                    renderField(row[0])
+                ),
+            )}
         </>
     );
 }

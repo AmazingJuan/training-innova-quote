@@ -97,7 +97,7 @@ class EncuadreSeeder extends Seeder
                 'Ej.: Diseño, fabricación y montaje de estructuras metálicas en la planta de Itagüí y la sede administrativa de Medellín.',
             ),
             $this->processes(),
-            $this->employees(),
+            ...$this->employees(),
             $this->certification(),
             $this->teamProfile('Ej.: auditor líder certificado en ISO 45001 con experiencia en el sector eléctrico.'),
             $this->arl(),
@@ -122,7 +122,7 @@ class EncuadreSeeder extends Seeder
                 'Ej.: Prestación de servicios de transporte de carga en las sedes de Bogotá y Barranquilla.',
             ),
             $this->processes(),
-            $this->employees(),
+            ...$this->employees(),
             $this->certification(),
             $this->teamProfile('Ej.: consultor con experiencia en el sector minero y en sistemas integrados de gestión.'),
             $this->arl(),
@@ -174,10 +174,13 @@ class EncuadreSeeder extends Seeder
         );
     }
 
-    /** @return array<string, mixed> */
+    /** @return list<array<string, mixed>> */
     private function employees(): array
     {
-        return $this->field('Número de empleados de la empresa', 'number', 'necesidad', 'Ej.: 85', 'Incluya a los contratistas que trabajan de forma permanente en la organización.');
+        return [
+            $this->field('Número de empleados fijos', 'number', 'necesidad', 'Ej.: 85'),
+            $this->field('Número de contratistas', 'number', 'necesidad', 'Ej.: 10'),
+        ];
     }
 
     /**
