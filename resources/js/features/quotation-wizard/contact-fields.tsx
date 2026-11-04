@@ -138,7 +138,7 @@ export function PrivacyConsent({ accepted, error, onChange }: { accepted: boolea
                     )}
                 />
                 <span>
-                    Autorizo el tratamiento de mis datos para responder esta solicitud, partiendo del {' '}
+                    Autorizo el tratamiento de mis datos para responder esta solicitud, partiendo del{' '}
                     <a href={corporate.privacy} target="_blank" rel="noopener noreferrer" className="link">
                         manual de protección de datos personales
                     </a>
