@@ -1,5 +1,6 @@
 import { FormActions, FormCard, FormField } from '@/components/admin/form';
 import { adminFieldInputClass } from '@/components/admin/styles';
+import { PasswordInput } from '@/components/password-input';
 import { useForm } from '@inertiajs/react';
 
 export type UserFormData = { name: string; email: string; phone: string; password: string };
@@ -59,13 +60,7 @@ export function UserForm({ initial, userId }: UserFormProps) {
                     hint={isEdit ? 'Déjela en blanco para conservar la actual.' : 'Mínimo 8 caracteres.'}
                     error={errors.password}
                 >
-                    <input
-                        type="password"
-                        autoComplete="new-password"
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        className={adminFieldInputClass}
-                    />
+                    <PasswordInput autoComplete="new-password" value={data.password} onChange={(e) => setData('password', e.target.value)} />
                 </FormField>
             </div>
             <FormActions

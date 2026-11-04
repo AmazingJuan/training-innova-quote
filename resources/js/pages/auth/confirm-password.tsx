@@ -1,7 +1,7 @@
 import InputError from '@/components/input-error';
 import InputLabel from '@/components/input-label';
+import { PasswordInput } from '@/components/password-input';
 import PrimaryButton from '@/components/primary-button';
-import TextInput from '@/components/text-input';
 import GuestLayout from '@/layouts/guest-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -29,9 +29,8 @@ export default function ConfirmPassword() {
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Contraseña" />
 
-                    <TextInput
+                    <PasswordInput
                         id="password"
-                        type="password"
                         name="password"
                         value={data.password}
                         className="mt-1 block w-full"

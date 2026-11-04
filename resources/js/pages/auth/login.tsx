@@ -1,6 +1,7 @@
 import Checkbox from '@/components/checkbox';
 import InputError from '@/components/input-error';
 import InputLabel from '@/components/input-label';
+import { PasswordInput } from '@/components/password-input';
 import PrimaryButton from '@/components/primary-button';
 import TextInput from '@/components/text-input';
 import GuestLayout from '@/layouts/guest-layout';
@@ -51,9 +52,8 @@ export default function Login({ status, canResetPassword }: { status?: string; c
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Contraseña" />
 
-                    <TextInput
+                    <PasswordInput
                         id="password"
-                        type="password"
                         name="password"
                         value={data.password}
                         className="mt-1 block w-full"
