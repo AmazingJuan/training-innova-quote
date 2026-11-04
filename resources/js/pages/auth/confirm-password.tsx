@@ -23,7 +23,7 @@ export default function ConfirmPassword() {
         <GuestLayout>
             <Head title="Confirmar contraseña" />
 
-            <div className="mb-4 text-sm text-pizarra">This is a secure area of the application. Please confirm your password before continuing.</div>
+            <div className="mb-4 text-sm text-pizarra">Esta es un área segura de la plataforma. Confirme su contraseña para continuar.</div>
 
             <form onSubmit={submit}>
                 <div className="mt-4">
@@ -43,7 +43,7 @@ export default function ConfirmPassword() {
 
                 <div className="mt-4 flex items-center justify-end">
                     <PrimaryButton className="ms-4" disabled={processing}>
-                        Confirm
+                        Confirmar
                     </PrimaryButton>
                 </div>
             </form>
