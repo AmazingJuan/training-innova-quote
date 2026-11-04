@@ -1,0 +1,1 @@
+function n(t){return t.charAt(0).toUpperCase()+t.slice(1)}function e(t){if(!t)return"—";const r=new Date(t);return Number.isNaN(r.getTime())?"—":r.toLocaleDateString("es-CO")}function i(t){return t==null||t===""?"—":String(t)}export{n as c,e as f,i as o};

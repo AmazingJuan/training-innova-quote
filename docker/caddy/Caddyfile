@@ -1,0 +1,28 @@
+# Caddy obtiene y renueva solo el certificado HTTPS de Let's Encrypt para APP_DOMAIN
+# y redirige http:// a https://. Requiere que el dominio apunte a este servidor
+# y que los puertos 80 y 443 estén abiertos.
+{
+	email {$ACME_EMAIL}
+}
+
+{$APP_DOMAIN} {
+	encode zstd gzip
+
+	# Documentos adjuntos: 5 x 10 MB (igual que post_max_size de PHP).
+	request_body {
+		max_size 60MB
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# Los archivos de Vite llevan un hash en el nombre: el navegador puede guardarlos un año.
+	@build path /build/*
+	header @build Cache-Control "public, max-age=31536000, immutable"
+
+	reverse_proxy app:80
+}

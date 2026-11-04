@@ -1,0 +1,115 @@
+# Producción: https://cotizaciones.trainingcorporation.com.co
+#
+#   caddy      HTTPS (certificado de Let's Encrypt automático) y proxy hacia app
+#   app        Laravel + frontend React compilado (Apache + PHP)
+#   worker     cola de Laravel: correos y exportaciones a Excel
+#   scheduler  tareas programadas (limpieza de exportaciones y adjuntos)
+#   db         MySQL 8.4 (solo accesible dentro de la red de Docker)
+#
+# Todo se configura en .env (plantilla: .env.production.example).
+# Guía completa: deploy/README.md
+
+name: cotizaciones
+
+x-laravel: &laravel
+  image: cotizaciones-app:latest
+  env_file: .env
+  restart: unless-stopped
+  volumes:
+    - storage:/var/www/html/storage
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "5" }
+
+services:
+  app:
+    <<: *laravel
+    build:
+      context: .
+      args:
+        VITE_APP_NAME: ${APP_NAME:-Training Corporation}
+    environment:
+      CONTAINER_ROLE: app
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost/up"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  worker:
+    <<: *laravel
+    pull_policy: never
+    user: www-data
+    environment:
+      CONTAINER_ROLE: worker
+    # --timeout debe ser menor que DB_QUEUE_RETRY_AFTER (.env).
+    command: php artisan queue:work --tries=3 --timeout=150 --sleep=3 --max-time=3600
+    stop_grace_period: 160s
+    depends_on:
+      app:
+        condition: service_healthy
+
+  scheduler:
+    <<: *laravel
+    pull_policy: never
+    user: www-data
+    environment:
+      CONTAINER_ROLE: scheduler
+    command: php artisan schedule:work
+    depends_on:
+      app:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: America/Bogota
+    command:
+      - --innodb-buffer-pool-size=${MYSQL_BUFFER_POOL:-512M}
+      - --max-connections=200
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  storage:
+  db_data:
+  caddy_data:
+  caddy_config:

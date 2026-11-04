@@ -1,0 +1,1 @@
+import{r as t,j as u}from"./app-BhpIURlu.js";const l=t.forwardRef(function({type:s="text",className:f="",isFocused:r=!1,...n},o){const e=t.useRef(null);return t.useImperativeHandle(o,()=>({focus:()=>e.current?.focus()})),t.useEffect(()=>{r&&e.current?.focus()},[r]),u.jsx("input",{...n,type:s,className:"control "+f,ref:e})});export{l as T};
