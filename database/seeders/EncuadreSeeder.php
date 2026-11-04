@@ -148,6 +148,7 @@ class EncuadreSeeder extends Seeder
                 'Indique el tema, el objetivo, a quién va dirigida, duración sugerida y si requiere certificado o constancia.',
             ),
             $this->field('Número de asistentes para formación', 'number', 'necesidad', 'Ej.: 20', 'Número aproximado de participantes. Si serán varios grupos, indique el total.'),
+            $this->field('Número de horas estimadas para la formación', 'number', 'necesidad', 'Ej.: 16'),
             $this->teamProfile('Ej.: entrenador certificado en trabajo en alturas con licencia en SST vigente.'),
             ...$this->arl(),
             ...$this->conditions('Fecha estimada de inicio para la prestación del servicio'),
