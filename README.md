@@ -27,8 +27,8 @@ Asegúrate de tener instaladas las siguientes herramientas:
 Clona el repositorio y entra al directorio del proyecto:
 
 ```bash
-git clone https://github.com/AmazingJuan/reto-2-p2
-cd reto-2-p2
+git clone https://github.com/AmazingJuan/training-innova-quote
+cd training-innova-quote/
 ```
 
 Instala las dependencias de **PHP** y **JavaScript**:
