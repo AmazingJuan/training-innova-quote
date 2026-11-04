@@ -86,11 +86,11 @@ negocio, la letra V, el año y un consecutivo:
     {\textcolor{azul}{EO}\textcolor{grismarca}{-}\textcolor{azulhondo}{V}\textcolor{grismarca}{-}%
      \textcolor{noche}{26}\textcolor{azulvivo}{01}};
   \foreach \x/\col/\parte/\titulo/\texto in {
-      -5.7/azul/EO/Abreviado/de la unidad de negocio,
-      -1.9/azulhondo/V/Virtual/fija: la cotización se solicitó en línea,
-      1.9/noche/26/Año/en dos cifras (2026),
-      5.7/azulvivo/01/Consecutivo/de la unidad dentro del año} {
-    \node[tarjeta, draw=\col!55, text width=3.3cm, align=center, inner ysep=8pt] at (\x,-2.3)
+      -6.0/azul/EO/Abreviado/de la unidad de negocio,
+      -2.0/azulhondo/V/Virtual/fija: la cotización se solicitó en línea,
+      2.0/noche/26/Año/en dos cifras (2026),
+      6.0/azulvivo/01/Consecutivo/de la unidad dentro del año} {
+    \node[tarjeta, draw=\col!55, text width=3.05cm, minimum height=3.1cm, align=center, inner ysep=8pt, anchor=north] at (\x,-1.0)
       {{\color{\col}\montserrat\fontseries{eb}\selectfont\Large\parte}\\[2pt]
        {\fontseries{sb}\selectfont\color{\col}\titulo}\\[1pt]{\footnotesize\color{pizarra}\texto}};
   }
