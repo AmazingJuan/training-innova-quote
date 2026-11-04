@@ -70,9 +70,8 @@ ssh -i cotizaciones.pem ubuntu@<ELASTIC_IP>
 En la EC2:
 
 ```bash
-git clone https://github.com/AmazingJuan/reto-2-p2.git
-cd reto-2-p2
-git checkout development        # o la rama que vaya a producción
+git clone --branch deployment https://github.com/AmazingJuan/training-innova-quote.git
+cd training-innova-quote
 
 sudo ./deploy/preparar-servidor.sh   # Docker, swap, hora de Colombia, respaldo diario
 exit                                 # salga y vuelva a entrar para usar docker sin sudo
@@ -118,5 +117,5 @@ Los respaldos de `backups/` están en el mismo disco que la base de datos. Para 
 ## Notas
 
 - `docker-compose.yml` reemplaza la configuración anterior con nginx y certbot. Caddy hace lo mismo y renueva el certificado solo.
-- El flujo de GitHub Actions `deployment-branch.yml` publica una rama `deployment` sin el código fuente del frontend. El `Dockerfile` nuevo compila el frontend, así que hay que desplegar desde una rama normal (`development` o `main`), no desde `deployment`.
+- El flujo de GitHub Actions `deployment-branch.yml` compila el frontend y publica los archivos de ejecución y los scripts en la rama `deployment`. En EC2, clone esa rama: su `Dockerfile` usa `public/build` ya generado y no vuelve a compilar el frontend.
 - Para probar el stack en su computador: `./deploy/configurar-env.sh localhost` en una copia del proyecto. Caddy usa entonces un certificado local.

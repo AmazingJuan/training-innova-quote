@@ -27,8 +27,18 @@ if [ ${#missing[@]} -gt 0 ]; then
 fi
 
 if [ "${1:-}" != "--sin-pull" ]; then
-    echo "==> git pull"
-    git pull --ff-only
+    if [ "$(git branch --show-current)" = "deployment" ]; then
+        echo "==> Actualizando la rama deployment"
+        if ! git diff --quiet || ! git diff --cached --quiet; then
+            echo "Hay cambios locales en archivos versionados; guárdelos antes de desplegar." >&2
+            exit 1
+        fi
+        git fetch origin deployment
+        git reset --hard FETCH_HEAD
+    else
+        echo "==> git pull"
+        git pull --ff-only
+    fi
 fi
 
 DOMAIN="$(env_value APP_DOMAIN)"

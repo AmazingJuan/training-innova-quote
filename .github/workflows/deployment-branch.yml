@@ -68,14 +68,16 @@ jobs:
 
           # Env example
           [ -f .env.example ] && cp -a .env.example "$DEPLOY_DIR/"
+          cp -a .env.production.example "$DEPLOY_DIR/"
 
-          [ -f Dockerfile ] && cp -a Dockerfile "$DEPLOY_DIR/"
-          [ -f nginx.conf ] && cp -a nginx.conf "$DEPLOY_DIR/"
+          cp -a Dockerfile.deployment "$DEPLOY_DIR/Dockerfile"
           [ -f docker-compose.yml ] && cp -a docker-compose.yml "$DEPLOY_DIR/"
           [ -d docker ] && cp -a docker "$DEPLOY_DIR/"
+          cp -a deploy "$DEPLOY_DIR/"
 
           # Sanity check
           test -f public/build/manifest.json || (echo "missing build" && exit 1)
+          test -f deploy/configurar-env.sh || (echo "missing deploy scripts" && exit 1)
 
       - name: Push orphan branch deployment
         env:
