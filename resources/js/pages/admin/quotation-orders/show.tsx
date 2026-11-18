@@ -45,7 +45,6 @@ function UploadProposalModal({ order, open, onOpenChange }: { order: QuotationOr
                         onChange={(e) => setData('quotation_url', e.target.value)}
                         placeholder="https://…/propuesta.pdf"
                         className={adminFieldInputClass}
-                        autoFocus
                     />
                 </FormField>
                 <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

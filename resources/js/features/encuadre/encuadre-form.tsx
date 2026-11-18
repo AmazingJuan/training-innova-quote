@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { useEffect, useRef, useState, type ReactNode, type Ref } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { VisibleField } from './answers';
 import { ConditionField } from './condition-field';
 import { sectionKey, sectionOf } from './sections';
@@ -11,7 +11,7 @@ export type EncuadreBlock = { key: string; title: string; short: string; hint: s
 export function encuadreBlocks(conditions: Record<string, PublicCondition>, fields: VisibleField[]): EncuadreBlock[] {
     const blocks: EncuadreBlock[] = [];
     for (const field of fields) {
-        const key = sectionKey(conditions[field.id].section) ?? 'otras';
+        const key = sectionKey(conditions[field.id]?.section ?? null) ?? 'otras';
         const last = blocks[blocks.length - 1];
         if (last?.key === key) {
             last.fields.push(field);
@@ -33,8 +33,8 @@ export function encuadreBlocks(conditions: Record<string, PublicCondition>, fiel
  * Short boxes that can share a row ("Número de empleados fijos", "Fecha estimada de inicio…"),
  * by kind: only boxes of the same kind pair up, so a date never sits next to a number.
  */
-const compactKind = (condition: PublicCondition) =>
-    condition.interaction_type === 'input' && (condition.type === 'number' || condition.type === 'date') ? condition.type : null;
+const compactKind = (condition: PublicCondition | undefined) =>
+    condition && condition.interaction_type === 'input' && (condition.type === 'number' || condition.type === 'date') ? condition.type : null;
 
 /**
  * The fields as rows: consecutive short boxes of the same kind that are not
@@ -57,7 +57,7 @@ function rowsOf(conditions: Record<string, PublicCondition>, fields: VisibleFiel
 export type FormPage = EncuadreBlock & { part: number; parts: number };
 
 /** How much room a question takes on screen (long text counts double). */
-const weightOf = (condition: PublicCondition) => (condition.interaction_type === 'input' && condition.multiline ? 2 : 1);
+const weightOf = (condition: PublicCondition | undefined) => (condition?.interaction_type === 'input' && condition.multiline ? 2 : 1);
 
 /**
  * Split a long block into parts that fit on screen. A question and the fields
@@ -68,19 +68,23 @@ export function paginate(conditions: Record<string, PublicCondition>, block: Enc
     const groups: VisibleField[][] = [];
     // A row of number boxes counts as one group, so a pair is never split across two screens.
     for (const row of rowsOf(conditions, block.fields)) {
-        if (row[0].depth === 0 || groups.length === 0) groups.push([...row]);
-        else groups[groups.length - 1].push(...row);
+        const lastGroup = groups[groups.length - 1];
+        if (row[0]?.depth === 0 || !lastGroup) groups.push([...row]);
+        else lastGroup.push(...row);
     }
 
     const parts: VisibleField[][] = [];
     let weight = 0;
     for (const group of groups) {
-        const w = weightOf(conditions[group[0].id]);
-        if (parts.length === 0 || weight + w > maxWeight) {
-            parts.push([]);
+        const first = group[0];
+        const w = first ? weightOf(conditions[first.id]) : 1;
+        let part = parts[parts.length - 1];
+        if (!part || weight + w > maxWeight) {
+            part = [];
+            parts.push(part);
             weight = 0;
         }
-        parts[parts.length - 1].push(...group);
+        part.push(...group);
         weight += w;
     }
 
@@ -103,48 +107,53 @@ export function BlockFields({ fields, conditions, answers, onAnswer, errors }: F
     // Fields that appear on the same screen were opened by an answer (not by moving to another screen).
     useEffect(() => {
         const ids = new Set(fields.map((f) => f.id));
-        if (shown.current?.has(fields[0]?.id)) {
+        const firstId = fields[0]?.id;
+        if (firstId !== undefined && shown.current?.has(firstId)) {
             const opened = fields.filter((f) => f.depth > 0 && !shown.current?.has(f.id)).map((f) => f.id);
             if (opened.length > 0) setOpening((current) => new Set([...current, ...opened]));
         }
         shown.current = ids;
     }, [fields]);
 
-    const renderField = ({ id, depth }: VisibleField) => (
-        <div
-            key={id}
-            className={cn(depth > 0 && 'border-l-2 border-linea pl-4 sm:pl-6', opening.has(id) && 'unfold')}
-            style={{ marginLeft: depth > 1 ? `${(depth - 1) * 1.5}rem` : undefined }}
-            onAnimationEnd={(event) => {
-                if (event.target !== event.currentTarget) return;
-                setOpening((current) => {
-                    const next = new Set(current);
-                    next.delete(id);
-                    return next;
-                });
-            }}
-        >
-            <div className={cn(opening.has(id) && 'min-h-0 overflow-hidden')}>
-                <ConditionField
-                    id={id}
-                    condition={conditions[id]}
-                    answer={answers[id]}
-                    onChange={(answer) => onAnswer(id, answer)}
-                    error={errors[id] ?? null}
-                />
+    const renderField = ({ id, depth }: VisibleField) => {
+        const condition = conditions[id];
+        if (!condition) return null;
+        return (
+            <div
+                key={id}
+                className={cn(depth > 0 && 'border-l-2 border-linea pl-4 sm:pl-6', opening.has(id) && 'unfold')}
+                style={{ marginLeft: depth > 1 ? `${(depth - 1) * 1.5}rem` : undefined }}
+                onAnimationEnd={(event) => {
+                    if (event.target !== event.currentTarget) return;
+                    setOpening((current) => {
+                        const next = new Set(current);
+                        next.delete(id);
+                        return next;
+                    });
+                }}
+            >
+                <div className={cn(opening.has(id) && 'min-h-0 overflow-hidden')}>
+                    <ConditionField
+                        id={id}
+                        condition={condition}
+                        answer={answers[id]}
+                        onChange={(answer) => onAnswer(id, answer)}
+                        error={errors[id] ?? null}
+                    />
+                </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <>
             {rowsOf(conditions, fields).map((row) =>
                 row.length > 1 ? (
-                    <div key={row[0].id} className="grid gap-7 sm:grid-cols-2">
+                    <div key={row[0]?.id} className="grid gap-7 sm:grid-cols-2">
                         {row.map(renderField)}
                     </div>
                 ) : (
-                    renderField(row[0])
+                    row[0] && renderField(row[0])
                 ),
             )}
         </>
@@ -170,13 +179,10 @@ type FormBlockProps = {
     title: string;
     hint?: string;
     children: ReactNode;
-    /** Navigation under the fields. */
-    footer?: ReactNode;
-    titleRef?: Ref<HTMLHeadingElement>;
 };
 
 /** A numbered block of the request form. */
-export function FormBlock({ id, number, title, hint, children, footer, titleRef }: FormBlockProps) {
+function FormBlock({ id, number, title, hint, children }: FormBlockProps) {
     return (
         <section id={id} aria-labelledby={`${id}-title`} className="panel scroll-mt-28 p-5 sm:p-8">
             <header className="mb-6 flex items-start gap-4 border-b border-linea pb-5">
@@ -187,19 +193,13 @@ export function FormBlock({ id, number, title, hint, children, footer, titleRef 
                     {number}
                 </span>
                 <div>
-                    <h2
-                        id={`${id}-title`}
-                        ref={titleRef}
-                        tabIndex={-1}
-                        className="font-display text-xl font-bold leading-tight text-tinta outline-none sm:text-2xl"
-                    >
+                    <h2 id={`${id}-title`} className="font-display text-xl font-bold leading-tight text-tinta sm:text-2xl">
                         {title}
                     </h2>
                     {hint && <p className="mt-1 text-base text-pizarra">{hint}</p>}
                 </div>
             </header>
             <div className="space-y-7">{children}</div>
-            {footer && <div className="mt-8 border-t border-linea pt-6">{footer}</div>}
         </section>
     );
 }

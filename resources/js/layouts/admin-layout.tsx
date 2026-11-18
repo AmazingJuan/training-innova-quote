@@ -149,7 +149,7 @@ type AdminLayoutProps = {
 
 export default function AdminLayout({ children, title }: AdminLayoutProps) {
     const { url } = usePage();
-    const currentPath = url.split('?')[0];
+    const currentPath = url.split('?')[0] ?? url;
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {

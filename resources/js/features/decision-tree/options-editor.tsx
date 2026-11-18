@@ -26,6 +26,7 @@ export function OptionsEditor({ question, targets, defaultLabel, onChange, branc
     const focusIndex = useRef<number | null>(null);
     const regular = options.map((option, index) => ({ option, index })).filter(({ option }) => !option.is_other);
     const other = options.findIndex((o) => o.is_other);
+    const otherOption = options[other];
 
     // Focus the option just created with Enter / "Añadir opción".
     useEffect(() => {
@@ -46,9 +47,11 @@ export function OptionsEditor({ question, targets, defaultLabel, onChange, branc
 
     const move = (index: number, delta: -1 | 1) => {
         const to = index + delta;
-        if (to < 0 || to >= options.length || options[to].is_other) return;
+        const [from, target] = [options[index], options[to]];
+        if (!from || !target || target.is_other) return;
         const copy = [...options];
-        [copy[index], copy[to]] = [copy[to], copy[index]];
+        copy[index] = target;
+        copy[to] = from;
         onChange(copy);
     };
 
@@ -165,10 +168,10 @@ export function OptionsEditor({ question, targets, defaultLabel, onChange, branc
                 </label>
             </div>
 
-            {other >= 0 && branching && (
+            {otherOption && branching && (
                 <label className="mt-2 flex flex-col gap-1 rounded-control border-2 border-dashed border-linea p-2 pl-9 text-sm text-pizarra sm:flex-row sm:items-center sm:gap-3">
                     <span className="shrink-0 font-semibold">Al elegir «Otro»</span>
-                    {branchSelect(options[other], other)}
+                    {branchSelect(otherOption, other)}
                 </label>
             )}
         </fieldset>

@@ -55,39 +55,3 @@ export function BrandRing({ src, alt, caption, focus = '50% 50%', className }: B
         </figure>
     );
 }
-
-/**
- * Small "go" ring used at the end of navigable rows: the ring closes when the
- * row (a `group`) is hovered or focused.
- */
-export function RingArrow({ className }: { className?: string }) {
-    return (
-        <span className={cn('relative inline-flex h-10 w-10 shrink-0 items-center justify-center text-azul', className)} aria-hidden>
-            <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full overflow-visible">
-                <circle
-                    cx="50"
-                    cy="50"
-                    r="46"
-                    pathLength={100}
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={5}
-                    strokeLinecap="round"
-                    transform="rotate(27 50 50)"
-                    className="transition-[stroke-dasharray] duration-300 ease-out [stroke-dasharray:85_15] group-hover:[stroke-dasharray:100_0] group-focus-visible:[stroke-dasharray:100_0]"
-                />
-            </svg>
-            <svg
-                viewBox="0 0 24 24"
-                className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            >
-                <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-        </span>
-    );
-}

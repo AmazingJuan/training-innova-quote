@@ -1,7 +1,7 @@
-import { SECTIONS, sectionOf, type SectionKey } from '@/features/quotation-wizard/sections';
+import { SECTIONS, sectionOf, type SectionKey } from '@/features/encuadre/sections';
 import { cn } from '@/lib/utils';
 import { AlertCircle, ArrowDown, ArrowUp, Copy, CornerDownRight, Loader2, Pencil, Trash2 } from 'lucide-react';
-import { useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { AnswerKindPicker } from './answer-kind-picker';
 import { isDirty, type Draft } from './draft';
 import { labelOf, type Arrival, type Issue } from './graph';
@@ -105,6 +105,17 @@ export function QuestionCard(props: QuestionCardProps) {
     const isNew = question.id < 0;
     const unused = isBranch && !isNew && arrivals.length === 0;
     const editing = draft !== null;
+    const labelRef = useRef<HTMLInputElement>(null);
+    const editRef = useRef<HTMLButtonElement>(null);
+    const wasEditing = useRef(false);
+
+    // Opening the editor moves the focus to the question; closing it (saved or cancelled) brings it back
+    // to the card's "Editar" button, instead of losing it when the editor goes away.
+    useEffect(() => {
+        if (editing && !wasEditing.current) labelRef.current?.focus();
+        if (!editing && wasEditing.current) editRef.current?.focus({ preventScroll: true });
+        wasEditing.current = editing;
+    }, [editing]);
     const q = draft?.question ?? question;
     const dirty = draft ? isDirty(draft) || isNew : false;
     const blocking = [...props.draftIssues.map((i) => i.message), ...props.serverErrors];
@@ -161,7 +172,7 @@ export function QuestionCard(props: QuestionCardProps) {
                                     className={iconButton}
                                     onClick={() => props.onMove('up')}
                                     disabled={locked || !props.canMoveUp}
-                                    aria-label="Subir pregunta"
+                                    aria-label={`Subir «${labelOf(question)}»`}
                                     title="Subir"
                                 >
                                     <ArrowUp className="h-4 w-4" aria-hidden />
@@ -171,7 +182,7 @@ export function QuestionCard(props: QuestionCardProps) {
                                     className={iconButton}
                                     onClick={() => props.onMove('down')}
                                     disabled={locked || !props.canMoveDown}
-                                    aria-label="Bajar pregunta"
+                                    aria-label={`Bajar «${labelOf(question)}»`}
                                     title="Bajar"
                                 >
                                     <ArrowDown className="h-4 w-4" aria-hidden />
@@ -179,11 +190,12 @@ export function QuestionCard(props: QuestionCardProps) {
                             </>
                         )}
                         <button
+                            ref={editRef}
                             type="button"
                             className={iconButton}
                             onClick={props.onEdit}
                             disabled={locked}
-                            aria-label="Editar pregunta"
+                            aria-label={`Editar «${labelOf(question)}»`}
                             title="Editar"
                         >
                             <Pencil className="h-4 w-4" aria-hidden />
@@ -211,7 +223,7 @@ export function QuestionCard(props: QuestionCardProps) {
                             onChange={(e) => props.onChange((d) => ({ ...d, label: e.target.value }))}
                             placeholder="Ej.: ¿Cuántos empleados tiene la empresa?"
                             className="control font-semibold"
-                            autoFocus
+                            ref={labelRef}
                         />
                     </div>
 

@@ -43,6 +43,7 @@ Lo mismo que corre la integración continua en cada PR:
 | `composer audit` | Vulnerabilidades conocidas en dependencias |
 | `npm run lint:check` | ESLint |
 | `npm run format:check` | Prettier |
+| `npm test` | Pruebas de la lógica del frontend (Vitest) |
 | `npm run build` | TypeScript y compilación del frontend |
 
 Las pruebas también corren contra MariaDB 11.4, la misma versión de producción.

@@ -1,7 +1,7 @@
 import { Modal } from '@/components/ui/modal';
-import { answerError, datePairErrors, pathAnswers, visibleFields } from '@/features/quotation-wizard/answers';
-import { EncuadreForm } from '@/features/quotation-wizard/encuadre-form';
-import type { Answer, PublicCondition } from '@/features/quotation-wizard/types';
+import { pathAnswers, validateFields, visibleFields } from '@/features/encuadre/answers';
+import { EncuadreForm } from '@/features/encuadre/encuadre-form';
+import type { Answer, PublicCondition } from '@/features/encuadre/types';
 import { useMemo, useState } from 'react';
 import type { TreeData } from './types';
 
@@ -9,20 +9,12 @@ type TestRunProps = { tree: TreeData; open: boolean; onOpenChange: (open: boolea
 
 /** Fill the unsaved questionnaire exactly as the client will, with the same form. */
 export function TestRun({ tree, open, onOpenChange }: TestRunProps) {
-    const conditions = useMemo(() => Object.fromEntries(tree.conditions.map((c) => [c.id, c as PublicCondition])), [tree]);
+    const conditions = useMemo(() => Object.fromEntries(tree.conditions.map((c): [number, PublicCondition] => [c.id, c])), [tree]);
     const [answers, setAnswers] = useState<Record<number, Answer>>({});
     const [checked, setChecked] = useState(false);
 
     const fields = useMemo(() => visibleFields(conditions, tree.initial_condition_id, answers), [conditions, tree.initial_condition_id, answers]);
-    const errors = useMemo(() => {
-        if (!checked) return {};
-        const found: Record<number, string> = {};
-        for (const { id } of fields) {
-            const error = answerError(conditions[id], answers[id]);
-            if (error) found[id] = error;
-        }
-        return { ...found, ...datePairErrors(conditions, fields, answers) };
-    }, [checked, fields, conditions, answers]);
+    const errors = useMemo(() => (checked ? validateFields(conditions, fields, answers) : {}), [checked, fields, conditions, answers]);
     const result = pathAnswers(
         conditions,
         fields.map((f) => f.id),

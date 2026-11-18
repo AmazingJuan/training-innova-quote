@@ -1,6 +1,5 @@
 import forms from '@tailwindcss/forms';
 
-const token = (name) => `hsl(var(--${name}) / <alpha-value>)`;
 
 /**
  * Tokens copied from the Training Corporation site (training/docs/BRAND.md) with
@@ -29,18 +28,6 @@ export default {
                 nube: '#eef4f8', // alternate ground
                 linea: '#d5e2eb', // rules and field borders
                 error: '#b3261e',
-                // shadcn/ui semantic tokens (app.css)
-                border: token('border'),
-                input: token('input'),
-                ring: token('ring'),
-                background: token('background'),
-                foreground: token('foreground'),
-                primary: { DEFAULT: token('primary'), foreground: token('primary-foreground') },
-                secondary: { DEFAULT: token('secondary'), foreground: token('secondary-foreground') },
-                destructive: { DEFAULT: token('destructive'), foreground: token('destructive-foreground') },
-                muted: { DEFAULT: token('muted'), foreground: token('muted-foreground') },
-                accent: { DEFAULT: token('accent'), foreground: token('accent-foreground') },
-                card: { DEFAULT: token('card'), foreground: token('card-foreground') },
             },
             borderRadius: {
                 control: '6px',

@@ -1,7 +1,7 @@
 import { corporate } from '@/components/public/links';
+import { SECTIONS } from '@/features/encuadre/sections';
 import { draft } from '@/features/quotation-wizard/draft';
 import { QuoteShell, unitSummaries, type QuotableUnit } from '@/features/quotation-wizard/quote-shell';
-import { SECTIONS } from '@/features/quotation-wizard/sections';
 import { ChannelsPanel, StepList, type Screen } from '@/features/quotation-wizard/step-nav';
 import PublicLayout from '@/layouts/public-layout';
 import { capitalize } from '@/lib/format';

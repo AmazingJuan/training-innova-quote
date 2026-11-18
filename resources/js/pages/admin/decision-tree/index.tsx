@@ -6,7 +6,7 @@ import { arrivalsTo, labelOf, mainSequence, validateTree } from '@/features/deci
 import { QuestionCard } from '@/features/decision-tree/question-card';
 import { TestRun } from '@/features/decision-tree/test-run';
 import type { ConditionData, TreeData } from '@/features/decision-tree/types';
-import { sectionOf } from '@/features/quotation-wizard/sections';
+import { sectionOf } from '@/features/encuadre/sections';
 import AdminLayout from '@/layouts/admin-layout';
 import { scrollIntoViewSoftly } from '@/lib/scroll';
 import { cn } from '@/lib/utils';
@@ -225,7 +225,7 @@ export default function DecisionTreePage() {
                         {/* Unit tabs, like the corporate site's mode tabs. The rule is an inset shadow under the
                             tabs, not a border they overlap: overlapping it made the row overflow and show a scrollbar. */}
                         <div
-                            role="tablist"
+                            role="group"
                             aria-label="Unidad de negocio"
                             className="flex gap-5 overflow-x-auto overflow-y-hidden shadow-[inset_0_-2px_0_theme(colors.linea)] [scrollbar-width:thin] sm:gap-10"
                         >
@@ -235,8 +235,7 @@ export default function DecisionTreePage() {
                                     <button
                                         key={t.id}
                                         type="button"
-                                        role="tab"
-                                        aria-selected={active}
+                                        aria-pressed={active}
                                         onClick={() => {
                                             if (active || !canLeaveDraft()) return;
                                             setDraft(null);
@@ -317,7 +316,7 @@ export default function DecisionTreePage() {
                                                     </li>
                                                 )}
                                                 {card(tree, question, String(index + 1))}
-                                                {index < displayed.length - 1 && question.id > 0 && displayed[index + 1].id > 0 && (
+                                                {question.id > 0 && (displayed[index + 1]?.id ?? 0) > 0 && (
                                                     <InsertHere onClick={() => createAt({ insert_after: question.id })} disabled={locked} />
                                                 )}
                                             </Fragment>
