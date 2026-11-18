@@ -53,6 +53,11 @@ return [
             'transport' => 'ses',
         ],
 
+        // Microsoft Graph as the management mailbox (see App\Mail\Transport\MicrosoftGraphTransport).
+        'msgraph' => [
+            'transport' => 'msgraph',
+        ],
+
         'postmark' => [
             'transport' => 'postmark',
             // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),

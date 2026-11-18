@@ -53,6 +53,15 @@ if [ "$DOMAIN" != "localhost" ]; then
     fi
 fi
 
+# Un disco lleno a mitad del build deja caídos los contenedores que se reinician en ese momento
+# (así se cayó el worker el 06-11-2026). Mejor no empezar.
+free_mb="$(df -Pm / | awk 'NR==2 {print $4}')"
+if [ "${free_mb:-0}" -lt 700 ]; then
+    echo "Solo quedan ${free_mb} MB libres en el disco; el build necesita al menos 700 MB." >&2
+    echo "Libere espacio (docker image prune -a, sudo apt-get autoremove --purge) y vuelva a intentar." >&2
+    exit 1
+fi
+
 echo "==> Construyendo la imagen (la primera vez tarda varios minutos)"
 docker compose build app
 
@@ -78,7 +87,9 @@ if [ "${units:-0}" = "0" ]; then
     echo "La base de datos está vacía. Cargue los datos iniciales con: ./deploy/datos-iniciales.sh"
 fi
 
+# Las capas de la imagen anterior y la caché del build ya no sirven: en un disco pequeño cuentan.
 docker image prune -f >/dev/null
+docker builder prune -f >/dev/null
 
 echo
 echo "Desplegado en https://$DOMAIN"

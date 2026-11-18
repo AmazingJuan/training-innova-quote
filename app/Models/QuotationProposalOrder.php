@@ -51,7 +51,20 @@ class QuotationProposalOrder extends Model
         'answers' => 'array',
         'is_generated' => 'boolean',
         'viewed_by_client' => 'boolean',
+        'reminders_sent' => 'integer',
+        'last_reminded_at' => 'datetime',
     ];
+
+    /** Beginning of the question with the date the client expects the offer by (it can be reworded in the admin). */
+    public const OFFER_DATE_QUESTION = 'fecha estimada de entrega';
+
+    /** Business days the client has to leave management before the offer date (Acta Meeting Control 2). */
+    public const MIN_OFFER_BUSINESS_DAYS = 3;
+
+    public static function isOfferDateQuestion(string $question): bool
+    {
+        return str_starts_with(mb_strtolower(trim($question)), self::OFFER_DATE_QUESTION);
+    }
 
     public function client(): BelongsTo
     {
@@ -195,5 +208,65 @@ class QuotationProposalOrder extends Model
     public function getUpdatedAt(): ?Carbon
     {
         return $this->getAttribute('updated_at');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Offer date and reminders to management
+    |--------------------------------------------------------------------------
+    */
+
+    /** The offer date as the client answered it ("20/11/2026"), or null. */
+    public function getOfferDateAnswer(): ?string
+    {
+        foreach ($this->getAnswers() as $question => $answer) {
+            if (self::isOfferDateQuestion((string) $question)) {
+                $value = trim(is_array($answer) ? implode(', ', $answer) : (string) $answer);
+
+                return $value === '' ? null : $value;
+            }
+        }
+
+        return null;
+    }
+
+    /** The offer date as a date, when the answer can be read as one (d/m/Y, as the form writes it, or Y-m-d). */
+    public function getOfferDate(): ?Carbon
+    {
+        $answer = $this->getOfferDateAnswer();
+
+        return $answer === null ? null : self::parseAnswerDate($answer);
+    }
+
+    public static function parseAnswerDate(string $value): ?Carbon
+    {
+        foreach (['!d/m/Y', '!Y-m-d'] as $format) {
+            $date = \DateTimeImmutable::createFromFormat($format, trim($value), new \DateTimeZone(config('app.timezone')));
+            $errors = \DateTimeImmutable::getLastErrors();
+            // Rejects leftovers and overflows such as 31/02/2026 (which PHP would roll over to March).
+            if ($date !== false && ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0))) {
+                return Carbon::instance($date);
+            }
+        }
+
+        return null;
+    }
+
+    /** Whether the offer date the client asked for has already gone by. */
+    public function isOverdue(?Carbon $now = null): bool
+    {
+        $date = $this->getOfferDate();
+
+        return $date !== null && $date->lt(($now ?? now())->startOfDay());
+    }
+
+    public function getRemindersSent(): int
+    {
+        return (int) ($this->attributes['reminders_sent'] ?? 0);
+    }
+
+    public function markReminded(int $count): void
+    {
+        $this->forceFill(['reminders_sent' => $count, 'last_reminded_at' => now()])->save();
     }
 }

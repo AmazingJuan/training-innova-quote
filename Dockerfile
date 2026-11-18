@@ -1,17 +1,16 @@
 # syntax=docker/dockerfile:1
 #
-# Imagen de producción: Laravel (PHP 8.4 + Apache) con el frontend React ya compilado.
+# Imagen de producción: Laravel (PHP 8.4 en FrankenPHP, sobre Alpine) con el frontend React ya compilado.
 # La usan los servicios app, worker y scheduler de docker-compose.yml.
 
 # ---------------------------------------------------------------------------
 # 1. Base PHP con las extensiones que necesita el proyecto
 # ---------------------------------------------------------------------------
-FROM php:8.4-apache AS base
+FROM dunglas/frankenphp:1.13.5-php8.4-alpine AS base
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        curl git unzip libpng-dev libonig-dev libxml2-dev libzip-dev \
-    && docker-php-ext-install pdo_mysql zip gd opcache pcntl \
-    && rm -rf /var/lib/apt/lists/*
+# OPcache ya viene en la imagen. curl: healthcheck. su-exec: Caddy corre como www-data.
+RUN install-php-extensions pdo_mysql zip gd pcntl \
+    && apk add --no-cache curl su-exec git unzip
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
@@ -47,16 +46,11 @@ RUN npm run build
 # ---------------------------------------------------------------------------
 FROM base AS app
 
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public \
-    APACHE_MAX_WORKERS=40
-
 RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
-    && a2enmod rewrite headers \
-    && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
-    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+    && chown -R www-data:www-data /config /data
 
 COPY docker/php/app.ini "$PHP_INI_DIR/conf.d/zz-app.ini"
-COPY docker/apache/app.conf /etc/apache2/conf-enabled/zz-app.conf
+COPY docker/frankenphp/Caddyfile /etc/frankenphp/Caddyfile
 
 COPY --from=vendor /var/www/html/vendor ./vendor
 COPY . .
@@ -70,6 +64,10 @@ RUN composer dump-autoload --optimize --no-dev --no-interaction \
 COPY docker/entrypoint.sh /usr/local/bin/app-entrypoint
 RUN chmod +x /usr/local/bin/app-entrypoint
 
-EXPOSE 80
+# La imagen base revisa la API de administración de Caddy, que aquí está apagada.
+# El healthcheck de app lo define docker-compose.yml; worker y scheduler no sirven HTTP.
+HEALTHCHECK NONE
+
+EXPOSE 8080
 ENTRYPOINT ["app-entrypoint"]
-CMD ["apache2-foreground"]
+CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]

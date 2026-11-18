@@ -23,6 +23,8 @@ export type PublicCondition = {
     required: boolean;
     next_condition: number | null;
     options: PublicOption[];
+    /** Soonest date accepted (Y-m-d), set by the server on the offer date: 3 business days after today. */
+    min_date?: string;
 };
 
 export type QuoteViewData = {

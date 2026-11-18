@@ -24,6 +24,14 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // Microsoft Graph: the app's e-mail goes out as the management mailbox (MAIL_MAILER=msgraph).
+    'msgraph' => [
+        'tenant_id' => env('MSGRAPH_TENANT_ID'),
+        'client_id' => env('MSGRAPH_CLIENT_ID'),
+        'client_secret' => env('MSGRAPH_CLIENT_SECRET'),
+        'from' => env('MSGRAPH_FROM', env('MAIL_FROM_ADDRESS')),
+    ],
+
     'resend' => [
         'key' => env('RESEND_KEY'),
     ],

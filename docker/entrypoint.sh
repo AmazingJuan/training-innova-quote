@@ -1,6 +1,6 @@
 #!/bin/sh
 # Arranque de los contenedores app, worker y scheduler.
-#   CONTAINER_ROLE=app       ejecuta las migraciones antes de iniciar Apache.
+#   CONTAINER_ROLE=app       ejecuta las migraciones antes de iniciar el servidor web (FrankenPHP).
 #   CONTAINER_ROLE=worker|scheduler solo prepara las cachés.
 set -e
 
@@ -15,10 +15,12 @@ fi
 
 php artisan optimize
 
-# El volumen storage lo comparten los tres contenedores; Apache, el worker y el
-# scheduler escriben en él como www-data.
+# El volumen storage lo comparten los tres contenedores; el servidor web, el
+# worker y el scheduler escriben en él como www-data.
 if [ "$(id -u)" = "0" ]; then
     chown -R www-data:www-data storage bootstrap/cache
+    # El servidor web no necesita root: corre como www-data.
+    exec su-exec www-data "$@"
 fi
 
 exec "$@"

@@ -29,4 +29,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withSchedule(function (Schedule $schedule) {
         $schedule->command('exports:clean-clientes')->hourly();
         $schedule->command('adjuntos:clean-cotizaciones')->hourly();
+        // Reminders to management: 8:00 a. m. and 2:00 p. m., Monday to Friday (holidays are skipped by the command).
+        $schedule->command('quotations:remind-management')
+            ->cron('0 8,14 * * 1-5')
+            ->timezone(config('app.timezone'))
+            ->withoutOverlapping();
     })->create();

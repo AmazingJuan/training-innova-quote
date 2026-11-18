@@ -75,7 +75,7 @@ Para saber dónde está el cuello de botella:
 |---|---|
 | `app` con CPU ~200 % en `docker stats` | PHP saturado: más vCPU (t3.large / c7i.large) |
 | `db` con CPU alta | MySQL saturado. Las sesiones y la caché van a la BD; pasarlas a Redis ayuda |
-| Latencia sube pero la CPU del servidor está baja | Se llenaron los procesos de Apache (`APACHE_MAX_WORKERS` en `.env`) o el límite es la conexión de quien corre k6 |
+| Latencia sube pero la CPU del servidor está baja | Se ocuparon todos los hilos de PHP (`PHP_THREADS` en `.env`) o el límite es la conexión de quien corre k6 |
 | `data_received` plano en el informe y la CPU de la EC2 baja | Su internet es el límite. Pruebe con `ASSETS=0` o corra k6 desde una EC2 |
 | Errores 502/504 | `app` reiniciándose o sin memoria: revise `docker compose logs app` |
 

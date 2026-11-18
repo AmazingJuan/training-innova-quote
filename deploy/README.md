@@ -5,10 +5,10 @@ La aplicación queda en **https://cotizaciones.trainingcorporation.com.co**. Cor
 | Servicio | Qué hace |
 |---|---|
 | `caddy` | HTTPS con certificado de Let's Encrypt (lo pide y lo renueva solo) y redirección de http a https |
-| `app` | Laravel y el frontend React ya compilado (Apache + PHP 8.4 con OPcache). Ejecuta las migraciones al arrancar |
+| `app` | Laravel y el frontend React ya compilado (FrankenPHP: PHP 8.4 con OPcache, sobre Alpine). Ejecuta las migraciones al arrancar |
 | `worker` | Cola de Laravel: correos y exportaciones a Excel |
 | `scheduler` | Tareas programadas: limpieza de exportaciones y adjuntos cada hora |
-| `db` | MySQL 8.4. Solo es accesible dentro de Docker, no desde internet |
+| `db` | MariaDB 11.4 LTS. Solo es accesible dentro de Docker, no desde internet |
 
 El frontend no tiene un servidor propio. Vite lo compila al construir la imagen y lo sirve el mismo contenedor `app`.
 
@@ -17,7 +17,7 @@ El frontend no tiene un servidor propio. Vite lo compila al construir la imagen 
 Para unos **50 usuarios simultáneos**: **t3.medium** (2 vCPU, 4 GB de RAM) con 30 GB de disco gp3.
 
 - 50 personas navegando y llenando el formulario generan unas 5 a 15 peticiones por segundo. Una t3.medium con OPcache atiende bastante más que eso. La prueba de carga confirma el número real.
-- Una t3.small (2 GB) se queda corta: MySQL, Apache y la compilación de la imagen no caben con holgura.
+- Una t3.small (2 GB) se queda corta: MariaDB, PHP y la compilación de la imagen no caben con holgura.
 - Use x86_64 (t3), no Graviton (t4g). Las dependencias de compilación del frontend están fijadas para x64.
 - Costo aproximado en us-east-1: unos US$30/mes de la instancia, más ~US$2,4 del disco y ~US$3,6 de la IP pública. Confírmelo en la [calculadora de AWS](https://calculator.aws/).
 - Las t3 son "burstable" y vienen en modo *unlimited*. Si la CPU pasa mucho tiempo por encima del 20 %, AWS cobra un extra en vez de frenar la máquina. Si las pruebas muestran la CPU alta de forma sostenida, pase a una t3.large o a una m7i.large.
@@ -81,7 +81,7 @@ Vuelva a entrar por SSH y continúe:
 
 ```bash
 cd reto-2-p2
-./deploy/configurar-env.sh      # crea .env: APP_KEY, contraseñas de MySQL, correo
+./deploy/configurar-env.sh      # crea .env: APP_KEY, contraseñas de la base de datos, correo
 nano .env                       # revise el bloque MAIL_*
 ./deploy/desplegar.sh           # construye y levanta todo (la primera vez tarda 5-10 min)
 ./deploy/datos-iniciales.sh     # usuarios admin, unidades, servicios y formulario de encuadre
@@ -90,12 +90,33 @@ nano .env                       # revise el bloque MAIL_*
 Abra https://cotizaciones.trainingcorporation.com.co y luego:
 
 1. Entre al panel con los usuarios de `database/seeders/DatabaseSeeder.php` y **cambie sus contraseñas**. Están escritas en el repositorio.
-2. En **Configuración**, ponga el correo que recibe las solicitudes nuevas.
+2. En **Configuración**, ponga el correo que recibe las solicitudes nuevas (gerencia@trainingcorporation.com.co).
 3. Envíe una solicitud de prueba y confirme que llegan los dos correos (al cliente y a gerencia).
 
 ### Correo
 
-El `.env` viene preparado para Gmail (`smtp.gmail.com:587`). `MAIL_PASSWORD` debe ser una [contraseña de aplicación](https://support.google.com/accounts/answer/185833) de la cuenta, no la contraseña normal. AWS bloquea el puerto 25 de salida; los puertos 587 y 465 sí funcionan.
+Los correos salen desde **gerencia@trainingcorporation.com.co** por Microsoft Graph (`MAIL_MAILER=msgraph`), no por SMTP. En Entra está registrada la app «App web Laravel - correos gerencia», con el permiso **Application Mail.Send** limitado por un alcance de Exchange («Solo gerencia») a ese buzón: no puede enviar como nadie más.
+
+En el `.env`:
+
+```env
+MAIL_MAILER=msgraph
+MAIL_FROM_ADDRESS=gerencia@trainingcorporation.com.co
+MSGRAPH_TENANT_ID=...
+MSGRAPH_CLIENT_ID=...
+MSGRAPH_CLIENT_SECRET=...   # Entra > Registros de aplicaciones > la app > Certificados y secretos (el «Valor»)
+MSGRAPH_FROM=gerencia@trainingcorporation.com.co
+```
+
+- El secreto vence (Entra ofrece 6, 12 o 24 meses). Antes de esa fecha cree uno nuevo, cámbielo en `.env` y ejecute `docker compose up -d`.
+- Los mensajes de más de 4 MB (solicitudes con documentos adjuntos) se arman como borrador y se envían; para eso la app necesita también **Application Mail.ReadWrite** sobre el mismo alcance:
+  `New-ManagementRoleAssignment -App <MSGRAPH_CLIENT_ID> -Role "Application Mail.ReadWrite" -CustomResourceScope "Solo gerencia"`
+- Prueba de envío: `docker compose exec app php artisan tinker --execute="Mail::raw('Prueba', fn(\$m) => \$m->to('gerencia@trainingcorporation.com.co')->subject('Prueba'));"`
+- Un permiso recién asignado puede tardar hasta 2 horas; mientras tanto Graph responde 403.
+
+### Recordatorios a Gerencia
+
+El contenedor `scheduler` ejecuta `quotations:remind-management` a las 8:00 a. m. y a las 2:00 p. m. de lunes a viernes (los festivos de Colombia se omiten). Cada solicitud sin cotización recibe un recordatorio cada 2,5 días hábiles desde su envío; si ya pasó la fecha de entrega que pidió el cliente, el correo la marca como vencida. Para ver qué se enviaría sin enviar nada: `docker compose exec app php artisan quotations:remind-management --dry-run`.
 
 ## 5. Operación diaria
 

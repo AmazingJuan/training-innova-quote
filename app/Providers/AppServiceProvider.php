@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Mail\Transport\MicrosoftGraphTransport;
 use App\Models\Configuration;
+use Illuminate\Http\Client\Factory as HttpFactory;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
@@ -24,6 +27,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
+
+        Mail::extend('msgraph', fn () => new MicrosoftGraphTransport(
+            $this->app->make(HttpFactory::class),
+            (string) config('services.msgraph.tenant_id'),
+            (string) config('services.msgraph.client_id'),
+            (string) config('services.msgraph.client_secret'),
+            (string) config('services.msgraph.from'),
+        ));
 
         if (str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');

@@ -121,6 +121,7 @@ function Control({ anchor, condition, value, onChange, aria, invalid }: ControlP
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
                 maxLength={isText ? MAX_ANSWER_LENGTH : undefined}
+                min={condition.type === 'date' ? condition.min_date : undefined}
                 className={cn('control', !isText && 'sm:max-w-xs')}
                 {...aria}
             />

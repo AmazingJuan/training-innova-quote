@@ -47,7 +47,11 @@ export function answerError(condition: PublicCondition, answer: Answer | undefin
                 const files = value as FilesAnswer;
                 return files.length === 0 ? 'Adjunte al menos un documento.' : filesError(files);
             }
-            return String(value).trim() === '' ? 'Este campo es obligatorio.' : null;
+            if (String(value).trim() === '') return 'Este campo es obligatorio.';
+            if (condition.type === 'date' && condition.min_date && String(value).trim() < condition.min_date) {
+                return `Seleccione una fecha a partir del ${formatDate(condition.min_date)} (3 días hábiles después del envío).`;
+            }
+            return null;
 
         case 'range': {
             const { min, max } = value as RangeAnswer;
