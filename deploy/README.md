@@ -89,7 +89,7 @@ nano .env                       # revise el bloque MAIL_*
 
 Abra https://cotizaciones.trainingcorporation.com.co y luego:
 
-1. Entre al panel con el administrador que creó `./deploy/datos-iniciales.sh` (el script pide su correo y contraseña; no hay contraseñas en el repositorio).
+1. Entre al panel con el administrador que creó `./deploy/datos-iniciales.sh` (el script pide sus datos; no hay contraseñas en el repositorio). Para crear otro administrador desde el servidor: `docker compose exec app php artisan app:create-admin`.
 2. En **Configuración**, ponga el correo que recibe las solicitudes nuevas (gerencia@trainingcorporation.com.co).
 3. Envíe una solicitud de prueba y confirme que llegan los dos correos (al cliente y a gerencia).
 

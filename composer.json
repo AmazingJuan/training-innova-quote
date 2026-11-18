@@ -1,16 +1,17 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/react-starter-kit",
+    "name": "trainingcorporation/innova-quote",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Cotizador en línea de Training Corporation: solicitudes de cotización con formulario de encuadre y panel de administración.",
     "keywords": [
         "laravel",
-        "framework"
+        "inertia",
+        "react",
+        "cotizaciones"
     ],
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "doctrine/dbal": "^4.3",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
@@ -19,10 +20,9 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
-        "laravel/breeze": "^2.3",
+        "larastan/larastan": "^3.15",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.18",
-        "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
         "phpunit/phpunit": "^11.5.3"
@@ -59,11 +59,6 @@
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
         ],
-        "dev:ssr": [
-            "npm run build:ssr",
-            "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"php artisan inertia:start-ssr\" --names=server,queue,logs,ssr --kill-others"
-        ],
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
@@ -82,7 +77,6 @@
             "php": "8.4.14"
         },
         "allow-plugins": {
-            "pestphp/pest-plugin": true,
             "php-http/discovery": true
         }
     },
