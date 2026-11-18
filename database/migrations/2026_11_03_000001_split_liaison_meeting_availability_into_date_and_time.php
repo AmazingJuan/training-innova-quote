@@ -12,9 +12,13 @@ use Illuminate\Support\Facades\DB;
 return new class extends Migration
 {
     private const AVAILABILITY = 'Disponibilidad para la reunión de enlace';
+
     private const AVAILABILITY_EXAMPLE = 'Ej.: martes y jueves de 2:00 p. m. a 5:00 p. m.';
+
     private const DATE = 'Fecha tentativa de la reunión de enlace';
+
     private const TIME = 'Horario tentativo de la reunión de enlace';
+
     private const TIME_EXAMPLE = 'Ej.: de 2:00 p. m. a 5:00 p. m.';
 
     public function up(): void

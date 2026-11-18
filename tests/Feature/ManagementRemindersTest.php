@@ -31,7 +31,11 @@ class ManagementRemindersTest extends TestCase
         Mail::assertNothingSent();
 
         $this->runAt('2026-11-25 14:00');
-        Mail::assertSent(QuotationReminderAdmin::class, fn ($m) => $m->hasTo('gerencia@example.com') && $m->number === 1 && ! $m->overdue);
+        Mail::assertSent(QuotationReminderAdmin::class, fn ($m) => $m->hasTo('gerencia@example.com')
+            && $m->number === 1
+            && ! $m->overdue
+            // Two and a half business days, not truncated to 2.
+            && str_contains($m->render(), 'lleva 2,5 días hábiles'));
 
         // Same turn again: nothing new.
         $this->runAt('2026-11-25 14:00');

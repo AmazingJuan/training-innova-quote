@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Carga los datos iniciales en una base de datos vacía:
-#   - usuarios administradores (DatabaseSeeder)
+#   - el administrador inicial (DatabaseSeeder), con los datos que se piden aquí
 #   - unidades de negocio, líneas de gestión, servicios y el formulario de encuadre (ExampleDataSeeder)
 #   ./deploy/datos-iniciales.sh
 set -euo pipefail
@@ -12,10 +12,12 @@ if [ "${units:-0}" != "0" ]; then
     exit 1
 fi
 
-docker compose exec -T app php artisan db:seed --force
+read -r -p "Correo del administrador inicial: " admin_email
+read -r -s -p "Contraseña (mínimo 12 caracteres): " admin_password
+echo
+docker compose exec -T -e ADMIN_EMAIL="$admin_email" -e ADMIN_PASSWORD="$admin_password" app php artisan db:seed --force
 docker compose exec -T app php artisan db:seed --class=ExampleDataSeeder --force
 
 echo
-echo "Datos cargados. Los usuarios administradores tienen las contraseñas que están en"
-echo "database/seeders/DatabaseSeeder.php: cámbielas desde el panel en cuanto entre."
+echo "Datos cargados. Entre al panel con el administrador que acaba de crear."
 echo "Configure también el correo de notificaciones en Configuración."
