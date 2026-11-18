@@ -1,147 +1,74 @@
-# 🚀 Transformación digital de Servicios Training Corporation
+# Training InnovaQuote
 
-[![Laravel](https://img.shields.io/badge/Laravel-10.x-red?style=flat&logo=laravel)](https://laravel.com/) 
-[![PHP](https://img.shields.io/badge/PHP-%3E=8.1-blue?style=flat&logo=php)](https://www.php.net/) 
-[![Node](https://img.shields.io/badge/Node.js-%3E=18-green?style=flat&logo=node.js)](https://nodejs.org/) 
-[![NPM](https://img.shields.io/badge/npm-latest-CB3837?style=flat&logo=npm)](https://www.npmjs.com/) 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+Cotizador en línea de **Training Corporation**. Las personas solicitan una cotización de auditoría, consultoría o formación desde el sitio, respondiendo el formulario de encuadre de cada unidad de negocio; el equipo de Gerencia la revisa en el panel, carga la cotización y el sistema se la envía al cliente.
 
-Este repositorio contiene una aplicación desarrollada en **Laravel** y **React** para la empresa Training Corporation.
+Producción: <https://cotizaciones.trainingcorporation.com.co>
 
----
+## Stack
 
-## 📋 Requisitos previos
+| Capa | Tecnología |
+|---|---|
+| Backend | Laravel 12, PHP 8.4 |
+| Frontend | React 18 + TypeScript con Inertia 2, Tailwind CSS 3, Vite 7 |
+| Base de datos | MariaDB 11.4 (SQLite en las pruebas) |
+| Servidor | FrankenPHP (Alpine) detrás de Caddy, con Docker Compose |
+| Correo | Microsoft Graph, como el buzón de Gerencia |
+| Tareas en segundo plano | Cola de Laravel (worker) y scheduler |
 
-Asegúrate de tener instaladas las siguientes herramientas:
+## Desarrollo local
 
-- [PHP >= 8.1](https://www.php.net/)
-- [Composer](https://getcomposer.org/)
-- [Node.js >= 18](https://nodejs.org/)
-- [npm](https://www.npmjs.com/)
-- [MySQL/MariaDB](https://www.mysql.com/) u otro motor compatible
-
----
-
-## ⚙️ Instalación
-
-Clona el repositorio y entra al directorio del proyecto:
-
-```bash
-git clone https://github.com/AmazingJuan/training-innova-quote
-cd training-innova-quote/
-```
-
-Instala las dependencias de **PHP** y **JavaScript**:
+Requisitos: PHP 8.4, Composer, Node.js 22 y MariaDB/MySQL (o SQLite).
 
 ```bash
 composer install
 npm install
-```
-
----
-
-## 🔑 Configuración
-
-Copia el archivo de entorno y genera la clave de la aplicación:
-
-```bash
 cp .env.example .env
 php artisan key:generate
+php artisan migrate --seed          # unidades de negocio y formulario de solicitud
+php artisan app:create-admin        # el primer usuario del panel
+composer dev                        # servidor, cola, logs y Vite a la vez
 ```
 
-Configura la conexión a tu base de datos en el archivo `.env`:
+En local, `MAIL_MAILER=log` deja los correos en `storage/logs` en vez de enviarlos.
 
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=mi_base
-DB_USERNAME=mi_usuario
-DB_PASSWORD=mi_password
-```
+## Calidad
 
-Ejecuta las migraciones y seeders:
+Lo mismo que corre la integración continua en cada PR:
+
+| Comando | Qué revisa |
+|---|---|
+| `php artisan test` | Pruebas (PHPUnit) |
+| `vendor/bin/pint --test` | Estilo del código PHP |
+| `vendor/bin/phpstan analyse` | Análisis estático (Larastan) |
+| `composer audit` | Vulnerabilidades conocidas en dependencias |
+| `npm run lint:check` | ESLint |
+| `npm run format:check` | Prettier |
+| `npm run build` | TypeScript y compilación del frontend |
+
+Las pruebas también corren contra MariaDB 11.4, la misma versión de producción.
+
+## Despliegue
+
+Cada push a `development` que pasa todas las revisiones publica la rama `deployment` (código con el frontend ya compilado). En el servidor:
 
 ```bash
-php artisan migrate --seed
+./deploy/desplegar.sh
 ```
 
----
+La guía completa del servidor (instalación, `.env`, correo por Microsoft Graph, recordatorios, respaldos y operación diaria) está en [`deploy/README.md`](deploy/README.md).
 
-## 🖥️ Servidor de desarrollo
+## Estructura
 
-Levanta el backend con Artisan:
-
-```bash
-php artisan serve
 ```
-
-Y en otra terminal, inicia el servidor de Vite para compilar los assets:
-
-```bash
-npm run dev
+app/
+  Console/Commands/   recordatorios a Gerencia, limpieza de adjuntos y exportaciones, crear administrador
+  Http/Controllers/   Admin/ (panel) y Quotation/ (sitio público)
+  Mail/               correos de la aplicación y Transport/ (Microsoft Graph)
+  Services/           árbol de decisión del formulario, envío de correos
+  Support/            calendario de días hábiles de Colombia, adjuntos
+resources/js/
+  pages/              una página de Inertia por ruta
+  features/           formulario público (quotation-wizard), editor del formulario (decision-tree), etc.
+  components/         componentes compartidos del panel y del sitio
+deploy/               scripts y guía del servidor
 ```
-
-La aplicación quedará disponible en:
-
-- Backend: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-- Frontend (Vite): normalmente [http://127.0.0.1:5173](http://127.0.0.1:5173)
-
----
-
-## ⏱️ Procesamiento de colas (correos y exportaciones)
-
-Algunas tareas se ejecutan en segundo plano mediante la **cola** de Laravel para no bloquear la aplicación, como el **envío de correos** y la **exportación de clientes a Excel**.
-
-Para que estas tareas se procesen, deja corriendo el _worker_ en una terminal aparte:
-
-```bash
-php artisan queue:work
-```
-
-> ⚠️ Si el worker no está en ejecución, los correos no se enviarán y la exportación a Excel se quedará en estado "Generando…" sin completarse.
-
----
-
-## 📦 Compilación para producción
-
-Genera los archivos optimizados de frontend con:
-
-```bash
-npm run build
-```
-
-Y limpia las caches de Laravel:
-
-```bash
-php artisan config:clear
-php artisan cache:clear
-php artisan route:clear
-```
-
----
-
-## 🛠️ Comandos útiles
-
-- Reiniciar migraciones:
-  ```bash
-  php artisan migrate:fresh --seed
-  ```
-- Ver rutas:
-  ```bash
-  php artisan route:list
-  ```
-- Compilar assets sin levantar servidor:
-  ```bash
-  npm run build
-  ```
-- Procesar la cola (correos y exportaciones):
-  ```bash
-  php artisan queue:work
-  ```
-
----
-
-## 📜 Licencia
-
-Este proyecto se distribuye bajo la licencia [MIT](LICENSE).

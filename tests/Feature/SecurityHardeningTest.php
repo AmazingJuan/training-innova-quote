@@ -30,19 +30,17 @@ class SecurityHardeningTest extends TestCase
         $this->getJson('/api/quotations')->assertNotFound();
     }
 
-    public function test_the_initial_admin_comes_from_the_environment(): void
+    public function test_no_user_is_seeded_and_admins_are_created_from_the_terminal(): void
     {
         $this->seed(DatabaseSeeder::class);
         $this->assertSame(0, User::count());
 
-        putenv('ADMIN_EMAIL=gerencia@example.com');
-        putenv('ADMIN_PASSWORD=una-clave-larga-segura');
-        try {
-            $this->seed(DatabaseSeeder::class);
-        } finally {
-            putenv('ADMIN_EMAIL');
-            putenv('ADMIN_PASSWORD');
-        }
+        $this->artisan('app:create-admin')
+            ->expectsQuestion('Nombre', 'Gerencia')
+            ->expectsQuestion('Correo electrónico', 'gerencia@example.com')
+            ->expectsQuestion('Teléfono', '3001234567')
+            ->expectsQuestion('Contraseña (mínimo 12 caracteres)', 'una-clave-larga-segura')
+            ->assertSuccessful();
 
         $admin = User::sole();
         $this->assertSame('gerencia@example.com', $admin->email);
