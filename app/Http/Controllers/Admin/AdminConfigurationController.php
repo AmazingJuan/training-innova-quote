@@ -29,11 +29,9 @@ class AdminConfigurationController extends Controller
         return to_route('dashboard.configurations.edit')->with('success', 'Configuración actualizada exitosamente.');
     }
 
+    /** The row itself (not the cached copy in Settings): it is about to be edited. */
     private function configuration(): Configuration
     {
-        $config = Configuration::current();
-        abort_if($config === null, 500, 'No existe el registro de configuración. Ejecute las migraciones (php artisan migrate).');
-
-        return $config;
+        return Configuration::query()->firstOrFail();
     }
 }

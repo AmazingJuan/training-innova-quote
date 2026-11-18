@@ -23,6 +23,7 @@ class AdminDecisionTreeController extends Controller
     public function index(): InertiaResponse
     {
         $businessUnits = BusinessUnit::query()
+            ->with('conditions.options')
             ->orderBy('display_name')
             ->get(['id', 'display_name', 'initial_condition_id'])
             ->map(fn (BusinessUnit $unit) => [

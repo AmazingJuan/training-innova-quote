@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Enums\Section;
 use App\Models\BusinessUnit;
 use App\Models\Condition;
 use App\Models\ConditionOption;
 use App\Models\User;
-use App\Services\DecisionTreeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -199,7 +199,7 @@ class DecisionTreeTest extends TestCase
         ]))->assertSessionHasNoErrors();
 
         $question = Condition::where('label', 'ARL')->sole();
-        $this->assertSame('necesidad', $question->getSection());
+        $this->assertSame(Section::Necesidad, $question->getSection());
         $this->assertFalse($question->isRequired());
 
         $this->get(route('dashboard.business-unit.decision-tree'))
@@ -247,7 +247,7 @@ class DecisionTreeTest extends TestCase
         $this->post(route('dashboard.decision-tree.copy', $empty), ['source_id' => $this->unit->id])->assertSessionHasNoErrors();
 
         $copy = $empty->conditions()->sole();
-        $this->assertSame('cierre', $copy->getSection());
+        $this->assertSame(Section::Cierre, $copy->getSection());
         $this->assertFalse($copy->isRequired());
     }
 
@@ -259,20 +259,6 @@ class DecisionTreeTest extends TestCase
             ->assertSessionHasErrors('options.0.label');
 
         $this->assertSame(0, Condition::count());
-    }
-
-    public function test_fake_branches_become_plain_order(): void
-    {
-        [$a, $b] = $this->sequenceOf('A', 'B');
-        $a->update(['interaction_type' => 'options', 'next_condition_id' => null]);
-        ConditionOption::create(['label' => 'Sí', 'condition_id' => $a->id, 'next_condition_id' => $b->id]);
-        ConditionOption::create(['label' => 'No', 'condition_id' => $a->id, 'next_condition_id' => $b->id]);
-
-        app(DecisionTreeService::class)->normalizeBranches($this->unit);
-
-        $this->assertSame($b->id, $a->fresh()->next_condition_id);
-        $this->assertSame(0, $a->options()->whereNotNull('next_condition_id')->count());
-        $this->assertSame(['A', 'B'], $this->order());
     }
 
     /**

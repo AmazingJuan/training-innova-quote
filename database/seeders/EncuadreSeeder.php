@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ConditionRole;
 use App\Models\BusinessUnit;
 use App\Models\Condition;
 use App\Models\ConditionOption;
@@ -55,7 +56,7 @@ class EncuadreSeeder extends Seeder
                 $unit = BusinessUnit::query()->where('name', $name)->first();
 
                 if ($unit === null) {
-                    $this->command?->warn("No existe la unidad «{$name}»: se omite.");
+                    $this->command->warn("No existe la unidad «{$name}»: se omite.");
 
                     continue;
                 }
@@ -67,12 +68,12 @@ class EncuadreSeeder extends Seeder
                     throw new RuntimeException(implode(' ', $errors));
                 }
 
-                $this->command?->info("✅ {$unit->getDisplayName()}: {$unit->conditions()->count()} campos del formulario de solicitud.");
+                $this->command->info("✅ {$unit->getDisplayName()}: {$unit->conditions()->count()} campos del formulario de solicitud.");
             }
         });
 
         foreach (BusinessUnit::query()->whereNull('initial_condition_id')->get() as $unit) {
-            $this->command?->warn("«{$unit->getDisplayName()}» quedó sin formulario de solicitud: no se ofrecerá para cotizar.");
+            $this->command->warn("«{$unit->getDisplayName()}» quedó sin formulario de solicitud: no se ofrecerá para cotizar.");
         }
     }
 
@@ -334,7 +335,7 @@ class EncuadreSeeder extends Seeder
                 ]),
                 'No',
             ]),
-            $this->field('Fecha estimada de entrega de la oferta comercial', 'date', 'cierre', observation: 'Seleccione un día hábil, como mínimo 3 días hábiles después del envío de la solicitud. Haremos lo posible por enviársela antes de esa fecha.'),
+            [...$this->field('Fecha estimada de entrega de la oferta comercial', 'date', 'cierre', observation: 'Seleccione un día hábil, como mínimo 3 días hábiles después del envío de la solicitud. Haremos lo posible por enviársela antes de esa fecha.'), 'role' => ConditionRole::OfferDate],
         ];
     }
 
@@ -426,6 +427,7 @@ class EncuadreSeeder extends Seeder
                 'placeholder' => $spec['placeholder'] ?? null,
                 'observation' => $spec['observation'] ?? null,
                 'section' => $spec['section'],
+                'role' => $spec['role'] ?? null,
                 'required' => $spec['required'] ?? true,
                 'next_condition_id' => $next,
             ]);

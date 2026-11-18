@@ -20,6 +20,7 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
+/** @implements WithMapping<Client> */
 class ClientsExport implements FromQuery, WithColumnWidths, WithCustomStartCell, WithDrawings, WithEvents, WithHeadings, WithMapping, WithTitle
 {
     private const HEADER_ROW = 5;
@@ -44,6 +45,7 @@ class ClientsExport implements FromQuery, WithColumnWidths, WithCustomStartCell,
      */
     public function __construct(private array $filters = []) {}
 
+    /** @return Builder<Client> */
     public function query(): Builder
     {
         return Client::query()

@@ -8,9 +8,7 @@ use App\Models\BusinessUnit;
 use App\Models\Client;
 use App\Models\Condition;
 use App\Models\Configuration;
-use App\Models\GestionLine;
 use App\Models\QuotationProposalOrder;
-use App\Models\Service;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
@@ -29,10 +27,6 @@ class QuotationFlowTest extends TestCase
         parent::setUp();
 
         $this->unit = BusinessUnit::create(['name' => 'consultoria', 'display_name' => 'Consultoría', 'abbreviation' => 'CON']);
-        $line = GestionLine::create(['name' => 'Calidad']);
-        Service::create(['name' => 'ISO 9001', 'business_unit_id' => $this->unit->id, 'gestion_line_id' => $line->id]);
-        $assets = GestionLine::create(['name' => 'Activos']);
-        Service::create(['name' => 'ISO 55001', 'business_unit_id' => $this->unit->id, 'gestion_line_id' => $assets->id]);
 
         $second = Condition::create(['label' => 'Empleados', 'interaction_type' => 'input', 'type' => 'number', 'business_unit_id' => $this->unit->id]);
         $first = Condition::create(['label' => 'Sector', 'interaction_type' => 'input', 'type' => 'text', 'business_unit_id' => $this->unit->id, 'next_condition_id' => $second->id]);
@@ -51,10 +45,10 @@ class QuotationFlowTest extends TestCase
                 ->has('viewData.conditions', 2));
     }
 
-    public function test_units_are_offered_when_they_have_a_questionnaire_even_without_services(): void
+    public function test_only_units_with_a_questionnaire_are_offered(): void
     {
-        $noServices = BusinessUnit::create(['name' => 'formacion', 'display_name' => 'Formación', 'abbreviation' => 'FOR']);
-        $noServices->update(['initial_condition_id' => Condition::create(['label' => 'Tema', 'interaction_type' => 'input', 'type' => 'text', 'business_unit_id' => $noServices->id])->id]);
+        $formacion = BusinessUnit::create(['name' => 'formacion', 'display_name' => 'Formación', 'abbreviation' => 'FOR']);
+        $formacion->update(['initial_condition_id' => Condition::create(['label' => 'Tema', 'interaction_type' => 'input', 'type' => 'text', 'business_unit_id' => $formacion->id])->id]);
         BusinessUnit::create(['name' => 'vacia', 'display_name' => 'Vacía', 'abbreviation' => 'VAC']);
 
         $this->get(route('quotation.select.business_unit'))
@@ -90,7 +84,7 @@ class QuotationFlowTest extends TestCase
     public function test_storing_a_quotation_creates_client_order_and_queues_mails(): void
     {
         Mail::fake();
-        Configuration::query()->update(['notification_email' => 'admin@example.com']);
+        Configuration::query()->firstOrFail()->update(['notification_email' => 'admin@example.com']);
 
         $this->from('/cotizar/consultoria')->post('/cotizar', $this->payload())
             ->assertRedirect('/cotizar/consultoria')
@@ -99,8 +93,7 @@ class QuotationFlowTest extends TestCase
         $order = QuotationProposalOrder::sole();
         $this->assertSame('CON-V-'.now()->format('y').'01', $order->getQuotationCode());
         $this->assertSame(['Sector' => 'Salud', 'Empleados' => '40'], $order->getAnswers());
-        $this->assertSame([], $order->getServices());
-        $this->assertNull($order->getGestionLine());
+        $this->assertSame($this->unit->id, $order->getBusinessUnitId());
         $this->assertSame('ana@empresa.com', $order->getClient()->getEmail());
         $this->assertSame('3001234567', $order->getClient()->getPhone());
 
@@ -212,7 +205,7 @@ class QuotationFlowTest extends TestCase
     {
         return array_replace([
             'contact' => ['nit' => '900123456-7', 'economic_activity' => 'Servicios de salud', 'address' => 'Cra. 50 # 10-20, Medellín', 'name' => 'Ana', 'email' => 'ana@empresa.com', 'phone' => '300 123 4567', 'company' => 'Clínica Sana', 'role' => 'Coordinadora HSEQ'],
-            'businessUnit' => 'Consultoría',
+            'unit' => 'consultoria',
             'answers' => ['Sector' => 'Salud', 'Empleados' => '40'],
             'privacy_accepted' => true,
         ], $overrides);
@@ -220,13 +213,6 @@ class QuotationFlowTest extends TestCase
 
     private function generatedOrder(): QuotationProposalOrder
     {
-        return QuotationProposalOrder::create([
-            'business_unit' => 'Consultoría',
-            'gestion_line' => 'Calidad',
-            'services' => ['ISO 9001'],
-            'answers' => [],
-            'is_generated' => true,
-            'quotation_url' => 'https://docs.example.com/propuesta.pdf',
-        ]);
+        return QuotationProposalOrder::factory()->ready()->create(['business_unit_id' => $this->unit->id]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Settings;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -9,6 +10,19 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Configuration extends Model
 {
+    /**
+     * Attributes:
+     *
+     * $this->attributes['id'] - int - Primary key (there is a single row)
+     * $this->attributes['notification_email'] - string|null - Inbox of management's notifications
+     * $this->attributes['company_contact_email'] - string|null - Contact e-mail shown in the footer and e-mails
+     * $this->attributes['company_contact_phone'] - string|null - Contact phone
+     * $this->attributes['company_contact_address'] - string|null - Address
+     * $this->attributes['company_website_url'] - string|null - Corporate website
+     * $this->attributes['company_website_label'] - string|null - Text of the website link
+     */
+
+    /** @var list<string> */
     protected $fillable = [
         'notification_email',
         'company_contact_email',
@@ -19,11 +33,11 @@ class Configuration extends Model
     ];
 
     /**
-     * The settings row (created by migration). Null only on a broken install.
+     * Read through App\Services\Settings (cached); saving the row clears that cache.
      */
-    public static function current(): ?self
+    protected static function booted(): void
     {
-        return static::query()->first();
+        static::saved(fn () => app(Settings::class)->forget());
     }
 
     public function getId(): int

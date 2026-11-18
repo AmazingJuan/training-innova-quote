@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Enums\FieldType;
+use App\Enums\InteractionType;
+use App\Enums\Section;
 use App\Models\BusinessUnit;
 use App\Models\Condition;
 use App\Services\DecisionTreeService;
@@ -22,6 +25,17 @@ class EncuadreSeederTest extends TestCase
         }
 
         $this->seed(EncuadreSeeder::class);
+    }
+
+    public function test_every_unit_marks_its_offer_date_question_by_role(): void
+    {
+        foreach (['auditoria', 'consultoria', 'formacion'] as $name) {
+            $question = $this->unit($name)->offerDateQuestion();
+
+            $this->assertNotNull($question, $name);
+            $this->assertSame('Fecha estimada de entrega de la oferta comercial', $question->getLabel(), $name);
+            $this->assertSame(FieldType::Date, $question->getType(), $name);
+        }
     }
 
     public function test_every_unit_gets_a_valid_encuadre_split_in_blocks(): void
@@ -106,9 +120,9 @@ class EncuadreSeederTest extends TestCase
             $files = Condition::find($description->next_condition_id);
 
             $this->assertSame('Adjuntar documentos', $files->label, $name);
-            $this->assertSame('input', $files->interaction_type);
-            $this->assertSame('file', $files->type);
-            $this->assertSame('cotizacion', $files->getSection());
+            $this->assertSame(InteractionType::Input, $files->getInteractionType());
+            $this->assertSame(FieldType::File, $files->getType());
+            $this->assertSame(Section::Cotizacion, $files->getSection());
             $this->assertFalse($files->isRequired());
             $this->assertSame('¿Cuenta con un presupuesto establecido para la prestación del servicio?', $files->getNextCondition()->label);
         }
@@ -172,7 +186,7 @@ class EncuadreSeederTest extends TestCase
         $meeting = $this->question('consultoria', 'En caso de precisar las necesidades del servicio, ¿estaría de acuerdo en realizar una reunión de enlace de manera virtual?');
         $date = Condition::find($meeting->options()->where('label', 'Sí')->value('next_condition_id'));
         $this->assertSame('Fecha tentativa de la reunión de enlace', $date->label);
-        $this->assertSame('date', $date->getType());
+        $this->assertSame(FieldType::Date, $date->getType());
         $this->assertSame('Horario tentativo de la reunión de enlace', Condition::find($date->next_condition_id)->label);
         $this->assertNull($meeting->options()->where('label', 'No')->value('next_condition_id'));
     }
@@ -201,7 +215,7 @@ class EncuadreSeederTest extends TestCase
 
         $last = $this->question('formacion', 'Fecha estimada de entrega de la oferta comercial');
         $this->assertNull($last->next_condition_id, 'the offer deadline closes the request');
-        $this->assertSame('cierre', $last->getSection());
+        $this->assertSame(Section::Cierre, $last->getSection());
     }
 
     private function unit(string $name): BusinessUnit

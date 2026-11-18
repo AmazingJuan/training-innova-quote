@@ -7,7 +7,6 @@ use App\Mail\QuotationGenerated;
 use App\Mail\QuotationGeneratedAdmin;
 use App\Mail\QuotationPending;
 use App\Mail\WelcomeEmail;
-use App\Models\Configuration;
 use App\Models\QuotationProposalOrder;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
@@ -18,6 +17,8 @@ use Illuminate\Support\Facades\Mail;
  */
 class MailService
 {
+    public function __construct(private readonly Settings $settings) {}
+
     /**
      * @param  list<array{path: string, name: string, mime: string|null}>  $files
      *                                                                             Documents attached by the client, which travel in the notice to management.
@@ -51,7 +52,7 @@ class MailService
 
     private function notifyAdmin(Mailable $mail): void
     {
-        $email = Configuration::current()?->getNotificationEmail();
+        $email = $this->settings->notificationEmail();
 
         if ($email) {
             Mail::to($email)->queue($mail);

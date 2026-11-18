@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers\Quotation;
 
+use App\Actions\SubmitQuotationRequest;
+use App\Enums\ConditionRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreQuotationProposal;
 use App\Models\BusinessUnit;
-use App\Models\Client;
 use App\Models\QuotationProposalOrder;
 use App\Services\DecisionTreeService;
-use App\Services\MailService;
-use App\Support\QuotationAttachment;
+use App\Support\OfferDatePolicy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -20,7 +19,7 @@ class QuotationController extends Controller
 {
     public function __construct(
         private readonly DecisionTreeService $trees,
-        private readonly MailService $mail,
+        private readonly OfferDatePolicy $offerDates,
     ) {}
 
     public function selectBusinessUnit(): InertiaResponse
@@ -45,9 +44,9 @@ class QuotationController extends Controller
         }
 
         // The offer date cannot be sooner than 3 business days away, so management gets at least one reminder before it.
-        $minOfferDate = StoreQuotationProposal::minOfferDate()->format('Y-m-d');
+        $minOfferDate = $this->offerDates->minimumFor(now())->format('Y-m-d');
         foreach ($conditions as $id => $condition) {
-            if (($condition['type'] ?? null) === 'date' && QuotationProposalOrder::isOfferDateQuestion((string) ($condition['label'] ?? ''))) {
+            if (($condition['role'] ?? null) === ConditionRole::OfferDate->value) {
                 $conditions[$id]['min_date'] = $minOfferDate;
             }
         }
@@ -64,7 +63,7 @@ class QuotationController extends Controller
         ]);
     }
 
-    public function storeQuotationProposal(StoreQuotationProposal $request): RedirectResponse
+    public function storeQuotationProposal(StoreQuotationProposal $request, SubmitQuotationRequest $submit): RedirectResponse
     {
         $data = $request->validated();
         $sent = fn (?string $code) => back()->with('quotation_sent', ['code' => $code, 'email' => $data['contact']['email']]);
@@ -74,21 +73,7 @@ class QuotationController extends Controller
             return $sent(null);
         }
 
-        $order = DB::transaction(function () use ($data) {
-            $businessUnit = BusinessUnit::query()->where('display_name', $data['businessUnit'])->firstOrFail();
-
-            return QuotationProposalOrder::create([
-                'quotation_code' => $businessUnit->lockAndAllocateNextQuotationCode(),
-                'client_id' => Client::upsertFromContact($data['contact'])->getId(),
-                // The client no longer picks services: the request is the encuadre (answers).
-                'services' => [],
-                'business_unit' => $data['businessUnit'],
-                'answers' => $data['answers'],
-            ]);
-        });
-
-        // The attached documents are not kept: they only wait for the notice to management.
-        $this->mail->sendQuotationPending($order, QuotationAttachment::keep($data['documents'] ?? []));
+        $order = $submit->handle($request->unit(), $data['contact'], $data['answers'], $data['documents'] ?? []);
 
         // The page itself confirms it (with the request's code), as the corporate contact form does.
         return $sent($order->getQuotationCode());

@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Configuration;
 use App\Models\QuotationProposalOrder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
@@ -19,7 +20,7 @@ class ManagementRemindersTest extends TestCase
         parent::setUp();
 
         Mail::fake();
-        Configuration::query()->update(['notification_email' => 'gerencia@example.com']);
+        Configuration::query()->firstOrFail()->update(['notification_email' => 'gerencia@example.com']);
     }
 
     public function test_reminders_follow_the_acta_example_and_stop_when_the_quotation_is_ready(): void
@@ -82,12 +83,10 @@ class ManagementRemindersTest extends TestCase
 
     private function order(string $offerDate): QuotationProposalOrder
     {
-        return QuotationProposalOrder::create([
-            'quotation_code' => 'AUD-V-2601',
-            'client_id' => Client::create(['name' => 'Ana', 'email' => 'ana@empresa.com', 'company' => 'Clínica Sana'])->id,
-            'business_unit' => 'Auditoría',
-            'services' => [],
-            'answers' => ['Fecha estimada de entrega de la oferta comercial' => $offerDate],
+        return QuotationProposalOrder::factory()->create([
+            'quotation_code' => 'EO-V-2601',
+            'client_id' => Client::factory()->state(['company' => 'Clínica Sana']),
+            'offer_date' => Carbon::createFromFormat('!d/m/Y', $offerDate),
         ]);
     }
 }

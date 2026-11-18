@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\ConditionRole;
+use App\Enums\FieldType;
+use App\Enums\InteractionType;
 use App\Models\BusinessUnit;
 use App\Models\Condition;
 use App\Models\ConditionOption;
@@ -66,7 +69,12 @@ class DecisionTreeService
      */
     public function allConditions(BusinessUnit $businessUnit): array
     {
-        return $this->loadConditions($businessUnit)
+        // Already eager-loaded for several units at once (the editor), or loaded now.
+        $conditions = $businessUnit->relationLoaded('conditions')
+            ? $businessUnit->conditions->sortBy('id')
+            : $this->loadConditions($businessUnit);
+
+        return $conditions
             ->map(fn (Condition $condition) => ['id' => $condition->getId(), ...$this->serialize($condition)])
             ->values()
             ->all();
@@ -132,6 +140,11 @@ class DecisionTreeService
                 $fields['next_condition_id'] = $data['next_condition'];
             }
 
+            // The offer date role only makes sense on a date question.
+            if ($question->hasRole(ConditionRole::OfferDate) && $fields['type'] !== FieldType::Date) {
+                $fields['role'] = null;
+            }
+
             $question->update($fields);
             $this->syncOptions($question, $data);
 
@@ -190,7 +203,7 @@ class DecisionTreeService
             $ids = [];
             foreach ($questions as $question) {
                 $ids[$question->id] = $unit->conditions()->create(
-                    $question->only('label', 'interaction_type', 'type', 'observation', 'placeholder', 'multiline', 'multiple', 'section', 'required'),
+                    $question->only('label', 'interaction_type', 'type', 'observation', 'placeholder', 'multiline', 'multiple', 'section', 'role', 'required'),
                 )->id;
             }
 
@@ -209,43 +222,6 @@ class DecisionTreeService
             $unit->update(['initial_condition_id' => $map($source->initial_condition_id)]);
         });
     }
-
-    /**
-     * Behaviour-preserving cleanup: option targets equal to the question's
-     * default are dropped, and when every option of a single-choice question
-     * leads to the same place, that place becomes the default. Multi-choice
-     * questions never branch at runtime, so their option targets are cleared.
-     */
-    public function normalizeBranches(BusinessUnit $businessUnit): void
-    {
-        DB::transaction(function () use ($businessUnit) {
-            foreach ($this->loadConditions($businessUnit) as $question) {
-                if ($question->interaction_type !== 'options' || $question->options->isEmpty()) {
-                    continue;
-                }
-
-                $default = $question->next_condition_id;
-                if (! $question->multiple) {
-                    $targets = $question->options->map(fn (ConditionOption $o) => $o->next_condition_id ?? $default)->unique();
-                    if ($targets->count() === 1) {
-                        $default = $targets->first();
-                        $question->update(['next_condition_id' => $default]);
-                    }
-                }
-
-                ConditionOption::query()
-                    ->where('condition_id', $question->id)
-                    ->when(! $question->multiple, fn ($q) => $default === null ? $q->whereRaw('1 = 0') : $q->where('next_condition_id', $default))
-                    ->update(['next_condition_id' => null]);
-            }
-        });
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Validation
-    |--------------------------------------------------------------------------
-    */
 
     /**
      * Structural problems of a tree in wire format (dangling links, cycles).
@@ -340,7 +316,11 @@ class DecisionTreeService
         return $sequence;
     }
 
-    /** Point each question of `sequence` to the following one and make the first the start. */
+    /**
+     * Point each question of `sequence` to the following one and make the first the start.
+     *
+     * @param  list<int>  $sequence
+     */
     private function writeSequence(BusinessUnit $unit, array $sequence): void
     {
         foreach ($sequence as $i => $id) {
@@ -383,15 +363,17 @@ class DecisionTreeService
      */
     private function fields(array $data): array
     {
-        $isChoice = $data['interaction_type'] === 'options';
+        $interaction = InteractionType::from($data['interaction_type']);
+        $isChoice = $interaction === InteractionType::Options;
+        $type = $isChoice ? FieldType::Text : FieldType::from($data['type']);
 
         return [
             'label' => trim($data['label']),
-            'interaction_type' => $data['interaction_type'],
-            'type' => $isChoice ? 'text' : $data['type'],
+            'interaction_type' => $interaction,
+            'type' => $type,
             'observation' => trim((string) ($data['observation'] ?? '')) ?: null,
             'placeholder' => $isChoice ? null : (trim((string) ($data['placeholder'] ?? '')) ?: null),
-            'multiline' => ! $isChoice && $data['interaction_type'] === 'input' && $data['type'] === 'text' && (bool) ($data['multiline'] ?? false),
+            'multiline' => $interaction === InteractionType::Input && $type === FieldType::Text && (bool) ($data['multiline'] ?? false),
             'multiple' => $isChoice && (bool) ($data['multiple'] ?? false),
             'section' => $data['section'] ?? null,
             'required' => (bool) ($data['required'] ?? true),
@@ -406,7 +388,7 @@ class DecisionTreeService
      */
     private function syncOptions(Condition $question, array $data): void
     {
-        $incoming = $data['interaction_type'] === 'options' ? ($data['options'] ?? []) : [];
+        $incoming = $question->isChoice() ? ($data['options'] ?? []) : [];
         $existing = $question->options()->get()->keyBy('id');
         $keep = [];
 
@@ -446,13 +428,14 @@ class DecisionTreeService
     {
         return [
             'label' => $condition->getLabel(),
-            'interaction_type' => $condition->getInteractionType(),
-            'type' => $condition->getType(),
+            'interaction_type' => $condition->getInteractionType()->value,
+            'type' => $condition->getType()->value,
             'observation' => $condition->getObservation(),
             'placeholder' => $condition->getPlaceholder(),
             'multiline' => $condition->isMultiline(),
             'multiple' => $condition->getMultiple(),
-            'section' => $condition->getSection(),
+            'section' => $condition->getSection()?->value,
+            'role' => $condition->getRole()?->value,
             'required' => $condition->isRequired(),
             'next_condition' => $condition->next_condition_id,
             'options' => $condition->options

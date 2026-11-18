@@ -5,7 +5,6 @@ namespace App\Mail;
 use App\Models\QuotationProposalOrder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -20,7 +19,7 @@ class QuotationGeneratedAdmin extends Mailable
 
     public function envelope(): Envelope
     {
-        $ref = $this->quotationOrder->getQuotationCode() ?? '#'.$this->quotationOrder->getId();
+        $ref = $this->quotationOrder->getReference();
 
         return new Envelope(
             subject: 'Cotización '.$ref.' generada (cliente notificado)',
@@ -32,13 +31,5 @@ class QuotationGeneratedAdmin extends Mailable
         return new Content(
             view: 'emails.admin.quotation-generated',
         );
-    }
-
-    /**
-     * @return array<int, Attachment>
-     */
-    public function attachments(): array
-    {
-        return [];
     }
 }

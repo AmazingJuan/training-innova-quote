@@ -18,7 +18,7 @@ type IndexPageProps = PageProps<{
     viewData: {
         clients: Paginated<ClientWithStats>;
         filters: ClientFilters;
-        options: { companies: string[]; businessUnits: string[] };
+        options: { companies: string[]; businessUnits: { name: string; display_name: string }[] };
     };
 }>;
 
@@ -73,7 +73,7 @@ export default function Index() {
                         value={filters.business_unit}
                         onChange={(business_unit) => visit({ business_unit })}
                         allLabel="Todas"
-                        options={toOptions(options.businessUnits)}
+                        options={options.businessUnits.map((unit) => ({ value: unit.name, label: unit.display_name }))}
                     />
                 </AdminTableToolbar>
 

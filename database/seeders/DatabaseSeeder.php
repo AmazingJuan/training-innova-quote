@@ -5,13 +5,14 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 
 /**
- * Users are not seeded: no password lives in the repository. The first
- * administrator is created with `php artisan app:create-admin`.
+ * The business units and their request forms. Users are not seeded (no
+ * password lives in the repository): the first administrator is created with
+ * `php artisan app:create-admin`.
  */
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call(ExampleDataSeeder::class);
+        $this->call([BusinessUnitSeeder::class, EncuadreSeeder::class]);
     }
 }

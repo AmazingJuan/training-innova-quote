@@ -8,6 +8,7 @@ use App\Models\BusinessUnit;
 use App\Models\Condition;
 use App\Models\Configuration;
 use App\Models\QuotationProposalOrder;
+use App\Services\Settings;
 use App\Support\QuotationAttachment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -21,6 +22,8 @@ class QuotationDocumentsTest extends TestCase
 {
     use RefreshDatabase;
 
+    private BusinessUnit $unit;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -30,7 +33,7 @@ class QuotationDocumentsTest extends TestCase
         Configuration::query()->delete();
         Configuration::create(['notification_email' => 'gerencia@trainingcorporation.com.co']);
 
-        $unit = BusinessUnit::create(['name' => 'consultoria', 'display_name' => 'Consultoría', 'abbreviation' => 'CON']);
+        $unit = $this->unit = BusinessUnit::create(['name' => 'consultoria', 'display_name' => 'Consultoría', 'abbreviation' => 'CON']);
         $files = Condition::create(['label' => 'Adjuntar documentos', 'interaction_type' => 'input', 'type' => 'file', 'required' => false, 'business_unit_id' => $unit->id]);
         $first = Condition::create(['label' => 'Sector', 'interaction_type' => 'input', 'type' => 'text', 'business_unit_id' => $unit->id, 'next_condition_id' => $files->id]);
         $unit->update(['initial_condition_id' => $first->id]);
@@ -66,16 +69,15 @@ class QuotationDocumentsTest extends TestCase
     {
         // The real e-mail, through the in-memory transport: what matters is what goes out.
         config(['mail.default' => 'array']);
-        $order = QuotationProposalOrder::create([
+        $order = QuotationProposalOrder::factory()->create([
             'quotation_code' => 'CON-V-2601',
-            'business_unit' => 'Consultoría',
-            'services' => [],
+            'business_unit_id' => $this->unit->id,
             'answers' => ['Adjuntar documentos' => 'alcance.pdf'],
         ]);
         $files = QuotationAttachment::keep([['file' => UploadedFile::fake()->createWithContent('alcance.pdf', '%PDF-1.4 alcance')]]);
         Storage::disk(QuotationAttachment::DISK)->assertExists($files[0]['path']);
 
-        (new NotifyManagementOfQuotation($order->getId(), $files))->handle();
+        (new NotifyManagementOfQuotation($order->getId(), $files))->handle(app(Settings::class));
 
         $messages = Mail::mailer('array')->getSymfonyTransport()->messages();
         $this->assertCount(1, $messages);
@@ -96,17 +98,16 @@ class QuotationDocumentsTest extends TestCase
     public function test_the_documents_are_deleted_even_when_management_has_no_address(): void
     {
         Mail::fake();
-        Configuration::query()->update(['notification_email' => null]);
+        Configuration::query()->firstOrFail()->update(['notification_email' => null]);
 
-        $order = QuotationProposalOrder::create([
+        $order = QuotationProposalOrder::factory()->create([
             'quotation_code' => 'CON-V-2601',
-            'business_unit' => 'Consultoría',
-            'services' => [],
+            'business_unit_id' => $this->unit->id,
             'answers' => [],
         ]);
         $files = QuotationAttachment::keep([['file' => UploadedFile::fake()->create('a.pdf', 10)]]);
 
-        (new NotifyManagementOfQuotation($order->getId(), $files))->handle();
+        (new NotifyManagementOfQuotation($order->getId(), $files))->handle(app(Settings::class));
 
         Mail::assertNotSent(QuotationPendingAdmin::class);
         Storage::disk(QuotationAttachment::DISK)->assertMissing($files[0]['path']);
@@ -114,10 +115,9 @@ class QuotationDocumentsTest extends TestCase
 
     public function test_a_failed_notice_keeps_the_documents_for_the_retry_and_drops_them_at_the_end(): void
     {
-        $order = QuotationProposalOrder::create([
+        $order = QuotationProposalOrder::factory()->create([
             'quotation_code' => 'CON-V-2602',
-            'business_unit' => 'Consultoría',
-            'services' => [],
+            'business_unit_id' => $this->unit->id,
             'answers' => [],
         ]);
         $files = QuotationAttachment::keep([['file' => UploadedFile::fake()->create('a.pdf', 10)]]);
@@ -126,7 +126,7 @@ class QuotationDocumentsTest extends TestCase
         // A mail failure must leave the attachments where the next try will find them.
         Mail::shouldReceive('to->send')->once()->andThrow(new RuntimeException('smtp caído'));
         try {
-            $job->handle();
+            $job->handle(app(Settings::class));
             $this->fail('the mail failure should surface so the job is retried');
         } catch (RuntimeException) {
             Storage::disk(QuotationAttachment::DISK)->assertExists($files[0]['path']);
@@ -146,7 +146,7 @@ class QuotationDocumentsTest extends TestCase
         $disk->put($stale, 'viejo');
         touch($disk->path($stale), now()->subHours(QuotationAttachment::RETENTION_HOURS + 1)->getTimestamp());
 
-        $this->artisan('adjuntos:clean-cotizaciones')->assertSuccessful();
+        $this->artisan('quotations:clean-attachments')->assertSuccessful();
 
         $disk->assertMissing($stale);
         $disk->assertExists($waiting);
@@ -207,7 +207,7 @@ class QuotationDocumentsTest extends TestCase
     {
         return [
             'contact' => ['nit' => '900123456-7', 'economic_activity' => 'Servicios de salud', 'address' => 'Cra. 50 # 10-20, Medellín', 'name' => 'Ana', 'email' => 'ana@empresa.com', 'phone' => '3001234567', 'company' => 'Clínica Sana', 'role' => 'Coordinadora HSEQ'],
-            'businessUnit' => 'Consultoría',
+            'unit' => 'consultoria',
             'answers' => ['Sector' => 'Salud', ...($documents ? ['Adjuntar documentos' => implode(', ', array_map(fn ($f) => $f->getClientOriginalName(), $documents))] : [])],
             'documents' => array_map(fn ($file) => ['question' => 'Adjuntar documentos', 'file' => $file], $documents),
             'privacy_accepted' => true,

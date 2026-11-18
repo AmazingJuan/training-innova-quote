@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
  * (or definitely fails). See App\Jobs\NotifyManagementOfQuotation.
  *
  * Nothing else reads these files, so anything left behind (a worker that never
- * ran, a lost job) is swept by `adjuntos:clean-cotizaciones`.
+ * ran, a lost job) is swept by `quotations:clean-attachments`.
  *
  * @phpstan-type KeptFile array{path: string, name: string, mime: string|null}
  */
@@ -72,7 +72,7 @@ final class QuotationAttachment
         $disk = Storage::disk(self::DISK);
 
         foreach ($files as $file) {
-            if (($file['path'] ?? '') !== '') {
+            if ($file['path'] !== '') {
                 $disk->delete($file['path']);
             }
         }

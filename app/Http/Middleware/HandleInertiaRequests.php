@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Configuration;
+use App\Services\Settings;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -14,6 +14,8 @@ class HandleInertiaRequests extends Middleware
      * @var string
      */
     protected $rootView = 'app';
+
+    public function __construct(private readonly Settings $settings) {}
 
     /**
      * Define the props that are shared by default.
@@ -28,29 +30,13 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user()?->only('id', 'name', 'email'),
             ],
             // Contact block of the public footer, editable in Configuración.
-            'company' => fn () => $this->company(),
+            'company' => fn () => $this->settings->companyContact(),
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
                 // Confirmation shown by the quote page itself: {code, email}.
                 'quotation_sent' => $request->session()->get('quotation_sent'),
             ],
-        ];
-    }
-
-    /**
-     * @return array{email: ?string, phone: ?string, address: ?string, website_url: ?string, website_label: ?string}
-     */
-    private function company(): array
-    {
-        $config = Configuration::current();
-
-        return [
-            'email' => $config?->getCompanyContactEmail(),
-            'phone' => $config?->getCompanyContactPhone(),
-            'address' => $config?->getCompanyContactAddress(),
-            'website_url' => $config?->getCompanyWebsiteUrl(),
-            'website_label' => $config?->getCompanyWebsiteLabel(),
         ];
     }
 }

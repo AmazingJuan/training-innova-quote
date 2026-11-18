@@ -1,7 +1,7 @@
 @extends('emails.layouts.base')
 
 @php
-  $code = $order->getQuotationCode() ?: '#'.$order->getId();
+  $code = $order->getReference();
   $receiveUrl = $order->getReceiveQuotationSignedUrl();
 @endphp
 

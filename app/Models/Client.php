@@ -3,14 +3,17 @@
 namespace App\Models;
 
 use App\Models\Concerns\Searchable;
+use Database\Factories\ClientFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 class Client extends Model
 {
-    use Searchable;
+    /** @use HasFactory<ClientFactory> */
+    use HasFactory, Searchable;
 
     /** Columns matched by the free-text search (also used by quotation orders). */
     public const SEARCHABLE_COLUMNS = ['name', 'email', 'company', 'nit', 'phone', 'role'];
@@ -34,7 +37,7 @@ class Client extends Model
     /**
      * Mass assignable attributes.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -53,6 +56,7 @@ class Client extends Model
     |--------------------------------------------------------------------------
     */
 
+    /** @return HasMany<QuotationProposalOrder, $this> */
     public function quotationProposalOrders(): HasMany
     {
         return $this->hasMany(QuotationProposalOrder::class, 'client_id');
@@ -80,6 +84,9 @@ class Client extends Model
 
     /**
      * Attach the derived counters and the latest-quotation timestamp.
+     *
+     * @param  Builder<Client>  $query
+     * @return Builder<Client>
      */
     public function scopeWithClientStats(Builder $query): Builder
     {
@@ -89,19 +96,26 @@ class Client extends Model
     }
 
     /**
+     * @param  Builder<Client>  $query
      * @param  array{search?:string, company?:string, business_unit?:string}  $filters
+     * @return Builder<Client>
      */
     public function scopeApplyClientFilters(Builder $query, array $filters): Builder
     {
         return $query
             ->search($filters['search'] ?? '', self::SEARCHABLE_COLUMNS)
             ->when(($filters['company'] ?? '') !== '', fn (Builder $q) => $q->where('company', $filters['company']))
+            // The unit by its slug (its URL), as the filter sends it.
             ->when(($filters['business_unit'] ?? '') !== '', fn (Builder $q) => $q->whereHas(
-                'quotationProposalOrders',
-                fn (Builder $q2) => $q2->where('business_unit', $filters['business_unit'])
+                'quotationProposalOrders.businessUnit',
+                fn (Builder $unit) => $unit->where('name', $filters['business_unit'])
             ));
     }
 
+    /**
+     * @param  Builder<Client>  $query
+     * @return Builder<Client>
+     */
     public function scopeOrderByActivity(Builder $query): Builder
     {
         return $query->orderByDesc('last_quotation_at')->orderBy('name');

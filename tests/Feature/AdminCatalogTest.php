@@ -2,13 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ExportStatus;
 use App\Jobs\GenerateClientsExport;
 use App\Models\BusinessUnit;
-use App\Models\GestionLine;
-use App\Models\Service;
+use App\Models\QuotationProposalOrder;
 use App\Models\User;
+use App\Support\ClientExportStore;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -40,27 +42,6 @@ class AdminCatalogTest extends TestCase
         $this->get('/dashboard/usuarios/999/editar')->assertNotFound();
     }
 
-    public function test_duplicate_gestion_line_name_is_a_validation_error(): void
-    {
-        GestionLine::create(['name' => 'Calidad']);
-        $other = GestionLine::create(['name' => 'Ambiental']);
-
-        $this->post(route('dashboard.lines.store'), ['name' => 'Calidad'])->assertSessionHasErrors('name');
-        $this->put(route('dashboard.lines.update', $other), ['name' => 'Calidad'])->assertSessionHasErrors('name');
-        $this->put(route('dashboard.lines.update', $other), ['name' => 'Ambiental'])->assertSessionHasNoErrors();
-    }
-
-    public function test_duplicate_service_name_is_a_validation_error(): void
-    {
-        $unit = BusinessUnit::create(['name' => 'a', 'display_name' => 'A', 'abbreviation' => 'AA']);
-        $line = GestionLine::create(['name' => 'Calidad']);
-        Service::create(['name' => 'ISO', 'business_unit_id' => $unit->id, 'gestion_line_id' => $line->id]);
-
-        $this->post(route('dashboard.services.store'), [
-            'name' => 'ISO', 'business_unit_id' => $unit->id, 'gestion_line_id' => $line->id,
-        ])->assertSessionHasErrors('name');
-    }
-
     public function test_business_unit_slug_is_derived_and_must_be_unique(): void
     {
         $this->post(route('dashboard.business-unit.store'), ['display_name' => 'Formación Ejecutiva', 'abbreviation' => 'fe 1'])
@@ -74,13 +55,23 @@ class AdminCatalogTest extends TestCase
             ->assertSessionHasErrors('display_name');
     }
 
-    public function test_business_unit_with_services_cannot_be_deleted(): void
+    public function test_business_unit_with_requests_cannot_be_deleted(): void
     {
-        $unit = BusinessUnit::create(['name' => 'a', 'display_name' => 'A', 'abbreviation' => 'AA']);
-        Service::create(['name' => 'ISO', 'business_unit_id' => $unit->id, 'gestion_line_id' => GestionLine::create(['name' => 'X'])->id]);
+        $unit = BusinessUnit::factory()->create();
+        QuotationProposalOrder::factory()->create(['business_unit_id' => $unit->id]);
 
         $this->delete(route('dashboard.business-unit.delete', $unit))->assertSessionHas('error');
         $this->assertModelExists($unit);
+
+        $empty = BusinessUnit::factory()->create();
+        $this->delete(route('dashboard.business-unit.delete', $empty))->assertSessionHas('success');
+        $this->assertModelMissing($empty);
+    }
+
+    public function test_the_service_catalog_no_longer_exists(): void
+    {
+        $this->get('/dashboard/servicios')->assertNotFound();
+        $this->get('/dashboard/lineas-gestion')->assertNotFound();
     }
 
     public function test_updating_a_user_without_password_keeps_the_current_one(): void
@@ -104,11 +95,30 @@ class AdminCatalogTest extends TestCase
     public function test_client_export_download_is_single_use(): void
     {
         Storage::fake('local');
-        $token = '9b2f4a1e-1c2d-4e5f-8a9b-0c1d2e3f4a5b';
-        Storage::disk('local')->put(GenerateClientsExport::relativePath($token), 'xlsx');
-        GenerateClientsExport::markStatus($token, GenerateClientsExport::STATUS_READY);
+        $exports = app(ClientExportStore::class);
+        $token = $exports->open();
+        $exports->disk()->put($exports->path($token), 'xlsx');
+        $exports->mark($token, ExportStatus::Ready);
 
+        $this->getJson(route('dashboard.clients.export.status', $token))->assertJson(['status' => 'ready']);
         $this->get(route('dashboard.clients.export.download', $token))->assertOk()->assertDownload();
         $this->get(route('dashboard.clients.export.download', $token))->assertNotFound();
+    }
+
+    public function test_the_client_export_runs_in_the_background_and_is_swept_if_never_downloaded(): void
+    {
+        Storage::fake('local');
+        Queue::fake();
+
+        $token = $this->postJson(route('dashboard.clients.export.start'))->assertOk()->json('token');
+        $this->getJson(route('dashboard.clients.export.status', $token))->assertJson(['status' => 'pending']);
+        Queue::assertPushed(GenerateClientsExport::class, fn (GenerateClientsExport $job) => $job->token === $token);
+
+        $exports = app(ClientExportStore::class);
+        $exports->disk()->put($exports->path($token), 'xlsx');
+        $this->travel(ClientExportStore::RETENTION_HOURS + 1)->hours();
+        $this->artisan('clients:clean-exports')->assertSuccessful();
+
+        $exports->disk()->assertMissing($exports->path($token));
     }
 }

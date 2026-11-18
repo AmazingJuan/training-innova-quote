@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Mail\Transport\MicrosoftGraphTransport;
-use App\Models\Configuration;
+use App\Services\Settings;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Request;
@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(Settings::class);
     }
 
     /**
@@ -57,13 +57,13 @@ class AppServiceProvider extends ServiceProvider
         }
 
         View::composer('emails.partials.company-contact', function ($view) {
-            $c = Configuration::current();
+            $contact = $this->app->make(Settings::class)->companyContact();
             $view->with([
-                'companyContactEmail' => $c?->getCompanyContactEmail(),
-                'companyContactPhone' => $c?->getCompanyContactPhone(),
-                'companyContactAddress' => $c?->getCompanyContactAddress(),
-                'companyWebsiteUrl' => $c?->getCompanyWebsiteUrl(),
-                'companyWebsiteLabel' => $c?->getCompanyWebsiteLabel(),
+                'companyContactEmail' => $contact['email'],
+                'companyContactPhone' => $contact['phone'],
+                'companyContactAddress' => $contact['address'],
+                'companyWebsiteUrl' => $contact['website_url'],
+                'companyWebsiteLabel' => $contact['website_label'],
             ]);
         });
     }

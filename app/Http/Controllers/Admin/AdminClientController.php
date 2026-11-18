@@ -4,14 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\GenerateClientsExport;
+use App\Models\BusinessUnit;
 use App\Models\Client;
 use App\Models\QuotationProposalOrder;
+use App\Support\ClientExportStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -46,7 +45,7 @@ class AdminClientController extends Controller
     {
         $client->loadCount(Client::statsCounts());
 
-        $orders = $client->quotationProposalOrders()->latest()->get();
+        $orders = $client->quotationProposalOrders()->with('businessUnit:id,display_name')->latest()->get();
 
         return Inertia::render('admin/clients/show', [
             'viewData' => [
@@ -58,7 +57,7 @@ class AdminClientController extends Controller
                 'quotations' => $orders->map(fn (QuotationProposalOrder $order) => [
                     'id' => $order->getId(),
                     'quotation_code' => $order->getQuotationCode(),
-                    'business_unit' => $order->getBusinessUnit(),
+                    'business_unit' => $order->getBusinessUnitName(),
                     'is_generated' => $order->getIsGenerated(),
                     'quotation_url' => $order->getQuotationUrl(),
                     'created_at' => $order->getCreatedAt()?->toIso8601String(),
@@ -70,40 +69,29 @@ class AdminClientController extends Controller
     /**
      * Queue the Excel generation and return a token the frontend can poll.
      */
-    public function startExport(Request $request): JsonResponse
+    public function startExport(Request $request, ClientExportStore $exports): JsonResponse
     {
-        $token = (string) Str::uuid();
-
-        GenerateClientsExport::markStatus($token, GenerateClientsExport::STATUS_PENDING);
+        $token = $exports->open();
         GenerateClientsExport::dispatch($token, $this->resolveFilters($request));
 
         return response()->json(['token' => $token]);
     }
 
-    public function exportStatus(string $token): JsonResponse
+    public function exportStatus(string $token, ClientExportStore $exports): JsonResponse
     {
-        return response()->json([
-            'status' => Cache::get(GenerateClientsExport::statusKey($token), 'unknown'),
-        ]);
+        return response()->json(['status' => $exports->status($token)->value]);
     }
 
     /**
      * Single-use download: the file is removed once it has been sent.
      */
-    public function downloadExport(string $token): BinaryFileResponse
+    public function downloadExport(string $token, ClientExportStore $exports): BinaryFileResponse
     {
-        $disk = Storage::disk('local');
-        $path = GenerateClientsExport::relativePath($token);
-
-        abort_unless(
-            Cache::get(GenerateClientsExport::statusKey($token)) === GenerateClientsExport::STATUS_READY && $disk->exists($path),
-            404,
-        );
-
-        Cache::forget(GenerateClientsExport::statusKey($token));
+        $path = $exports->claim($token);
+        abort_if($path === null, 404);
 
         return response()
-            ->download($disk->path($path), 'clientes_'.now()->format('d-m-Y_h-iA').'.xlsx')
+            ->download($path, 'clientes_'.now()->format('d-m-Y_h-iA').'.xlsx')
             ->deleteFileAfterSend();
     }
 
@@ -146,7 +134,7 @@ class AdminClientController extends Controller
     }
 
     /**
-     * @return array{companies: list<string>, businessUnits: list<string>}
+     * @return array{companies: list<string>, businessUnits: list<array{name: string, display_name: string}>}
      */
     private function filterOptions(): array
     {
@@ -158,11 +146,12 @@ class AdminClientController extends Controller
                 ->orderBy('company')
                 ->pluck('company')
                 ->all(),
-            'businessUnits' => QuotationProposalOrder::query()
-                ->where('business_unit', '!=', '')
-                ->distinct()
-                ->orderBy('business_unit')
-                ->pluck('business_unit')
+            // Only the units clients have asked for.
+            'businessUnits' => BusinessUnit::query()
+                ->whereHas('quotationOrders')
+                ->orderBy('display_name')
+                ->get(['name', 'display_name'])
+                ->map(fn (BusinessUnit $unit) => ['name' => $unit->getName(), 'display_name' => $unit->getDisplayName()])
                 ->all(),
         ];
     }

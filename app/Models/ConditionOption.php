@@ -20,7 +20,7 @@ class ConditionOption extends Model
     /**
      * Mass assignable attributes.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'label',
@@ -32,9 +32,11 @@ class ConditionOption extends Model
 
     public $timestamps = false;
 
-    protected $casts = [
-        'is_other' => 'boolean',
-    ];
+    /** @return array<string, string> */
+    protected function casts(): array
+    {
+        return ['is_other' => 'boolean'];
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -45,6 +47,7 @@ class ConditionOption extends Model
     /**
      * A ConditionOption belongs to a Condition.
      */
+    /** @return BelongsTo<Condition, $this> */
     public function condition(): BelongsTo
     {
         return $this->belongsTo(Condition::class, 'condition_id');
@@ -58,6 +61,7 @@ class ConditionOption extends Model
     /**
      * A ConditionOption may point to a next Condition.
      */
+    /** @return BelongsTo<Condition, $this> */
     public function nextCondition(): BelongsTo
     {
         return $this->belongsTo(Condition::class, 'next_condition_id');

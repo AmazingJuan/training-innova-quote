@@ -54,7 +54,7 @@ export default function Index() {
                                 </Link>
                                 {/* On a phone the unit and date columns are hidden: they go under the code. */}
                                 <span className="mt-0.5 block font-sans text-xs font-normal text-pizarra md:hidden">
-                                    {order.business_unit}, {formatDate(order.created_at)}
+                                    {order.business_unit.display_name}, {formatDate(order.created_at)}
                                 </span>
                             </td>
                             <td className={adminTableTdClass}>
@@ -62,7 +62,7 @@ export default function Index() {
                                 <span className="block text-xs text-pizarra">{order.client?.email}</span>
                             </td>
                             <td className={cn(adminTableTdClass, 'hidden lg:table-cell')}>{orDash(order.client?.company)}</td>
-                            <td className={cn(adminTableTdClass, 'hidden md:table-cell')}>{order.business_unit}</td>
+                            <td className={cn(adminTableTdClass, 'hidden md:table-cell')}>{order.business_unit.display_name}</td>
                             <td className={cn(adminTableTdClass, 'hidden whitespace-nowrap tabular-nums md:table-cell')}>
                                 {formatDate(order.created_at)}
                             </td>

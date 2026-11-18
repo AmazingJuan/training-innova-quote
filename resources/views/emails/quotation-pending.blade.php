@@ -2,7 +2,7 @@
 
 @php
   $contact = $quotationOrder->client;
-  $code = $quotationOrder->getQuotationCode() ?: '#'.$quotationOrder->id;
+  $code = $quotationOrder->getReference();
 @endphp
 
 @section('title', 'Recibimos su solicitud de cotización')
@@ -21,7 +21,7 @@
 
   @include('emails.partials.rows', ['title' => 'Solicitud', 'rows' => [
     'Fecha' => $quotationOrder->created_at?->format('d/m/Y, H:i'),
-    'Unidad de negocio' => $quotationOrder->business_unit,
+    'Unidad de negocio' => $quotationOrder->getBusinessUnitName(),
     'Línea de gestión' => $quotationOrder->gestion_line,
     'Servicios' => collect($quotationOrder->services ?? [])->map(fn ($s) => is_array($s) ? ($s['name'] ?? json_encode($s)) : $s)->implode("\n"),
   ]])

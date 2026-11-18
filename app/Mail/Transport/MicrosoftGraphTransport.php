@@ -12,6 +12,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\MessageConverter;
 use Symfony\Component\Mime\Part\DataPart;
 
@@ -61,7 +62,11 @@ class MicrosoftGraphTransport extends AbstractTransport
 
     protected function doSend(SentMessage $message): void
     {
-        $email = MessageConverter::toEmail($message->getOriginalMessage());
+        $original = $message->getOriginalMessage();
+        if (! $original instanceof Message) {
+            throw new TransportException('Microsoft Graph solo envía mensajes con encabezados (Symfony\\Component\\Mime\\Message).');
+        }
+        $email = MessageConverter::toEmail($original);
         $mime = base64_encode($message->toString());
 
         if (strlen($mime) <= self::MAX_SINGLE_REQUEST_BYTES && $email->getBcc() === []) {

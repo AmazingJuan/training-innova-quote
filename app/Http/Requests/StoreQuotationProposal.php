@@ -2,16 +2,18 @@
 
 namespace App\Http\Requests;
 
-use App\Models\QuotationProposalOrder;
-use App\Support\BusinessCalendar;
+use App\Models\BusinessUnit;
+use App\Support\OfferDatePolicy;
 use App\Support\QuotationAttachment;
-use Carbon\CarbonImmutable;
+use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class StoreQuotationProposal extends FormRequest
 {
+    private ?BusinessUnit $unit = null;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -41,7 +43,8 @@ class StoreQuotationProposal extends FormRequest
             // Honeypot, hidden from people (see QuotationController).
             'web' => ['nullable', 'string', 'max:255'],
 
-            'businessUnit' => ['required', 'string', 'max:255', Rule::exists('business_units', 'display_name')],
+            // Slug of the business unit (its URL).
+            'unit' => ['required', 'string', 'max:255', Rule::exists('business_units', 'name')],
 
             // The encuadre: readable answers keyed by question.
             'answers' => [
@@ -57,20 +60,7 @@ class StoreQuotationProposal extends FormRequest
                     }
                 },
                 function ($attribute, $value, $fail) {
-                    foreach ($value as $question => $answer) {
-                        if (! is_string($question) || ! QuotationProposalOrder::isOfferDateQuestion($question) || ! is_string($answer) || trim($answer) === '') {
-                            continue;
-                        }
-
-                        $date = QuotationProposalOrder::parseAnswerDate($answer);
-                        $min = self::minOfferDate();
-
-                        if ($date === null) {
-                            $fail('Indique una fecha válida en «'.$question.'».');
-                        } elseif ($date->lt($min)) {
-                            $fail('La fecha estimada de entrega de la oferta debe ser a partir del '.$min->format('d/m/Y').' (3 días hábiles después del envío).');
-                        }
-                    }
+                    $this->validateOfferDate($value, $fail);
                 },
             ],
             // Open questions of the encuadre (descriptions) can be long.
@@ -84,10 +74,36 @@ class StoreQuotationProposal extends FormRequest
         ];
     }
 
-    /** The soonest offer date a client may ask for: 3 business days after today. */
-    public static function minOfferDate(): CarbonImmutable
+    /** The business unit the request is for (null when the slug is not valid). */
+    public function unit(): ?BusinessUnit
     {
-        return BusinessCalendar::addBusinessDays(now(), QuotationProposalOrder::MIN_OFFER_BUSINESS_DAYS);
+        return $this->unit ??= BusinessUnit::query()->where('name', $this->input('unit'))->first();
+    }
+
+    /**
+     * The offer date (the unit's question with that role) must be a real date
+     * at least 3 business days away.
+     *
+     * @param  array<string, mixed>  $answers
+     */
+    private function validateOfferDate(array $answers, Closure $fail): void
+    {
+        $label = $this->unit()?->offerDateQuestion()?->getLabel();
+        $answer = $label !== null ? ($answers[$label] ?? null) : null;
+
+        if (! is_string($answer) || trim($answer) === '') {
+            return;
+        }
+
+        $policy = app(OfferDatePolicy::class);
+        $date = $policy->parse($answer);
+        $min = $policy->minimumFor(now());
+
+        if ($date === null) {
+            $fail('Indique una fecha válida en «'.$label.'».');
+        } elseif ($date->lt($min)) {
+            $fail('La fecha estimada de entrega de la oferta debe ser a partir del '.$min->format('d/m/Y').' (3 días hábiles después del envío).');
+        }
     }
 
     /**
@@ -158,7 +174,8 @@ class StoreQuotationProposal extends FormRequest
             'contact.phone.required' => 'Indique un teléfono de contacto.',
             'contact.phone.regex' => 'El teléfono solo puede contener números, espacios y los signos + ( ) - .',
 
-            'businessUnit.required' => 'Elija el tipo de servicio que desea cotizar.',
+            'unit.required' => 'Elija el tipo de servicio que desea cotizar.',
+            'unit.exists' => 'El tipo de servicio elegido no existe. Vuelva a elegirlo.',
 
             'answers.required' => 'No se recibieron las respuestas de la solicitud. Inténtelo nuevamente.',
             'answers.array' => 'No se recibieron las respuestas de la solicitud. Inténtelo nuevamente.',

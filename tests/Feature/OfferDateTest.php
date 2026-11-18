@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ConditionRole;
 use App\Models\BusinessUnit;
 use App\Models\Condition;
+use App\Models\QuotationProposalOrder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -20,7 +22,7 @@ class OfferDateTest extends TestCase
         parent::setUp();
 
         $unit = BusinessUnit::create(['name' => 'auditoria', 'display_name' => 'Auditoría', 'abbreviation' => 'AUD']);
-        $date = Condition::create(['label' => self::LABEL, 'interaction_type' => 'input', 'type' => 'date', 'business_unit_id' => $unit->id]);
+        $date = Condition::create(['label' => self::LABEL, 'interaction_type' => 'input', 'type' => 'date', 'role' => ConditionRole::OfferDate, 'business_unit_id' => $unit->id]);
         $unit->update(['initial_condition_id' => $date->id]);
 
         // Friday 13 Nov 2026: Monday 16 is a holiday, so the 3 business days are Tue 17, Wed 18 and Thu 19.
@@ -39,13 +41,24 @@ class OfferDateTest extends TestCase
 
         $this->post('/cotizar', $this->payload('18/11/2026'))->assertSessionHasErrors('answers');
         $this->post('/cotizar', $this->payload('19/11/2026'))->assertSessionHasNoErrors();
+
+        // The date is kept in its own column, which the reminders read.
+        $this->assertSame('2026-11-19', QuotationProposalOrder::sole()->getOfferDate()?->format('Y-m-d'));
+    }
+
+    public function test_rewording_the_question_keeps_the_rule(): void
+    {
+        Condition::sole()->update(['label' => '¿Para cuándo necesita la propuesta?']);
+
+        $this->post('/cotizar', [...$this->payload('18/11/2026'), 'answers' => ['¿Para cuándo necesita la propuesta?' => '18/11/2026']])
+            ->assertSessionHasErrors('answers');
     }
 
     private function payload(string $date): array
     {
         return [
             'contact' => ['nit' => '900123456-7', 'economic_activity' => 'Salud', 'address' => 'Cra. 50 # 10-20', 'name' => 'Ana', 'email' => 'ana@empresa.com', 'phone' => '3001234567', 'company' => 'Clínica Sana', 'role' => 'Coordinadora'],
-            'businessUnit' => 'Auditoría',
+            'unit' => 'auditoria',
             'answers' => [self::LABEL => $date],
             'privacy_accepted' => true,
         ];
