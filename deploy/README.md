@@ -90,12 +90,33 @@ nano .env                       # revise el bloque MAIL_*
 Abra https://cotizaciones.trainingcorporation.com.co y luego:
 
 1. Entre al panel con los usuarios de `database/seeders/DatabaseSeeder.php` y **cambie sus contraseñas**. Están escritas en el repositorio.
-2. En **Configuración**, ponga el correo que recibe las solicitudes nuevas.
+2. En **Configuración**, ponga el correo que recibe las solicitudes nuevas (gerencia@trainingcorporation.com.co).
 3. Envíe una solicitud de prueba y confirme que llegan los dos correos (al cliente y a gerencia).
 
 ### Correo
 
-El `.env` viene preparado para Gmail (`smtp.gmail.com:587`). `MAIL_PASSWORD` debe ser una [contraseña de aplicación](https://support.google.com/accounts/answer/185833) de la cuenta, no la contraseña normal. AWS bloquea el puerto 25 de salida; los puertos 587 y 465 sí funcionan.
+Los correos salen desde **gerencia@trainingcorporation.com.co** por Microsoft Graph (`MAIL_MAILER=msgraph`), no por SMTP. En Entra está registrada la app «App web Laravel - correos gerencia», con el permiso **Application Mail.Send** limitado por un alcance de Exchange («Solo gerencia») a ese buzón: no puede enviar como nadie más.
+
+En el `.env`:
+
+```env
+MAIL_MAILER=msgraph
+MAIL_FROM_ADDRESS=gerencia@trainingcorporation.com.co
+MSGRAPH_TENANT_ID=...
+MSGRAPH_CLIENT_ID=...
+MSGRAPH_CLIENT_SECRET=...   # Entra > Registros de aplicaciones > la app > Certificados y secretos (el «Valor»)
+MSGRAPH_FROM=gerencia@trainingcorporation.com.co
+```
+
+- El secreto vence (Entra ofrece 6, 12 o 24 meses). Antes de esa fecha cree uno nuevo, cámbielo en `.env` y ejecute `docker compose up -d`.
+- Los mensajes de más de 4 MB (solicitudes con documentos adjuntos) se arman como borrador y se envían; para eso la app necesita también **Application Mail.ReadWrite** sobre el mismo alcance:
+  `New-ManagementRoleAssignment -App <MSGRAPH_CLIENT_ID> -Role "Application Mail.ReadWrite" -CustomResourceScope "Solo gerencia"`
+- Prueba de envío: `docker compose exec app php artisan tinker --execute="Mail::raw('Prueba', fn(\$m) => \$m->to('gerencia@trainingcorporation.com.co')->subject('Prueba'));"`
+- Un permiso recién asignado puede tardar hasta 2 horas; mientras tanto Graph responde 403.
+
+### Recordatorios a Gerencia
+
+El contenedor `scheduler` ejecuta `quotations:remind-management` a las 8:00 a. m. y a las 2:00 p. m. de lunes a viernes (los festivos de Colombia se omiten). Cada solicitud sin cotización recibe un recordatorio cada 2,5 días hábiles desde su envío; si ya pasó la fecha de entrega que pidió el cliente, el correo la marca como vencida. Para ver qué se enviaría sin enviar nada: `docker compose exec app php artisan quotations:remind-management --dry-run`.
 
 ## 5. Operación diaria
 

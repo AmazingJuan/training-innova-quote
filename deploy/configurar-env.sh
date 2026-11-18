@@ -4,7 +4,7 @@
 #   ./deploy/configurar-env.sh otro.dominio    otro dominio (o "localhost" para probar en local)
 #
 # Genera APP_KEY y las contraseñas de MySQL, y pregunta el correo de Let's Encrypt
-# y los datos del SMTP. Si el .env ya existe no lo toca.
+# y los datos de Microsoft Graph para el correo. Si el .env ya existe no lo toca.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -46,9 +46,9 @@ ask() {
 
 echo "Deje en blanco lo que quiera completar después en .env"
 ask ACME_EMAIL "Correo para avisos de Let's Encrypt (vencimiento del certificado)"
-ask MAIL_USERNAME "Usuario SMTP (ej. cuenta@gmail.com)"
-ask MAIL_PASSWORD "Contraseña SMTP (en Gmail: contraseña de aplicación)"
-ask MAIL_FROM_ADDRESS "Remitente de los correos (normalmente el mismo usuario SMTP)"
+ask MSGRAPH_TENANT_ID "Microsoft Graph: ID de inquilino (tenant) de Entra"
+ask MSGRAPH_CLIENT_ID "Microsoft Graph: ID de la app «App web Laravel - correos gerencia»"
+ask MSGRAPH_CLIENT_SECRET "Microsoft Graph: valor del secreto de cliente"
 
 echo
 echo "Creado .env (permisos 600). Revíselo con: nano .env"
