@@ -5,8 +5,3 @@ export interface BusinessUnit {
     quotation_seq_year: number | null;
     quotation_seq_value: number | null;
 }
-
-export interface GestionLineOption {
-    id: number;
-    name: string;
-}

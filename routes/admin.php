@@ -5,16 +5,14 @@ use App\Http\Controllers\Admin\AdminClientController;
 use App\Http\Controllers\Admin\AdminConfigurationController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminDecisionTreeController;
-use App\Http\Controllers\Admin\AdminGestionLineController;
 use App\Http\Controllers\Admin\AdminQuotationOrderController;
-use App\Http\Controllers\Admin\AdminServiceController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminWelcomeBroadcastController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('dashboard')
     ->middleware(['auth', 'verified'])
-    ->whereNumber(['user', 'service', 'gestionLine', 'client', 'businessUnit', 'condition'])
+    ->whereNumber(['user', 'client', 'businessUnit', 'condition'])
     ->group(function () {
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
 
@@ -25,22 +23,6 @@ Route::prefix('dashboard')
         Route::get('/usuarios/{user}/editar', [AdminUserController::class, 'edit'])->name('dashboard.users.edit');
         Route::put('/usuarios/{user}', [AdminUserController::class, 'update'])->name('dashboard.users.update');
         Route::delete('/usuarios/{user}', [AdminUserController::class, 'destroy'])->name('dashboard.users.delete');
-
-        // Servicios
-        Route::get('/servicios', [AdminServiceController::class, 'index'])->name('dashboard.services.index');
-        Route::get('/servicios/crear', [AdminServiceController::class, 'create'])->name('dashboard.services.create');
-        Route::post('/servicios', [AdminServiceController::class, 'store'])->name('dashboard.services.store');
-        Route::get('/servicios/{service}/editar', [AdminServiceController::class, 'edit'])->name('dashboard.services.edit');
-        Route::put('/servicios/{service}', [AdminServiceController::class, 'update'])->name('dashboard.services.update');
-        Route::delete('/servicios/{service}', [AdminServiceController::class, 'destroy'])->name('dashboard.services.delete');
-
-        // Líneas de gestión
-        Route::get('/lineas-gestion', [AdminGestionLineController::class, 'index'])->name('dashboard.lines.index');
-        Route::get('/lineas-gestion/crear', [AdminGestionLineController::class, 'create'])->name('dashboard.lines.create');
-        Route::post('/lineas-gestion', [AdminGestionLineController::class, 'store'])->name('dashboard.lines.store');
-        Route::get('/lineas-gestion/{gestionLine}/editar', [AdminGestionLineController::class, 'edit'])->name('dashboard.lines.edit');
-        Route::put('/lineas-gestion/{gestionLine}', [AdminGestionLineController::class, 'update'])->name('dashboard.lines.update');
-        Route::delete('/lineas-gestion/{gestionLine}', [AdminGestionLineController::class, 'destroy'])->name('dashboard.lines.delete');
 
         // Clientes
         Route::get('/clientes', [AdminClientController::class, 'index'])->name('dashboard.clients.index');

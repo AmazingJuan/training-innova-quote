@@ -26,7 +26,7 @@ class QuotationPendingAdmin extends Mailable
 
     public function envelope(): Envelope
     {
-        $ref = $this->quotationOrder->getQuotationCode() ?? '#'.$this->quotationOrder->getId();
+        $ref = $this->quotationOrder->getReference();
 
         return new Envelope(
             subject: 'Nueva solicitud de cotización '.$ref,
@@ -39,7 +39,7 @@ class QuotationPendingAdmin extends Mailable
             view: 'emails.admin.quotation-pending',
             with: [
                 'attachedFiles' => array_column($this->files, 'name'),
-                'offerDate' => $this->quotationOrder->getOfferDateAnswer(),
+                'offerDate' => $this->quotationOrder->getOfferDate()?->format('d/m/Y'),
             ],
         );
     }

@@ -2,7 +2,7 @@
 
 @php
   $contact = $quotationOrder->client;
-  $code = $quotationOrder->getQuotationCode() ?: '#'.$quotationOrder->getId();
+  $code = $quotationOrder->getReference();
   $who = $contact?->company ?: $contact?->name ?: 'un cliente';
   $days = number_format($businessDaysWaiting, 1, ',', '');
   $days = str_ends_with($days, ',0') ? substr($days, 0, -2) : $days;
@@ -35,7 +35,7 @@
     'Persona de contacto' => $contact?->name,
     'Correo electrónico' => $contact?->email,
     'Teléfono' => $contact?->phone,
-    'Unidad de negocio' => $quotationOrder->business_unit,
+    'Unidad de negocio' => $quotationOrder->getBusinessUnitName(),
     'Fecha de envío' => $quotationOrder->getCreatedAt()?->timezone(config('app.timezone'))->format('d/m/Y h:i a'),
     'Fecha estimada de entrega de la oferta comercial' => $offerDate,
     'Recordatorio' => 'N.º '.$number,

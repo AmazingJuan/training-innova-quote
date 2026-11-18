@@ -7,7 +7,6 @@ import {
     BriefcaseBusiness,
     Contact,
     ExternalLink,
-    GitBranch,
     LogOut,
     Mail,
     Menu,
@@ -15,7 +14,6 @@ import {
     Settings,
     Users,
     Workflow,
-    Wrench,
     X,
     type LucideIcon,
 } from 'lucide-react';
@@ -47,8 +45,6 @@ export const adminNavigation: NavGroup[] = [
                 icon: BriefcaseBusiness,
                 description: 'Unidades y su código de cotización',
             },
-            { routeName: 'dashboard.lines.index', label: 'Líneas de gestión', icon: GitBranch, description: 'Agrupan los servicios ofrecidos' },
-            { routeName: 'dashboard.services.index', label: 'Servicios', icon: Wrench, description: 'Servicios por unidad y línea' },
             {
                 routeName: 'dashboard.business-unit.decision-tree',
                 label: 'Árbol de decisión',

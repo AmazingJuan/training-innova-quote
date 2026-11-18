@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Mail\QuotationPendingAdmin;
-use App\Models\Configuration;
 use App\Models\QuotationProposalOrder;
+use App\Services\Settings;
 use App\Support\QuotationAttachment;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -37,10 +37,10 @@ class NotifyManagementOfQuotation implements ShouldQueue
         public array $files = [],
     ) {}
 
-    public function handle(): void
+    public function handle(Settings $settings): void
     {
-        $order = QuotationProposalOrder::query()->with('client')->find($this->orderId);
-        $email = Configuration::current()?->getNotificationEmail();
+        $order = QuotationProposalOrder::query()->with(['client', 'businessUnit'])->find($this->orderId);
+        $email = $settings->notificationEmail();
 
         if ($order === null || $email === null) {
             Log::warning('Nueva solicitud sin aviso a gerencia.', [

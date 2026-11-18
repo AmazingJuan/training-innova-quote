@@ -14,10 +14,10 @@ export interface QuotationOrder {
     id: string;
     quotation_code: string | null;
     client: ClientSummary | null;
-    business_unit: string;
-    gestion_line?: string | null;
-    services?: string[];
+    business_unit: { id: number; display_name: string };
     answers?: Record<string, string>;
+    /** Date the client expects the offer by (Y-m-d). */
+    offer_date?: string | null;
     is_generated: boolean;
     viewed_by_client: boolean;
     quotation_url: string | null;

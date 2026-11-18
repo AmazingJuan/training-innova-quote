@@ -110,23 +110,11 @@ export default function Show() {
                         <DetailList
                             title="Solicitud"
                             items={[
-                                { label: 'Unidad de negocio', value: order.business_unit },
-                                // Requests made before the encuadre picked services from the catalog.
-                                ...(order.services?.length
-                                    ? [
-                                          { label: 'Línea de gestión', value: orDash(order.gestion_line) },
-                                          {
-                                              label: 'Servicios',
-                                              value: (
-                                                  <ul className="space-y-1">
-                                                      {order.services.map((service) => (
-                                                          <li key={service}>{service}</li>
-                                                      ))}
-                                                  </ul>
-                                              ),
-                                          },
-                                      ]
-                                    : []),
+                                { label: 'Unidad de negocio', value: order.business_unit.display_name },
+                                {
+                                    label: 'Fecha estimada de entrega de la oferta',
+                                    value: order.offer_date ? formatDate(order.offer_date) : orDash(null),
+                                },
                             ]}
                         />
 

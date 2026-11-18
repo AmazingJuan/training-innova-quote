@@ -38,7 +38,8 @@ class AdminBusinessUnitController extends Controller
         return Inertia::render('admin/business-units/show', [
             'viewData' => [
                 'businessUnit' => $businessUnit->only(self::PUBLIC_COLUMNS),
-                'services' => $businessUnit->services()->orderBy('name')->get(['id', 'name']),
+                'questionCount' => $businessUnit->conditions()->count(),
+                'requestCount' => $businessUnit->quotationOrders()->count(),
             ],
         ]);
     }
@@ -75,9 +76,10 @@ class AdminBusinessUnitController extends Controller
 
     public function destroy(BusinessUnit $businessUnit): RedirectResponse
     {
-        if ($businessUnit->services()->exists()) {
+        // Its requests point to it (and keep their history).
+        if ($businessUnit->quotationOrders()->exists()) {
             return to_route('dashboard.business-unit.index')
-                ->with('error', 'No se puede eliminar la unidad de negocio «'.$businessUnit->getDisplayName().'» porque tiene servicios asociados.');
+                ->with('error', 'No se puede eliminar la unidad de negocio «'.$businessUnit->getDisplayName().'» porque tiene solicitudes de cotización.');
         }
 
         $businessUnit->delete();

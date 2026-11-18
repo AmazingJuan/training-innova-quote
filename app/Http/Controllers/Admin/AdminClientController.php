@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\GenerateClientsExport;
+use App\Models\BusinessUnit;
 use App\Models\Client;
 use App\Models\QuotationProposalOrder;
 use Illuminate\Http\JsonResponse;
@@ -46,7 +47,7 @@ class AdminClientController extends Controller
     {
         $client->loadCount(Client::statsCounts());
 
-        $orders = $client->quotationProposalOrders()->latest()->get();
+        $orders = $client->quotationProposalOrders()->with('businessUnit:id,display_name')->latest()->get();
 
         return Inertia::render('admin/clients/show', [
             'viewData' => [
@@ -58,7 +59,7 @@ class AdminClientController extends Controller
                 'quotations' => $orders->map(fn (QuotationProposalOrder $order) => [
                     'id' => $order->getId(),
                     'quotation_code' => $order->getQuotationCode(),
-                    'business_unit' => $order->getBusinessUnit(),
+                    'business_unit' => $order->getBusinessUnitName(),
                     'is_generated' => $order->getIsGenerated(),
                     'quotation_url' => $order->getQuotationUrl(),
                     'created_at' => $order->getCreatedAt()?->toIso8601String(),
@@ -146,7 +147,7 @@ class AdminClientController extends Controller
     }
 
     /**
-     * @return array{companies: list<string>, businessUnits: list<string>}
+     * @return array{companies: list<string>, businessUnits: list<array{name: string, display_name: string}>}
      */
     private function filterOptions(): array
     {
@@ -158,11 +159,12 @@ class AdminClientController extends Controller
                 ->orderBy('company')
                 ->pluck('company')
                 ->all(),
-            'businessUnits' => QuotationProposalOrder::query()
-                ->where('business_unit', '!=', '')
-                ->distinct()
-                ->orderBy('business_unit')
-                ->pluck('business_unit')
+            // Only the units clients have asked for.
+            'businessUnits' => BusinessUnit::query()
+                ->whereHas('quotationOrders')
+                ->orderBy('display_name')
+                ->get(['name', 'display_name'])
+                ->map(fn (BusinessUnit $unit) => ['name' => $unit->getName(), 'display_name' => $unit->getDisplayName()])
                 ->all(),
         ];
     }

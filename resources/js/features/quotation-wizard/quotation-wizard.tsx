@@ -294,7 +294,7 @@ export function QuotationWizard({ viewData }: { viewData: QuoteViewData }) {
 
         router.post(
             route('quotation.store.proposal'),
-            { contact, businessUnit: viewData.businessUnit, answers: answered, documents, privacy_accepted: privacyAccepted, web },
+            { contact, unit: viewData.unit, answers: answered, documents, privacy_accepted: privacyAccepted, web },
             {
                 preserveState: true,
                 preserveScroll: true,

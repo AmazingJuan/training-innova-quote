@@ -2,7 +2,7 @@
 
 @php
   $contact = $quotationOrder->client;
-  $code = $quotationOrder->getQuotationCode() ?: '#'.$quotationOrder->getId();
+  $code = $quotationOrder->getReference();
 @endphp
 
 @section('title', 'Cotización enviada al cliente')

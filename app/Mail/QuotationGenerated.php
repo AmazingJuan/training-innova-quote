@@ -5,36 +5,24 @@ namespace App\Mail;
 use App\Models\QuotationProposalOrder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
+/** Tells the client their quotation is ready, with the signed link to it. */
 class QuotationGenerated extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public QuotationProposalOrder $order;
+    public function __construct(public QuotationProposalOrder $order) {}
 
-    /**
-     * Create a new message instance.
-     *
-     * @param  array  $mailData
-     */
-    public function __construct(QuotationProposalOrder $order)
+    public function envelope(): Envelope
     {
-        $this->order = $order;
+        return new Envelope(subject: 'Su cotización '.$this->order->getReference().' está lista');
     }
 
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build()
+    public function content(): Content
     {
-        $ref = $this->order->getQuotationCode() ?? $this->order->getId();
-        $subject = 'Su cotización '.$ref.' está lista';
-
-        return $this
-            ->subject($subject)
-            ->view('emails.quotation-generated');
+        return new Content(view: 'emails.quotation-generated');
     }
 }

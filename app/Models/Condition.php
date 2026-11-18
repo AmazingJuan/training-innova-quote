@@ -2,38 +2,44 @@
 
 namespace App\Models;
 
+use App\Enums\ConditionRole;
+use App\Enums\FieldType;
+use App\Enums\InteractionType;
+use App\Enums\Section;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Collection;
 
+/**
+ * A question of a business unit's request form (the "encuadre"). Questions are
+ * chained through next_condition_id; options may open branches.
+ */
 class Condition extends Model
 {
-    /**
-     * Blocks of the "formato de encuadre", in the order the client goes through them.
-     */
-    public const SECTIONS = ['necesidad', 'condiciones', 'cotizacion', 'cierre'];
-
     /**
      * Attributes:
      *
      * $this->attributes['id'] - int - Primary key identifier
-     * $this->attributes['label'] - string - Unique name of the condition
-     * $this->attributes['interaction_type'] - string - Specifies what can the user do with the condition
-     * $this->attributes['type'] - string - Input type (default: "text")
-     * $this->attributes['observation'] - string|null - Description of the condition
-     * $this->attributes['next_condition_id'] - int|null - ID of the next condition in sequence
-     * $this->attributes['business_unit_id'] - int - ID of the associated business unit
-     * $this->attributes['section'] - string|null - Block of the encuadre it belongs to (see SECTIONS)
-     * $this->attributes['required'] - bool - Whether the client must answer it
+     * $this->attributes['label'] - string - The question, as the client reads it
+     * $this->attributes['interaction_type'] - InteractionType - How the client answers it
+     * $this->attributes['type'] - FieldType - Kind of value asked for (default: text)
+     * $this->attributes['observation'] - string|null - Help text under the question
      * $this->attributes['placeholder'] - string|null - Example of the expected answer, shown inside the field
      * $this->attributes['multiline'] - bool - Free text answered in a long field
+     * $this->attributes['multiple'] - bool - Several options can be chosen
+     * $this->attributes['section'] - Section|null - Block of the encuadre it belongs to
+     * $this->attributes['role'] - ConditionRole|null - What the application does with its answer
+     * $this->attributes['required'] - bool - Whether the client must answer it
+     * $this->attributes['next_condition_id'] - int|null - ID of the next question in the chain
+     * $this->attributes['business_unit_id'] - int - ID of the business unit it belongs to
      */
 
     /**
      * Mass assignable attributes.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'label',
@@ -44,6 +50,7 @@ class Condition extends Model
         'business_unit_id',
         'multiple',
         'section',
+        'role',
         'required',
         'placeholder',
         'multiline',
@@ -51,11 +58,19 @@ class Condition extends Model
 
     public $timestamps = false;
 
-    protected $casts = [
-        'multiple' => 'boolean',
-        'required' => 'boolean',
-        'multiline' => 'boolean',
-    ];
+    /** @return array<string, string> */
+    protected function casts(): array
+    {
+        return [
+            'interaction_type' => InteractionType::class,
+            'type' => FieldType::class,
+            'section' => Section::class,
+            'role' => ConditionRole::class,
+            'multiple' => 'boolean',
+            'required' => 'boolean',
+            'multiline' => 'boolean',
+        ];
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -63,16 +78,19 @@ class Condition extends Model
     |--------------------------------------------------------------------------
     */
 
+    /** @return HasMany<ConditionOption, $this> */
     public function options(): HasMany
     {
         return $this->hasMany(ConditionOption::class);
     }
 
+    /** @return Collection<int, ConditionOption> */
     public function getOptions(): Collection
     {
         return $this->options;
     }
 
+    /** @return BelongsTo<BusinessUnit, $this> */
     public function businessUnit(): BelongsTo
     {
         return $this->belongsTo(BusinessUnit::class);
@@ -83,14 +101,30 @@ class Condition extends Model
         return $this->businessUnit;
     }
 
-    public function condition(): BelongsTo
+    /** @return BelongsTo<Condition, $this> */
+    public function nextCondition(): BelongsTo
     {
         return $this->belongsTo(Condition::class, 'next_condition_id');
     }
 
     public function getNextCondition(): ?Condition
     {
-        return $this->condition;
+        return $this->nextCondition;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Scopes
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * @param  Builder<Condition>  $query
+     * @return Builder<Condition>
+     */
+    public function scopeWithRole(Builder $query, ConditionRole $role): Builder
+    {
+        return $query->where('role', $role->value);
     }
 
     /*
@@ -99,13 +133,11 @@ class Condition extends Model
     |--------------------------------------------------------------------------
     */
 
-    // ID
     public function getId(): int
     {
         return $this->attributes['id'];
     }
 
-    // Label
     public function getLabel(): string
     {
         return $this->attributes['label'];
@@ -116,30 +148,26 @@ class Condition extends Model
         $this->attributes['label'] = $value;
     }
 
-    // Interaction Type
-
-    public function getInteractionType(): string
+    public function getInteractionType(): InteractionType
     {
-        return $this->attributes['interaction_type'];
+        return $this->interaction_type;
     }
 
-    public function setInteractionType(string $value): void
+    public function setInteractionType(InteractionType $value): void
     {
-        $this->attributes['interaction_type'] = $value;
+        $this->interaction_type = $value;
     }
 
-    // Type
-    public function getType(): string
+    public function getType(): FieldType
     {
-        return $this->attributes['type'];
+        return $this->type ?? FieldType::Text;
     }
 
-    public function setType(string $value): void
+    public function setType(FieldType $value): void
     {
-        $this->attributes['type'] = $value;
+        $this->type = $value;
     }
 
-    // Observation
     public function getObservation(): ?string
     {
         return $this->attributes['observation'] ?? null;
@@ -149,8 +177,6 @@ class Condition extends Model
     {
         $this->attributes['observation'] = $value;
     }
-
-    // Multiple
 
     public function getMultiple(): bool
     {
@@ -162,31 +188,38 @@ class Condition extends Model
         $this->attributes['multiple'] = $value;
     }
 
-    // Section
-
-    public function getSection(): ?string
+    public function getSection(): ?Section
     {
-        return $this->attributes['section'] ?? null;
+        return $this->section;
     }
 
-    // Required
+    public function getRole(): ?ConditionRole
+    {
+        return $this->role;
+    }
+
+    public function hasRole(ConditionRole $role): bool
+    {
+        return $this->getRole() === $role;
+    }
 
     public function isRequired(): bool
     {
         return (bool) ($this->attributes['required'] ?? true);
     }
 
-    // Placeholder
-
     public function getPlaceholder(): ?string
     {
         return $this->attributes['placeholder'] ?? null;
     }
 
-    // Multiline
-
     public function isMultiline(): bool
     {
         return (bool) ($this->attributes['multiline'] ?? false);
+    }
+
+    public function isChoice(): bool
+    {
+        return $this->getInteractionType() === InteractionType::Options;
     }
 }

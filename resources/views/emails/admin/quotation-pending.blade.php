@@ -2,12 +2,12 @@
 
 @php
   $contact = $quotationOrder->client;
-  $code = $quotationOrder->getQuotationCode() ?: '#'.$quotationOrder->getId();
+  $code = $quotationOrder->getReference();
 @endphp
 
 @section('title', 'Nueva solicitud de cotización')
 
-@section('preheader', ($contact?->company ?: $contact?->name ?: 'Un cliente').' solicitó una cotización de '.($quotationOrder->business_unit ?? 'un servicio').'.')
+@section('preheader', ($contact?->company ?: $contact?->name ?: 'Un cliente').' solicitó una cotización de '.$quotationOrder->getBusinessUnitName().'.')
 
 @section('heading', 'Nueva solicitud de cotización')
 
@@ -25,7 +25,7 @@
     'NIT' => $contact?->nit,
     'Actividad económica' => $contact?->economic_activity,
     'Dirección' => $contact?->address,
-    'Unidad de negocio' => $quotationOrder->business_unit,
+    'Unidad de negocio' => $quotationOrder->getBusinessUnitName(),
   ]])
 
   @include('emails.partials.rows', ['title' => 'Persona de contacto', 'rows' => [

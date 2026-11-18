@@ -27,7 +27,7 @@ class QuotationReminderAdmin extends Mailable
 
     public function envelope(): Envelope
     {
-        $ref = $this->quotationOrder->getQuotationCode() ?? '#'.$this->quotationOrder->getId();
+        $ref = $this->quotationOrder->getReference();
 
         return new Envelope(
             subject: ($this->overdue ? 'Cotización vencida: ' : 'Recordatorio: cotización pendiente ').$ref,
@@ -38,7 +38,7 @@ class QuotationReminderAdmin extends Mailable
     {
         return new Content(
             view: 'emails.admin.quotation-reminder',
-            with: ['offerDate' => $this->quotationOrder->getOfferDateAnswer()],
+            with: ['offerDate' => $this->quotationOrder->getOfferDate()?->format('d/m/Y')],
         );
     }
 }

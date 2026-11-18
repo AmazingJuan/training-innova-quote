@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\ConditionRole;
 use App\Models\Concerns\Searchable;
+use Database\Factories\BusinessUnitFactory;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Collection;
 
 /**
  * @property string $abbreviation
@@ -15,21 +18,25 @@ use Illuminate\Support\Collection;
  */
 class BusinessUnit extends Model
 {
-    use Searchable;
+    /** @use HasFactory<BusinessUnitFactory> */
+    use HasFactory, Searchable;
 
     /**
      * Attributes:
      *
      * $this->attributes['id'] - int - Primary key identifier
-     * $this->attributes['name'] - string - Unique name of the condition
+     * $this->attributes['name'] - string - Unique slug, used in the URL
      * $this->attributes['created_at'] - Carbon - Record creation timestamp
      * $this->attributes['updated_at'] - Carbon - Record last update timestamp
-     * $this->attributes['services'] - Service[] - Services associated with the business unit
+     * $this->attributes['display_name'] - string - Name shown to people
+     * $this->attributes['abbreviation'] - string - Start of its requests' codes (EO, CNN, GC)
+     * $this->attributes['initial_condition_id'] - int|null - First question of its request form
      */
     protected $fillable = ['name', 'display_name', 'initial_condition_id', 'abbreviation'];
 
     // Relationships
 
+    /** @return BelongsTo<Condition, $this> */
     public function initialCondition(): BelongsTo
     {
         return $this->belongsTo(Condition::class, 'initial_condition_id');
@@ -40,11 +47,13 @@ class BusinessUnit extends Model
         return $this->initialCondition;
     }
 
+    /** @return HasMany<Condition, $this> */
     public function conditions(): HasMany
     {
         return $this->hasMany(Condition::class);
     }
 
+    /** @return Collection<int, Condition> */
     public function getConditions(): Collection
     {
         return $this->conditions;
@@ -79,16 +88,16 @@ class BusinessUnit extends Model
         $this->attributes['display_name'] = $displayName;
     }
 
-    // Relationships
-
-    public function services(): HasMany
+    /** The question of its form that asks for the offer date, if it has one. */
+    public function offerDateQuestion(): ?Condition
     {
-        return $this->hasMany(Service::class);
+        return $this->conditions()->withRole(ConditionRole::OfferDate)->first();
     }
 
-    public function getServices(): Collection
+    /** @return HasMany<QuotationProposalOrder, $this> */
+    public function quotationOrders(): HasMany
     {
-        return $this->services;
+        return $this->hasMany(QuotationProposalOrder::class);
     }
 
     public function getAbbreviation(): string

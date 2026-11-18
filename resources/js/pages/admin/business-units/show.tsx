@@ -1,7 +1,6 @@
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { BackLink } from '@/components/admin/back-link';
-import { DataTable } from '@/components/admin/data-table';
-import { adminListShellClass, adminOutlineButtonClass, adminTableTdClass } from '@/components/admin/styles';
+import { adminListShellClass, adminOutlineButtonClass } from '@/components/admin/styles';
 import { SequenceLabel } from '@/features/catalog/business-unit-form';
 import type { BusinessUnit } from '@/features/catalog/types';
 import AdminLayout from '@/layouts/admin-layout';
@@ -12,11 +11,11 @@ import { Link, usePage } from '@inertiajs/react';
 import { Pencil } from 'lucide-react';
 
 type ShowPageProps = PageProps<{
-    viewData: { businessUnit: BusinessUnit; services: { id: number; name: string }[] };
+    viewData: { businessUnit: BusinessUnit; questionCount: number; requestCount: number };
 }>;
 
 export default function Show() {
-    const { businessUnit, services } = usePage<ShowPageProps>().props.viewData;
+    const { businessUnit, questionCount, requestCount } = usePage<ShowPageProps>().props.viewData;
 
     return (
         <AdminLayout title={businessUnit.display_name}>
@@ -41,26 +40,25 @@ export default function Show() {
                     </Link>
                 </AdminPageHeader>
 
-                <section className="space-y-3">
-                    <h2 className="text-lg font-semibold text-tinta">Servicios ({services.length})</h2>
-                    <DataTable
-                        columns={[{ label: 'ID' }, { label: 'Nombre' }]}
-                        minWidth="20rem"
-                        isEmpty={services.length === 0}
-                        emptyMessage="Esta unidad no tiene servicios asociados."
-                    >
-                        {services.map((service) => (
-                            <tr key={service.id} className="hover:bg-nube/70">
-                                <td className={cn(adminTableTdClass, 'w-20 tabular-nums text-pizarra')}>{service.id}</td>
-                                <td className={adminTableTdClass}>
-                                    <Link href={route('dashboard.services.edit', service.id)} className="hover:text-azul-hondo hover:underline">
-                                        {service.name}
-                                    </Link>
-                                </td>
-                            </tr>
-                        ))}
-                    </DataTable>
-                </section>
+                <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="rounded-[10px] border-2 border-linea bg-white p-5">
+                        <dt className="text-sm text-pizarra">Preguntas del formulario de solicitud</dt>
+                        <dd className="mt-1 font-display text-2xl font-bold tabular-nums text-tinta">{questionCount}</dd>
+                        <Link
+                            href={route('dashboard.business-unit.decision-tree')}
+                            className="mt-2 inline-block text-sm text-azul-hondo hover:underline"
+                        >
+                            Editar el formulario
+                        </Link>
+                    </div>
+                    <div className="rounded-[10px] border-2 border-linea bg-white p-5">
+                        <dt className="text-sm text-pizarra">Solicitudes de cotización</dt>
+                        <dd className="mt-1 font-display text-2xl font-bold tabular-nums text-tinta">{requestCount}</dd>
+                        <Link href={route('dashboard.quotation-orders.index')} className="mt-2 inline-block text-sm text-azul-hondo hover:underline">
+                            Ver solicitudes
+                        </Link>
+                    </div>
+                </dl>
             </div>
         </AdminLayout>
     );

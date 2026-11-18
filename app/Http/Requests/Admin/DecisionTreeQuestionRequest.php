@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Admin;
 
-use App\Models\Condition;
+use App\Enums\FieldType;
+use App\Enums\InteractionType;
+use App\Enums\Section;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -23,18 +25,20 @@ class DecisionTreeQuestionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $isChoice = $this->input('interaction_type') === 'options';
+        $isChoice = $this->input('interaction_type') === InteractionType::Options->value;
 
         return [
             'label' => ['required', 'string', 'max:255'],
             'observation' => ['nullable', 'string', 'max:2000'],
             'placeholder' => ['nullable', 'string', 'max:500'],
             'multiline' => ['boolean'],
-            'interaction_type' => ['required', Rule::in(['input', 'options', 'range'])],
+            'interaction_type' => ['required', Rule::enum(InteractionType::class)],
             // A range is of numbers or dates; only an open field can take files.
-            'type' => ['required', Rule::in($this->input('interaction_type') === 'range' ? ['number', 'date'] : ['text', 'number', 'date', 'file'])],
+            'type' => ['required', $this->input('interaction_type') === InteractionType::Range->value
+                ? Rule::enum(FieldType::class)->only(FieldType::forRange())
+                : Rule::enum(FieldType::class)],
             'multiple' => ['boolean'],
-            'section' => ['nullable', Rule::in(Condition::SECTIONS)],
+            'section' => ['nullable', Rule::enum(Section::class)],
             'required' => ['boolean'],
             'next_condition' => ['nullable', 'integer'],
 
