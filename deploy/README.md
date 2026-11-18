@@ -5,10 +5,10 @@ La aplicación queda en **https://cotizaciones.trainingcorporation.com.co**. Cor
 | Servicio | Qué hace |
 |---|---|
 | `caddy` | HTTPS con certificado de Let's Encrypt (lo pide y lo renueva solo) y redirección de http a https |
-| `app` | Laravel y el frontend React ya compilado (Apache + PHP 8.4 con OPcache). Ejecuta las migraciones al arrancar |
+| `app` | Laravel y el frontend React ya compilado (FrankenPHP: PHP 8.4 con OPcache, sobre Alpine). Ejecuta las migraciones al arrancar |
 | `worker` | Cola de Laravel: correos y exportaciones a Excel |
 | `scheduler` | Tareas programadas: limpieza de exportaciones y adjuntos cada hora |
-| `db` | MySQL 8.4. Solo es accesible dentro de Docker, no desde internet |
+| `db` | MariaDB 11.4 LTS. Solo es accesible dentro de Docker, no desde internet |
 
 El frontend no tiene un servidor propio. Vite lo compila al construir la imagen y lo sirve el mismo contenedor `app`.
 
@@ -17,7 +17,7 @@ El frontend no tiene un servidor propio. Vite lo compila al construir la imagen 
 Para unos **50 usuarios simultáneos**: **t3.medium** (2 vCPU, 4 GB de RAM) con 30 GB de disco gp3.
 
 - 50 personas navegando y llenando el formulario generan unas 5 a 15 peticiones por segundo. Una t3.medium con OPcache atiende bastante más que eso. La prueba de carga confirma el número real.
-- Una t3.small (2 GB) se queda corta: MySQL, Apache y la compilación de la imagen no caben con holgura.
+- Una t3.small (2 GB) se queda corta: MariaDB, PHP y la compilación de la imagen no caben con holgura.
 - Use x86_64 (t3), no Graviton (t4g). Las dependencias de compilación del frontend están fijadas para x64.
 - Costo aproximado en us-east-1: unos US$30/mes de la instancia, más ~US$2,4 del disco y ~US$3,6 de la IP pública. Confírmelo en la [calculadora de AWS](https://calculator.aws/).
 - Las t3 son "burstable" y vienen en modo *unlimited*. Si la CPU pasa mucho tiempo por encima del 20 %, AWS cobra un extra en vez de frenar la máquina. Si las pruebas muestran la CPU alta de forma sostenida, pase a una t3.large o a una m7i.large.
@@ -81,7 +81,7 @@ Vuelva a entrar por SSH y continúe:
 
 ```bash
 cd reto-2-p2
-./deploy/configurar-env.sh      # crea .env: APP_KEY, contraseñas de MySQL, correo
+./deploy/configurar-env.sh      # crea .env: APP_KEY, contraseñas de la base de datos, correo
 nano .env                       # revise el bloque MAIL_*
 ./deploy/desplegar.sh           # construye y levanta todo (la primera vez tarda 5-10 min)
 ./deploy/datos-iniciales.sh     # usuarios admin, unidades, servicios y formulario de encuadre

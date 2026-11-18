@@ -27,6 +27,13 @@ echo "==> Docker"
 if ! command -v docker >/dev/null 2>&1; then
     curl -fsSL https://get.docker.com | sh
 fi
+# Almacenamiento clásico (overlay2) en vez del de containerd: el de containerd guarda
+# cada imagen dos veces (comprimida y descomprimida), y en un disco pequeño eso pesa.
+mkdir -p /etc/docker
+if [ ! -s /etc/docker/daemon.json ]; then
+    echo '{ "features": { "containerd-snapshotter": false } }' > /etc/docker/daemon.json
+    systemctl restart docker 2>/dev/null || true
+fi
 systemctl enable --now docker
 usermod -aG docker "$APP_USER"
 

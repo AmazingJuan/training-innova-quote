@@ -1,10 +1,10 @@
 # Producción: https://cotizaciones.trainingcorporation.com.co
 #
 #   caddy      HTTPS (certificado de Let's Encrypt automático) y proxy hacia app
-#   app        Laravel + frontend React compilado (Apache + PHP)
+#   app        Laravel + frontend React compilado (FrankenPHP: PHP 8.4 sobre Alpine)
 #   worker     cola de Laravel: correos y exportaciones a Excel
 #   scheduler  tareas programadas (limpieza de exportaciones y adjuntos)
-#   db         MySQL 8.4 (solo accesible dentro de la red de Docker)
+#   db         MariaDB 11.4 LTS (solo accesible dentro de la red de Docker)
 #
 # Todo se configura en .env (plantilla: .env.production.example).
 # Guía completa: deploy/README.md
@@ -34,7 +34,7 @@ services:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost/up"]
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8080/up"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -65,21 +65,25 @@ services:
         condition: service_healthy
 
   db:
-    image: mysql:8.4
+    # MariaDB en vez de MySQL: compatible con Laravel y la imagen ocupa ~460 MB
+    # en disco, frente a ~1,1 GB de mysql:8.4.
+    image: mariadb:11.4.13
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USERNAME}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       TZ: America/Bogota
     command:
-      - --innodb-buffer-pool-size=${MYSQL_BUFFER_POOL:-512M}
+      - --innodb-buffer-pool-size=${DB_BUFFER_POOL:-512M}
       - --max-connections=200
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     volumes:
-      - db_data:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -110,6 +114,6 @@ services:
 
 volumes:
   storage:
-  db_data:
+  mariadb_data:
   caddy_data:
   caddy_config:

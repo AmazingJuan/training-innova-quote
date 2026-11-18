@@ -1,22 +1,20 @@
 # Imagen de producción desde la rama deployment, donde public/build ya viene compilado.
-FROM php:8.4-apache
+#
+# FrankenPHP sobre Alpine: PHP 8.4 embebido en un servidor web (Caddy). Ocupa
+# ~300 MB en disco, frente a ~800 MB de php:8.4-apache sobre Debian.
+FROM dunglas/frankenphp:1.13.5-php8.4-alpine
 
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public \
-    APACHE_MAX_WORKERS=40
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        curl libpng-dev libonig-dev libxml2-dev libzip-dev \
-    && docker-php-ext-install pdo_mysql zip gd opcache pcntl \
-    && rm -rf /var/lib/apt/lists/* \
+# OPcache ya viene en la imagen. curl: healthcheck del contenedor. su-exec: el
+# servidor web corre como www-data después de que el arranque (root) ajusta permisos.
+RUN install-php-extensions pdo_mysql zip gd pcntl \
+    && apk add --no-cache curl su-exec \
     && cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
-    && a2enmod rewrite headers \
-    && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
-    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+    && chown -R www-data:www-data /config /data
 
 WORKDIR /var/www/html
 
 COPY docker/php/app.ini "$PHP_INI_DIR/conf.d/zz-app.ini"
-COPY docker/apache/app.conf /etc/apache2/conf-enabled/zz-app.conf
+COPY docker/frankenphp/Caddyfile /etc/frankenphp/Caddyfile
 
 COPY app ./app
 COPY bootstrap ./bootstrap
@@ -35,6 +33,10 @@ RUN mkdir -p storage/app/private storage/app/public storage/framework/cache/data
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod +x /usr/local/bin/app-entrypoint
 
-EXPOSE 80
+# La imagen base revisa la API de administración de Caddy, que aquí está apagada.
+# El healthcheck de app lo define docker-compose.yml; worker y scheduler no sirven HTTP.
+HEALTHCHECK NONE
+
+EXPOSE 8080
 ENTRYPOINT ["app-entrypoint"]
-CMD ["apache2-foreground"]
+CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
