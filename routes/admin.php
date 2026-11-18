@@ -11,7 +11,7 @@ use App\Http\Controllers\Admin\AdminWelcomeBroadcastController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('dashboard')
-    ->middleware(['auth', 'verified'])
+    ->middleware('auth')
     ->whereNumber(['user', 'client', 'businessUnit', 'condition'])
     ->group(function () {
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');

@@ -2,12 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ExportStatus;
 use App\Jobs\GenerateClientsExport;
 use App\Models\BusinessUnit;
 use App\Models\QuotationProposalOrder;
 use App\Models\User;
+use App\Support\ClientExportStore;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -92,11 +95,30 @@ class AdminCatalogTest extends TestCase
     public function test_client_export_download_is_single_use(): void
     {
         Storage::fake('local');
-        $token = '9b2f4a1e-1c2d-4e5f-8a9b-0c1d2e3f4a5b';
-        Storage::disk('local')->put(GenerateClientsExport::relativePath($token), 'xlsx');
-        GenerateClientsExport::markStatus($token, GenerateClientsExport::STATUS_READY);
+        $exports = app(ClientExportStore::class);
+        $token = $exports->open();
+        $exports->disk()->put($exports->path($token), 'xlsx');
+        $exports->mark($token, ExportStatus::Ready);
 
+        $this->getJson(route('dashboard.clients.export.status', $token))->assertJson(['status' => 'ready']);
         $this->get(route('dashboard.clients.export.download', $token))->assertOk()->assertDownload();
         $this->get(route('dashboard.clients.export.download', $token))->assertNotFound();
+    }
+
+    public function test_the_client_export_runs_in_the_background_and_is_swept_if_never_downloaded(): void
+    {
+        Storage::fake('local');
+        Queue::fake();
+
+        $token = $this->postJson(route('dashboard.clients.export.start'))->assertOk()->json('token');
+        $this->getJson(route('dashboard.clients.export.status', $token))->assertJson(['status' => 'pending']);
+        Queue::assertPushed(GenerateClientsExport::class, fn (GenerateClientsExport $job) => $job->token === $token);
+
+        $exports = app(ClientExportStore::class);
+        $exports->disk()->put($exports->path($token), 'xlsx');
+        $this->travel(ClientExportStore::RETENTION_HOURS + 1)->hours();
+        $this->artisan('clients:clean-exports')->assertSuccessful();
+
+        $exports->disk()->assertMissing($exports->path($token));
     }
 }

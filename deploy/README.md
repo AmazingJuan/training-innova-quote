@@ -7,7 +7,7 @@ La aplicación queda en **https://cotizaciones.trainingcorporation.com.co**. Cor
 | `caddy` | HTTPS con certificado de Let's Encrypt (lo pide y lo renueva solo) y redirección de http a https |
 | `app` | Laravel y el frontend React ya compilado (FrankenPHP: PHP 8.4 con OPcache, sobre Alpine). Ejecuta las migraciones al arrancar |
 | `worker` | Cola de Laravel: correos y exportaciones a Excel |
-| `scheduler` | Tareas programadas: limpieza de exportaciones y adjuntos cada hora |
+| `scheduler` | Tareas programadas: recordatorios a Gerencia (8:00 a. m. y 2:00 p. m.) y limpieza de exportaciones y adjuntos cada hora |
 | `db` | MariaDB 11.4 LTS. Solo es accesible dentro de Docker, no desde internet |
 
 El frontend no tiene un servidor propio. Vite lo compila al construir la imagen y lo sirve el mismo contenedor `app`.

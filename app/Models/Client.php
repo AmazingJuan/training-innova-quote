@@ -37,7 +37,7 @@ class Client extends Model
     /**
      * Mass assignable attributes.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -56,6 +56,7 @@ class Client extends Model
     |--------------------------------------------------------------------------
     */
 
+    /** @return HasMany<QuotationProposalOrder, $this> */
     public function quotationProposalOrders(): HasMany
     {
         return $this->hasMany(QuotationProposalOrder::class, 'client_id');
@@ -83,6 +84,9 @@ class Client extends Model
 
     /**
      * Attach the derived counters and the latest-quotation timestamp.
+     *
+     * @param  Builder<Client>  $query
+     * @return Builder<Client>
      */
     public function scopeWithClientStats(Builder $query): Builder
     {
@@ -92,7 +96,9 @@ class Client extends Model
     }
 
     /**
+     * @param  Builder<Client>  $query
      * @param  array{search?:string, company?:string, business_unit?:string}  $filters
+     * @return Builder<Client>
      */
     public function scopeApplyClientFilters(Builder $query, array $filters): Builder
     {
@@ -106,6 +112,10 @@ class Client extends Model
             ));
     }
 
+    /**
+     * @param  Builder<Client>  $query
+     * @return Builder<Client>
+     */
     public function scopeOrderByActivity(Builder $query): Builder
     {
         return $query->orderByDesc('last_quotation_at')->orderBy('name');

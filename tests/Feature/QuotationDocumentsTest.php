@@ -146,7 +146,7 @@ class QuotationDocumentsTest extends TestCase
         $disk->put($stale, 'viejo');
         touch($disk->path($stale), now()->subHours(QuotationAttachment::RETENTION_HOURS + 1)->getTimestamp());
 
-        $this->artisan('adjuntos:clean-cotizaciones')->assertSuccessful();
+        $this->artisan('quotations:clean-attachments')->assertSuccessful();
 
         $disk->assertMissing($stale);
         $disk->assertExists($waiting);

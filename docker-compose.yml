@@ -3,7 +3,7 @@
 #   caddy      HTTPS (certificado de Let's Encrypt automático) y proxy hacia app
 #   app        Laravel + frontend React compilado (FrankenPHP: PHP 8.4 sobre Alpine)
 #   worker     cola de Laravel: correos y exportaciones a Excel
-#   scheduler  tareas programadas (limpieza de exportaciones y adjuntos)
+#   scheduler  tareas programadas (recordatorios a Gerencia, limpieza de exportaciones y adjuntos)
 #   db         MariaDB 11.4 LTS (solo accesible dentro de la red de Docker)
 #
 # Todo se configura en .env (plantilla: .env.production.example).

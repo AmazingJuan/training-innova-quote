@@ -10,17 +10,17 @@ use Illuminate\Console\Command;
  * mails them, so anything still here after the retention period belongs to a
  * notice that never went out, and nothing else will ever read it.
  */
-class CleanQuotationAttachmentsCommand extends Command
+class CleanQuotationAttachments extends Command
 {
-    protected $signature = 'adjuntos:clean-cotizaciones';
+    protected $signature = 'quotations:clean-attachments';
 
-    protected $description = 'Delete quotation attachments left waiting longer than the retention period';
+    protected $description = 'Elimina los documentos adjuntos que quedaron esperando un correo que nunca salió';
 
     public function handle(): int
     {
         $deleted = QuotationAttachment::sweep();
 
-        $this->info("Deleted {$deleted} stale quotation attachment(s).");
+        $this->info("Adjuntos eliminados: {$deleted}.");
 
         return self::SUCCESS;
     }

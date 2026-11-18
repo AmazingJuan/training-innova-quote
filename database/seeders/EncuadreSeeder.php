@@ -56,7 +56,7 @@ class EncuadreSeeder extends Seeder
                 $unit = BusinessUnit::query()->where('name', $name)->first();
 
                 if ($unit === null) {
-                    $this->command?->warn("No existe la unidad «{$name}»: se omite.");
+                    $this->command->warn("No existe la unidad «{$name}»: se omite.");
 
                     continue;
                 }
@@ -68,12 +68,12 @@ class EncuadreSeeder extends Seeder
                     throw new RuntimeException(implode(' ', $errors));
                 }
 
-                $this->command?->info("✅ {$unit->getDisplayName()}: {$unit->conditions()->count()} campos del formulario de solicitud.");
+                $this->command->info("✅ {$unit->getDisplayName()}: {$unit->conditions()->count()} campos del formulario de solicitud.");
             }
         });
 
         foreach (BusinessUnit::query()->whereNull('initial_condition_id')->get() as $unit) {
-            $this->command?->warn("«{$unit->getDisplayName()}» quedó sin formulario de solicitud: no se ofrecerá para cotizar.");
+            $this->command->warn("«{$unit->getDisplayName()}» quedó sin formulario de solicitud: no se ofrecerá para cotizar.");
         }
     }
 

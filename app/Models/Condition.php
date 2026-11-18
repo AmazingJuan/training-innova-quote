@@ -150,22 +150,22 @@ class Condition extends Model
 
     public function getInteractionType(): InteractionType
     {
-        return $this->interaction_type;
+        return InteractionType::from($this->attributes['interaction_type']);
     }
 
     public function setInteractionType(InteractionType $value): void
     {
-        $this->interaction_type = $value;
+        $this->attributes['interaction_type'] = $value->value;
     }
 
     public function getType(): FieldType
     {
-        return $this->type ?? FieldType::Text;
+        return FieldType::tryFrom((string) ($this->attributes['type'] ?? '')) ?? FieldType::Text;
     }
 
     public function setType(FieldType $value): void
     {
-        $this->type = $value;
+        $this->attributes['type'] = $value->value;
     }
 
     public function getObservation(): ?string
@@ -190,12 +190,12 @@ class Condition extends Model
 
     public function getSection(): ?Section
     {
-        return $this->section;
+        return Section::tryFrom((string) ($this->attributes['section'] ?? ''));
     }
 
     public function getRole(): ?ConditionRole
     {
-        return $this->role;
+        return ConditionRole::tryFrom((string) ($this->attributes['role'] ?? ''));
     }
 
     public function hasRole(ConditionRole $role): bool

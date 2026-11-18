@@ -69,7 +69,12 @@ class DecisionTreeService
      */
     public function allConditions(BusinessUnit $businessUnit): array
     {
-        return $this->loadConditions($businessUnit)
+        // Already eager-loaded for several units at once (the editor), or loaded now.
+        $conditions = $businessUnit->relationLoaded('conditions')
+            ? $businessUnit->conditions->sortBy('id')
+            : $this->loadConditions($businessUnit);
+
+        return $conditions
             ->map(fn (Condition $condition) => ['id' => $condition->getId(), ...$this->serialize($condition)])
             ->values()
             ->all();
@@ -311,7 +316,11 @@ class DecisionTreeService
         return $sequence;
     }
 
-    /** Point each question of `sequence` to the following one and make the first the start. */
+    /**
+     * Point each question of `sequence` to the following one and make the first the start.
+     *
+     * @param  list<int>  $sequence
+     */
     private function writeSequence(BusinessUnit $unit, array $sequence): void
     {
         foreach ($sequence as $i => $id) {

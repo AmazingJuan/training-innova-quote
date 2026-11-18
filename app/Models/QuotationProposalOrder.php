@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
 use Database\Factories\QuotationProposalOrderFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -170,16 +171,18 @@ class QuotationProposalOrder extends Model
 
     public function getOfferDate(): ?Carbon
     {
-        return $this->offer_date;
+        $value = $this->attributes['offer_date'] ?? null;
+
+        return $value === null ? null : Carbon::parse($value)->startOfDay();
     }
 
-    public function setOfferDate(?Carbon $value): void
+    public function setOfferDate(?CarbonInterface $value): void
     {
-        $this->offer_date = $value;
+        $this->attributes['offer_date'] = $value?->format('Y-m-d');
     }
 
     /** Whether the offer date the client asked for has already gone by. */
-    public function isOverdue(Carbon $now): bool
+    public function isOverdue(CarbonInterface $now): bool
     {
         $date = $this->getOfferDate();
 
@@ -221,10 +224,10 @@ class QuotationProposalOrder extends Model
         return (int) ($this->attributes['reminders_sent'] ?? 0);
     }
 
-    public function setRemindersSent(int $value, Carbon $at): void
+    public function setRemindersSent(int $value, CarbonInterface $at): void
     {
         $this->attributes['reminders_sent'] = $value;
-        $this->last_reminded_at = $at;
+        $this->setAttribute('last_reminded_at', $at);
     }
 
     /** Signed link the client receives by e-mail; null until there is a quotation. */

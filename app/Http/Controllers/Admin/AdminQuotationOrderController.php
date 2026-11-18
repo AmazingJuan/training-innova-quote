@@ -22,13 +22,10 @@ class AdminQuotationOrderController extends Controller
         $quotationOrders = QuotationProposalOrder::query()
             ->select('id', 'quotation_code', 'client_id', 'business_unit_id', 'is_generated', 'viewed_by_client', 'quotation_url', 'created_at')
             ->with(['client:id,name,email,company,role', 'businessUnit:id,display_name'])
-            ->when($search !== '', function (Builder $query) use ($search) {
-                $like = '%'.$search.'%';
-                $query->where(fn (Builder $inner) => $inner
-                    ->where('quotation_code', 'like', $like)
-                    ->orWhereHas('businessUnit', fn (Builder $unit) => $unit->where('display_name', 'like', $like))
-                    ->orWhereHas('client', fn (Builder $client) => $client->search($search, Client::SEARCHABLE_COLUMNS)));
-            })
+            ->when($search !== '', fn (Builder $query) => $query->where(fn (Builder $inner) => $inner
+                ->where(fn (Builder $code) => Client::whereContains($code, 'quotation_code', $search))
+                ->orWhereHas('businessUnit', fn (Builder $unit) => Client::whereContains($unit, 'display_name', $search))
+                ->orWhereHas('client', fn (Builder $client) => $client->search($search, Client::SEARCHABLE_COLUMNS))))
             ->latest()
             ->paginate(self::PER_PAGE)
             ->withQueryString();
