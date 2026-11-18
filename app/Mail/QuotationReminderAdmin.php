@@ -21,7 +21,7 @@ class QuotationReminderAdmin extends Mailable
     public function __construct(
         public QuotationProposalOrder $quotationOrder,
         public int $number,
-        public int $businessDaysWaiting,
+        public float $businessDaysWaiting,
         public bool $overdue,
     ) {}
 

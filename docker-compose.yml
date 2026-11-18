@@ -93,7 +93,7 @@ services:
       options: { max-size: "10m", max-file: "3" }
 
   caddy:
-    image: caddy:2
+    image: caddy:2.11.9
     restart: unless-stopped
     ports:
       - "80:80"
