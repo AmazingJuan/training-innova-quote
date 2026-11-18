@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\QuotationProposalOrder;
+use App\Support\BusinessCalendar;
 use App\Support\QuotationAttachment;
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -53,6 +56,22 @@ class StoreQuotationProposal extends FormRequest
                         }
                     }
                 },
+                function ($attribute, $value, $fail) {
+                    foreach ($value as $question => $answer) {
+                        if (! is_string($question) || ! QuotationProposalOrder::isOfferDateQuestion($question) || ! is_string($answer) || trim($answer) === '') {
+                            continue;
+                        }
+
+                        $date = QuotationProposalOrder::parseAnswerDate($answer);
+                        $min = self::minOfferDate();
+
+                        if ($date === null) {
+                            $fail('Indique una fecha válida en «'.$question.'».');
+                        } elseif ($date->lt($min)) {
+                            $fail('La fecha estimada de entrega de la oferta debe ser a partir del '.$min->format('d/m/Y').' (3 días hábiles después del envío).');
+                        }
+                    }
+                },
             ],
             // Open questions of the encuadre (descriptions) can be long.
             'answers.*' => ['required', 'string', 'max:5000'],
@@ -63,6 +82,12 @@ class StoreQuotationProposal extends FormRequest
             'documents.*.question' => ['required', 'string', Rule::in(array_keys((array) $this->input('answers', [])))],
             'documents.*.file' => ['required', 'file', 'max:'.QuotationAttachment::MAX_KILOBYTES, 'extensions:'.implode(',', QuotationAttachment::EXTENSIONS)],
         ];
+    }
+
+    /** The soonest offer date a client may ask for: 3 business days after today. */
+    public static function minOfferDate(): CarbonImmutable
+    {
+        return BusinessCalendar::addBusinessDays(now(), QuotationProposalOrder::MIN_OFFER_BUSINESS_DAYS);
     }
 
     /**

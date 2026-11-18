@@ -44,6 +44,14 @@ class QuotationController extends Controller
             return $this->backToSelection('No existen condiciones definidas para la unidad de negocio seleccionada.');
         }
 
+        // The offer date cannot be sooner than 3 business days away, so management gets at least one reminder before it.
+        $minOfferDate = StoreQuotationProposal::minOfferDate()->format('Y-m-d');
+        foreach ($conditions as $id => $condition) {
+            if (($condition['type'] ?? null) === 'date' && QuotationProposalOrder::isOfferDateQuestion((string) ($condition['label'] ?? ''))) {
+                $conditions[$id]['min_date'] = $minOfferDate;
+            }
+        }
+
         return Inertia::render('quotation/index', [
             'viewData' => [
                 'businessUnit' => $businessUnit->getDisplayName(),

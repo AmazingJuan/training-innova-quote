@@ -334,7 +334,7 @@ class EncuadreSeeder extends Seeder
                 ]),
                 'No',
             ]),
-            $this->field('Fecha estimada de entrega de la oferta comercial', 'date', 'cierre', observation: 'Seleccione un día hábil. Haremos lo posible por enviársela antes de esa fecha.'),
+            $this->field('Fecha estimada de entrega de la oferta comercial', 'date', 'cierre', observation: 'Seleccione un día hábil, como mínimo 3 días hábiles después del envío de la solicitud. Haremos lo posible por enviársela antes de esa fecha.'),
         ];
     }
 
