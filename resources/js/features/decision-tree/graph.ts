@@ -107,7 +107,7 @@ export function validateTree(tree: TreeData): Issue[] {
     const cycle = findCycle(tree.conditions);
     if (cycle) {
         issues.push({
-            conditionId: cycle[0],
+            conditionId: cycle[0] ?? null,
             message: `Se forma un ciclo: ${cycle.map((id) => `«${labelOf(byId.get(id))}»`).join(' → ')}. El cliente nunca terminaría.`,
         });
     }

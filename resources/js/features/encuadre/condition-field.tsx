@@ -3,7 +3,7 @@ import { FileText, Paperclip, X } from 'lucide-react';
 import { useState, type InputHTMLAttributes } from 'react';
 import { emptyAnswer, formatNumber, MAX_ANSWER_LENGTH, onlyDigits } from './answers';
 import { ACCEPT, formatSize } from './documents';
-import type { Answer, FilesAnswer, OptionsAnswer, PublicCondition, RangeAnswer } from './types';
+import { filesOf, optionsOf, rangeOf, textOf, type Answer, type FilesAnswer, type PublicCondition } from './types';
 
 type ConditionFieldProps = {
     id: number;
@@ -58,7 +58,7 @@ export function ConditionField({ id, condition, answer, onChange, error }: Condi
                             {condition.observation}
                         </p>
                     )}
-                    {counted && <CharCount id={`${anchor}-count`} length={(value as string).length} className="ml-auto shrink-0" />}
+                    {counted && <CharCount id={`${anchor}-count`} length={textOf(value).length} className="ml-auto shrink-0" />}
                 </div>
             )}
             {error && (
@@ -84,13 +84,13 @@ function Control({ anchor, condition, value, onChange, aria, invalid }: ControlP
 
     if (condition.interaction_type === 'input') {
         if (condition.type === 'file') {
-            return <FilesControl anchor={anchor} files={value as FilesAnswer} onChange={onChange} aria={aria} invalid={invalid} />;
+            return <FilesControl anchor={anchor} files={filesOf(value)} onChange={onChange} aria={aria} invalid={invalid} />;
         }
         if (condition.type === 'text' && condition.multiline) {
             return (
                 <textarea
                     id={`${anchor}-input`}
-                    value={value as string}
+                    value={textOf(value)}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
                     rows={5}
@@ -104,7 +104,7 @@ function Control({ anchor, condition, value, onChange, aria, invalid }: ControlP
             return (
                 <NumberInput
                     id={`${anchor}-input`}
-                    value={value as string}
+                    value={textOf(value)}
                     onChange={onChange}
                     placeholder={placeholder}
                     className="control sm:max-w-xs"
@@ -117,7 +117,7 @@ function Control({ anchor, condition, value, onChange, aria, invalid }: ControlP
             <input
                 id={`${anchor}-input`}
                 type={condition.type}
-                value={value as string}
+                value={textOf(value)}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
                 maxLength={isText ? MAX_ANSWER_LENGTH : undefined}
@@ -129,7 +129,7 @@ function Control({ anchor, condition, value, onChange, aria, invalid }: ControlP
         return condition.type === 'date' ? (
             <div className="grid gap-1.5">
                 {input}
-                <DateInWords value={value as string} />
+                <DateInWords value={textOf(value)} />
             </div>
         ) : (
             input
@@ -137,7 +137,7 @@ function Control({ anchor, condition, value, onChange, aria, invalid }: ControlP
     }
 
     if (condition.interaction_type === 'range') {
-        const range = value as RangeAnswer;
+        const range = rangeOf(value);
         return (
             <div role="group" aria-labelledby={`${anchor}-label`} className="grid grid-cols-1 gap-3 sm:max-w-lg sm:grid-cols-2">
                 {(['min', 'max'] as const).map((bound) => (
@@ -168,7 +168,7 @@ function Control({ anchor, condition, value, onChange, aria, invalid }: ControlP
         );
     }
 
-    const options = value as OptionsAnswer;
+    const options = optionsOf(value);
     const toggle = (index: number) => {
         const isOn = options.selected.includes(index);
         const selected = condition.multiple ? (isOn ? options.selected.filter((i) => i !== index) : [...options.selected, index]) : [index];

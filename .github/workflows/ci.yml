@@ -83,7 +83,7 @@ jobs:
         run: php artisan test
 
   frontend:
-    name: Frontend (ESLint, Prettier, TypeScript, build)
+    name: Frontend (ESLint, Prettier, Vitest, TypeScript, build)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -110,6 +110,9 @@ jobs:
 
       - name: Format (Prettier)
         run: npm run format:check
+
+      - name: Unit tests (Vitest)
+        run: npm test
 
       - name: Build (TypeScript + Vite)
         run: npm run build

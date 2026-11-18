@@ -1,4 +1,5 @@
-import type { Answer, ContactData, PublicCondition } from './types';
+import type { Answer, PublicCondition } from '@/features/encuadre/types';
+import type { ContactData } from './types';
 
 /**
  * The request is kept in this browser while it is filled in, as the corporate
@@ -27,6 +28,8 @@ export const treeSignature = (conditions: Record<string, PublicCondition>) =>
         .sort(([a], [b]) => Number(a) - Number(b))
         .map(([id, c]) => `${id}:${c.interaction_type}:${c.type}:${c.multiple ? 1 : 0}`)
         .join(',');
+
+const CONTACT_FIELDS: (keyof ContactData)[] = ['name', 'company', 'nit', 'economic_activity', 'address', 'role', 'email', 'phone'];
 
 const local = () => window.localStorage;
 const session = () => window.sessionStorage;
@@ -67,7 +70,12 @@ export const draft = {
         return ok;
     },
 
-    contact: () => read<ContactData>(CONTACT_KEY),
+    /** Only the known fields, as text: what is stored may come from an older version of the form. */
+    contact(): Partial<ContactData> {
+        const stored = read<Record<string, unknown>>(CONTACT_KEY);
+        if (!stored || typeof stored !== 'object') return {};
+        return Object.fromEntries(CONTACT_FIELDS.flatMap((key) => (typeof stored[key] === 'string' ? [[key, stored[key]]] : [])));
+    },
     saveContact: (contact: ContactData) => write(CONTACT_KEY, contact),
     /** On a shared computer the client can take their data out of this browser. */
     clearContact: () => remove(CONTACT_KEY),

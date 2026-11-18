@@ -6,7 +6,7 @@ const MAX_POLLS = 120;
 
 function readCookie(name: string): string {
     const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`));
-    return match ? decodeURIComponent(match[1]) : '';
+    return match?.[1] ? decodeURIComponent(match[1]) : '';
 }
 
 /**
@@ -50,7 +50,7 @@ export function useClientsExport(filters: Record<string, string>) {
             } else if (status === 'failed' || status === 'unknown') {
                 fail('No se pudo generar el archivo. Intente nuevamente.');
             } else {
-                timer.current = setTimeout(() => poll(token, attempt + 1), POLL_INTERVAL_MS);
+                timer.current = setTimeout(() => void poll(token, attempt + 1), POLL_INTERVAL_MS);
             }
         } catch {
             fail('Se perdió la conexión durante la exportación.');

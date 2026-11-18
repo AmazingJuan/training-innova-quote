@@ -1,37 +1,16 @@
-import type { SectionKey } from '@/features/quotation-wizard/sections';
+import type { OptionData as BaseOption, QuestionData } from '@/features/encuadre/types';
 
-export type InteractionType = 'input' | 'range' | 'options';
-export type ValueType = 'text' | 'number' | 'date' | 'file';
+export type { FieldType, InteractionType } from '@/features/encuadre/types';
 
-export type OptionData = {
+export type OptionData = BaseOption & {
     /** Database id; absent for options not saved yet. */
     id?: number | null;
-    label: string;
-    /** Opaque value stored with the option; preserved on save. */
-    value: string | null;
-    is_other: boolean;
-    /** Branch: where this option leads. null = the question's default next. */
-    next_condition: number | null;
 };
 
-export type ConditionData = {
+/** A question in the editor: the shared shape plus its id. */
+export type ConditionData = Omit<QuestionData, 'options'> & {
     /** Database id, or a negative id for a question being created. */
     id: number;
-    label: string;
-    interaction_type: InteractionType;
-    type: ValueType;
-    observation: string | null;
-    /** Example of the expected answer, shown inside the field (open questions). */
-    placeholder: string | null;
-    /** Free text answered in a long field. */
-    multiline: boolean;
-    multiple: boolean;
-    /** Block of the encuadre it belongs to; null = none. */
-    section: SectionKey | null;
-    /** false lets the client skip it. */
-    required: boolean;
-    /** Default next question; null ends the questionnaire. */
-    next_condition: number | null;
     options: OptionData[];
 };
 

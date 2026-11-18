@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Search, X } from 'lucide-react';
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import { adminFieldInputClass, adminOutlineButtonClass } from './styles';
 
 type AdminTableToolbarProps = {
@@ -14,8 +14,13 @@ type AdminTableToolbarProps = {
 
 export function AdminTableToolbar({ search, onSearch, searchPlaceholder = 'Buscar…', children, className }: AdminTableToolbarProps) {
     const [query, setQuery] = useState(search);
+    const [appliedSearch, setAppliedSearch] = useState(search);
 
-    useEffect(() => setQuery(search), [search]);
+    // The search changed from outside (filters cleared, back button): the box follows it.
+    if (search !== appliedSearch) {
+        setAppliedSearch(search);
+        setQuery(search);
+    }
 
     const submit = (event: FormEvent) => {
         event.preventDefault();

@@ -11,20 +11,18 @@ const toneClass = {
 
 const baseClass = 'inline-flex h-9 w-9 items-center justify-center rounded-control transition-colors';
 
-/** Stops row-level click handlers from firing when an action is used. */
+/** The actions of a table row. Each action stops the click from reaching a row-level handler. */
 export function RowActions({ children }: { children: ReactNode }) {
-    return (
-        <div className="flex items-center justify-center gap-1" onClick={(e: MouseEvent) => e.stopPropagation()}>
-            {children}
-        </div>
-    );
+    return <div className="flex items-center justify-center gap-1">{children}</div>;
 }
+
+const stop = (event: MouseEvent) => event.stopPropagation();
 
 type ActionLinkProps = { href: string; label: string; icon: LucideIcon; tone?: keyof typeof toneClass };
 
 export function ActionLink({ href, label, icon: Icon, tone = 'primary' }: ActionLinkProps) {
     return (
-        <Link href={href} className={cn(baseClass, toneClass[tone])} title={label} aria-label={label}>
+        <Link href={href} onClick={stop} className={cn(baseClass, toneClass[tone])} title={label} aria-label={label}>
             <Icon className="h-[18px] w-[18px]" aria-hidden />
         </Link>
     );
@@ -38,7 +36,8 @@ export const EditAction = ({ href }: { href: string }) => <ActionLink href={href
 
 /** Asks for confirmation and sends a DELETE request. */
 export function DeleteAction({ href, confirmMessage }: { href: string; confirmMessage: string }) {
-    const onClick = () => {
+    const onClick = (event: MouseEvent) => {
+        stop(event);
         if (window.confirm(confirmMessage)) {
             router.delete(href, { preserveScroll: true });
         }

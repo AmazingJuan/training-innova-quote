@@ -49,8 +49,8 @@ export function StepList({ steps, current, reached, complete, onGo }: StepListPr
                             <li key={entry.group} className="flex-1">
                                 <button
                                     type="button"
-                                    onClick={() => onGo(entry.start)}
-                                    disabled={locked || active}
+                                    onClick={() => !active && onGo(entry.start)}
+                                    disabled={locked}
                                     aria-current={active ? 'step' : undefined}
                                     className="flex h-11 w-full items-center disabled:cursor-default"
                                 >
@@ -84,8 +84,8 @@ export function StepList({ steps, current, reached, complete, onGo }: StepListPr
                         <li key={entry.group}>
                             <button
                                 type="button"
-                                onClick={() => onGo(entry.start)}
-                                disabled={locked || active}
+                                onClick={() => !active && onGo(entry.start)}
+                                disabled={locked}
                                 aria-current={active ? 'step' : undefined}
                                 title={locked ? 'Se habilita al completar los pasos anteriores' : undefined}
                                 className={cn(

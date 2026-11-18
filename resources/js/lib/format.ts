@@ -13,11 +13,6 @@ export function formatDate(value?: string | null): string {
     return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString('es-CO');
 }
 
-/** `pluralize(3, 'año', 'años')` → "3 años". */
-export function pluralize(count: number, singular: string, plural: string): string {
-    return `${count} ${count === 1 ? singular : plural}`;
-}
-
 /** Shown in tables and detail views for empty values. */
 export function orDash(value?: string | number | null): string {
     return value === null || value === undefined || value === '' ? '—' : String(value);

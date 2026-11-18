@@ -11,25 +11,6 @@
     :root {
         color-scheme: light;
         --focus-ring: 3px solid #1391da;
-
-        /* shadcn/ui semantic tokens mapped to the brand (HSL triplets). */
-        --background: 0 0% 100%;
-        --foreground: 207 59% 16%;
-        --card: 0 0% 100%;
-        --card-foreground: 207 59% 16%;
-        --primary: 201 100% 34%;
-        --primary-foreground: 0 0% 100%;
-        --secondary: 205 45% 95%;
-        --secondary-foreground: 207 59% 16%;
-        --muted: 205 45% 95%;
-        --muted-foreground: 207 16% 35%;
-        --accent: 205 45% 95%;
-        --accent-foreground: 207 59% 16%;
-        --destructive: 3 71% 41%;
-        --destructive-foreground: 0 0% 100%;
-        --border: 205 36% 88%;
-        --input: 205 36% 88%;
-        --ring: 202 84% 47%;
     }
 
     html {

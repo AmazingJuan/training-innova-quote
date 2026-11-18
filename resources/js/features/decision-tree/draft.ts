@@ -23,6 +23,7 @@ export function newDraft(placement: Placement, section: ConditionData['section']
         observation: '',
         placeholder: '',
         multiline: false,
+        role: null,
         multiple: false,
         section,
         required: true,

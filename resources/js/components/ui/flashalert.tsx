@@ -12,9 +12,15 @@ export default function FlashAlert() {
     const message = flash.error ?? flash.success ?? null;
     const isError = Boolean(flash.error);
     const [dismissed, setDismissed] = useState<string | null>(null);
+    const [shownFlash, setShownFlash] = useState(flash);
+
+    // A new visit shows its message again, even when it repeats the last one (adjusted while rendering, not in an effect).
+    if (flash !== shownFlash) {
+        setShownFlash(flash);
+        setDismissed(null);
+    }
 
     useEffect(() => {
-        setDismissed(null);
         if (!message) return;
         const timer = setTimeout(() => setDismissed(message), AUTO_DISMISS_MS);
         return () => clearTimeout(timer);
