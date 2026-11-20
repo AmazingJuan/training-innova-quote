@@ -28,6 +28,10 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user()?->only('id', 'name', 'email'),
+                // Decides what the panel shows; the routes enforce it on their own.
+                'can' => [
+                    'manageUsers' => $request->user()?->can('manage-users') ?? false,
+                ],
             ],
             // Contact block of the public footer, editable in Configuración.
             'company' => fn () => $this->settings->companyContact(),

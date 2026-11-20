@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Validator;
@@ -45,7 +46,8 @@ class CreateAdmin extends Command
             return self::FAILURE;
         }
 
-        $user = User::create($data); // The password is hashed by the model's cast.
+        // The password is hashed by the model's cast.
+        $user = User::create([...$data, 'role' => UserRole::Admin]);
         $this->info("Administrador creado: {$user->email}");
 
         return self::SUCCESS;

@@ -1,23 +1,27 @@
 import { FormActions, FormCard, FormField } from '@/components/admin/form';
 import { adminFieldInputClass } from '@/components/admin/styles';
 import { PasswordInput } from '@/components/password-input';
+import { cn } from '@/lib/utils';
+import type { RoleOption, UserRole } from '@/types';
 import { useForm } from '@inertiajs/react';
 
-export type UserFormData = { name: string; email: string; phone: string; password: string };
+export type UserFormData = { name: string; email: string; phone: string; password: string; role: UserRole };
 
 type UserFormProps = {
+    roles: RoleOption[];
     initial?: Omit<UserFormData, 'password'>;
     /** Present when editing. */
     userId?: number;
 };
 
-export function UserForm({ initial, userId }: UserFormProps) {
+export function UserForm({ roles, initial, userId }: UserFormProps) {
     const isEdit = userId !== undefined;
     const { data, setData, post, put, processing, errors } = useForm<UserFormData>({
         name: initial?.name ?? '',
         email: initial?.email ?? '',
         phone: initial?.phone ?? '',
         password: '',
+        role: initial?.role ?? 'user',
     });
 
     const submit = () => (isEdit ? put(route('dashboard.users.update', userId)) : post(route('dashboard.users.store')));
@@ -61,6 +65,25 @@ export function UserForm({ initial, userId }: UserFormProps) {
                     error={errors.password}
                 >
                     <PasswordInput autoComplete="new-password" value={data.password} onChange={(e) => setData('password', e.target.value)} />
+                </FormField>
+                <FormField
+                    id="role"
+                    label="Rol"
+                    required
+                    hint="Solo los administradores ven y editan los usuarios y sus contraseñas."
+                    error={errors.role}
+                >
+                    <select
+                        value={data.role}
+                        onChange={(e) => setData('role', e.target.value as UserRole)}
+                        className={cn(adminFieldInputClass, 'cursor-pointer')}
+                    >
+                        {roles.map((role) => (
+                            <option key={role.value} value={role.value}>
+                                {role.label}
+                            </option>
+                        ))}
+                    </select>
                 </FormField>
             </div>
             <FormActions

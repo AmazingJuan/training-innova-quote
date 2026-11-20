@@ -1,3 +1,7 @@
+export type UserRole = 'admin' | 'user';
+
+export type RoleOption = { value: UserRole; label: string };
+
 export interface User {
     id: number;
     name: string;
@@ -24,6 +28,8 @@ export interface Flash {
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
     auth: {
         user: User | null;
+        /** What the signed-in account may do (the server enforces it too). */
+        can: { manageUsers: boolean };
     };
     flash: Flash;
     company: Company;

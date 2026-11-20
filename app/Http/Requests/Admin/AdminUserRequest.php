@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 /**
  * Shared by create and update. On update the password is optional: when it
@@ -32,6 +34,25 @@ class AdminUserRequest extends FormRequest
                 ? ['required', 'string', 'min:8']
                 : [Rule::excludeIf($this->input('password') === null), 'string', 'min:8'],
             'phone' => ['required', 'string', 'min:10', 'max:15'],
+            'role' => ['required', Rule::enum(UserRole::class)],
+        ];
+    }
+
+    /**
+     * An administrator cannot take away their own role: the panel could be left
+     * with nobody able to manage the accounts.
+     *
+     * @return list<callable(Validator): void>
+     */
+    public function after(): array
+    {
+        return [
+            function (Validator $validator) {
+                $editing = $this->route('user');
+                if ($editing instanceof User && $this->user()?->is($editing) && $this->input('role') !== UserRole::Admin->value) {
+                    $validator->errors()->add('role', 'No puede quitarse su propio rol de administrador.');
+                }
+            },
         ];
     }
 
@@ -52,6 +73,8 @@ class AdminUserRequest extends FormRequest
             'phone.string' => 'El teléfono debe ser un texto válido',
             'phone.min' => 'El teléfono debe tener al menos 10 dígitos',
             'phone.max' => 'El teléfono no puede tener más de 15 dígitos',
+            'role.required' => 'El rol es obligatorio',
+            'role.enum' => 'El rol no es válido',
         ];
     }
 }

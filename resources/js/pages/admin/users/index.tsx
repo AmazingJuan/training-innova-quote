@@ -7,11 +7,13 @@ import { adminListShellClass, adminPrimaryButtonClass, adminTableTdClass } from 
 import { useListFilters } from '@/hooks/use-list-filters';
 import AdminLayout from '@/layouts/admin-layout';
 import { cn } from '@/lib/utils';
-import type { PageProps, Paginated, SearchFilters } from '@/types';
+import type { PageProps, Paginated, SearchFilters, UserRole } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 
-type UserRow = { id: number; name: string; email: string; phone: string | null };
+type UserRow = { id: number; name: string; email: string; phone: string | null; role: UserRole };
+
+const roleLabels: Record<UserRole, string> = { admin: 'Administrador', user: 'Usuario' };
 
 type IndexPageProps = PageProps<{
     viewData: { users: Paginated<UserRow>; filters: SearchFilters };
@@ -43,6 +45,7 @@ export default function Index() {
                         { label: 'Nombre' },
                         { label: 'Correo' },
                         { label: 'Teléfono' },
+                        { label: 'Rol' },
                         { label: 'Acciones', align: 'center' },
                     ]}
                     isEmpty={users.data.length === 0}
@@ -57,6 +60,7 @@ export default function Index() {
                             </td>
                             <td className={adminTableTdClass}>{user.email}</td>
                             <td className={adminTableTdClass}>{user.phone ?? '—'}</td>
+                            <td className={adminTableTdClass}>{roleLabels[user.role]}</td>
                             <td className={adminTableTdClass}>
                                 <RowActions>
                                     <EditAction href={route('dashboard.users.edit', user.id)} />
