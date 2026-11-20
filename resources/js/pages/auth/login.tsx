@@ -5,10 +5,10 @@ import { PasswordInput } from '@/components/password-input';
 import PrimaryButton from '@/components/primary-button';
 import TextInput from '@/components/text-input';
 import GuestLayout from '@/layouts/guest-layout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
-export default function Login({ status, canResetPassword }: { status?: string; canResetPassword: boolean }) {
+export default function Login() {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -26,8 +26,6 @@ export default function Login({ status, canResetPassword }: { status?: string; c
     return (
         <GuestLayout>
             <Head title="Iniciar sesión" />
-
-            {status && <div className="mb-4 text-sm font-medium text-green-600">{status}</div>}
 
             <h1 className="mb-7 font-display text-[1.75rem] font-extrabold leading-tight tracking-tight text-azul">Panel de cotizaciones</h1>
 
@@ -75,19 +73,10 @@ export default function Login({ status, canResetPassword }: { status?: string; c
                     </label>
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-pizarra underline hover:text-tinta focus:ring-2 focus:ring-azul focus:ring-offset-2"
-                        >
-                            ¿Olvidó su contraseña?
-                        </Link>
-                    )}
+                <p className="mt-4 text-sm text-pizarra">Si olvidó su contraseña, solicite una nueva a Gerencia.</p>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Iniciar sesión
-                    </PrimaryButton>
+                <div className="mt-4 flex items-center justify-end">
+                    <PrimaryButton disabled={processing}>Iniciar sesión</PrimaryButton>
                 </div>
             </form>
         </GuestLayout>
