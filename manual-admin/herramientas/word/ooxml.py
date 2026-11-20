@@ -504,7 +504,7 @@ def incrustar_fuentes(ruta_docx, familias):
         tipos = tipos.replace('<Default ', '<Default Extension="odttf" ContentType="application/vnd.openxmlformats-officedocument.obfuscatedFont"/><Default ', 1)
     archivos['[Content_Types].xml'] = tipos.encode('utf-8')
 
-    archivos['word/settings.xml'] = _con_fuentes_incrustadas(archivos['word/settings.xml'])
+    archivos['word/settings.xml'] = _con_silabeo(_con_fuentes_incrustadas(archivos['word/settings.xml']))
 
     with zipfile.ZipFile(ruta_docx, 'w', zipfile.ZIP_DEFLATED) as z:
         # [Content_Types].xml primero, como lo escribe Word
@@ -529,6 +529,40 @@ def _con_fuentes_incrustadas(xml):
             previos[-1].addnext(nuevo)
         else:
             raiz.insert(0, nuevo)
+    return etree.tostring(raiz, xml_declaration=True, encoding='UTF-8', standalone=True)
+
+
+
+# Elementos de w:settings que deben ir antes de w:autoHyphenation (ECMA-376, CT_Settings)
+_ANTES_DE_SILABEO = _ANTES_DE_FUENTES + (
+    'embedTrueTypeFonts', 'embedSystemFonts', 'saveSubsetFonts', 'saveFormsData', 'mirrorMargins',
+    'alignBordersAndEdges', 'bordersDoNotSurroundHeader', 'bordersDoNotSurroundFooter', 'gutterAtTop',
+    'hideSpellingErrors', 'hideGrammaticalErrors', 'activeWritingStyle', 'proofState', 'formsDesign',
+    'attachedTemplate', 'linkStyles', 'stylePaneFormatFilter', 'stylePaneSortMethod', 'documentType', 'mailMerge',
+    'revisionView', 'trackRevisions', 'doNotTrackMoves', 'doNotTrackFormatting', 'documentProtection',
+    'autoFormatOverride', 'styleLockTheme', 'styleLockQFSet', 'defaultTabStop')
+
+
+def _con_silabeo(xml):
+    """Separación silábica automática (en español, el idioma del documento): el texto justificado no abre huecos."""
+    from lxml import etree
+    raiz = etree.fromstring(xml)
+    w = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    zoom = raiz.find(f'{{{w}}}zoom')
+    if zoom is not None and zoom.get(f'{{{w}}}percent') is None:
+        zoom.set(f'{{{w}}}percent', '100')  # obligatorio según ECMA-376
+    if raiz.find(f'{{{w}}}autoHyphenation') is None:
+        nuevos = [etree.Element(f'{{{w}}}autoHyphenation'),
+                  etree.Element(f'{{{w}}}consecutiveHyphenLimit', {f'{{{w}}}val': '2'}),
+                  etree.Element(f'{{{w}}}hyphenationZone', {f'{{{w}}}val': '284'})]
+        previos = [h for h in raiz if etree.QName(h).localname in _ANTES_DE_SILABEO]
+        ancla = previos[-1] if previos else None
+        for e in nuevos:
+            if ancla is None:
+                raiz.insert(0, e)
+            else:
+                ancla.addnext(e)
+            ancla = e
     return etree.tostring(raiz, xml_declaration=True, encoding='UTF-8', standalone=True)
 
 

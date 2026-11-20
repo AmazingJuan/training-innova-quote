@@ -10,38 +10,43 @@ acompañan los correos de la plataforma.}
 \section{Usuarios}\label{sec:usuarios}
 
 \ficha{F0C0}{\menu{Sistema}{Usuarios}}{/dashboard/usuarios}
-  {Crear, editar y eliminar las cuentas con acceso al panel.}
+  {Crear, editar y eliminar las cuentas con acceso al panel, asignar su rol y su contraseña.}
 
 \begin{importante}
-Todas las cuentas tienen acceso completo al panel, como se explica en la
-\seccion{sec:quien}. Antes de crear una cuenta, asegúrese de que la persona deba administrar
-Training~InnovaQuote.
+Este módulo solo lo ven las cuentas con el rol \textbf{Administrador} (\seccion{sec:quien}). Para
+una cuenta con el rol Usuario, \textbf{Usuarios} no aparece en la barra lateral ni en el Panel de
+inicio, y si escribe la dirección \ruta{/dashboard/usuarios} el sistema le muestra una página de
+error (acceso no autorizado).
 \end{importante}
 
 \subsection{La lista de usuarios}
 
 La pantalla \textbf{Usuarios} (\msg{Cuentas con acceso al panel de administración.}) muestra
-\campo{ID}, \campo{Nombre}, \campo{Correo}, \campo{Teléfono} y \campo{Acciones}. Su propia
+\campo{ID}, \campo{Nombre}, \campo{Correo}, \campo{Teléfono}, \campo{Rol} y \campo{Acciones}. Su propia
 cuenta aparece marcada con \textbf{(usted)} junto al nombre y no tiene ícono de eliminar. La búsqueda (\msg{Nombre o correo…}) encuentra usuarios por su nombre o su correo.
 
 \captura[7cm]{05-01-usuarios-lista}{/dashboard/usuarios}{Lista de usuarios del panel.}
-  {la pantalla Usuarios con al menos dos cuentas, en la que se vea la marca «(usted)» en su fila.}
+  {la pantalla Usuarios con al menos dos cuentas y la columna «Rol», en la que se vea la marca
+   «(usted)» en su fila.}
 
 \subsection{Crear un usuario}\label{sec:usuario-crear}
 
 \begin{pasos}
-  \item Haga clic en \boton{\icMas\ Nuevo usuario}. Se abre \textbf{Crear usuario}, con el aviso
-        \msg{Las cuentas de usuario tienen acceso completo al panel.}
+  \item Haga clic en \boton{\icMas\ Nuevo usuario}. Se abre \textbf{Crear usuario}, con el texto
+        \msg{Todas las cuentas usan el panel; los administradores además gestionan los usuarios.}
   \item Complete los campos:
 \end{pasos}
 
-\begin{tabla}{colspec={Q[3.8cm,l] X[l]}}
+\begin{tabla}{colspec={Q[3.8cm,j] X[j]}}
   Campo & Qué escribir \\
   Nombre & Nombre completo de la persona. El Panel de inicio la saludará por el primer nombre. \\
   Correo electrónico & El correo con el que iniciará sesión. No puede estar registrado en otra
     cuenta. \\
   Teléfono & Entre 10 y 15 caracteres, por ejemplo \texttt{3001234567}. \\
   Contraseña & Mínimo 8 caracteres. \\
+  Rol & \textbf{Usuario} (por defecto): todo el panel menos el módulo Usuarios.
+    \textbf{Administrador}: además gestiona las cuentas y sus contraseñas. Asigne el rol
+    Administrador solo a quien deba gestionar las cuentas. \\
 \end{tabla}
 
 \begin{pasos}[resume]
@@ -59,32 +64,37 @@ sesión (\seccion{sec:iniciar-sesion}).
 
 \begin{consejo}
 Entregue la contraseña inicial por un medio seguro, nunca en el mismo mensaje que el correo de
-acceso, y pídale a la persona que la cambie en su primer ingreso. Cada usuario puede cambiar su
-propia contraseña editando su fila en \menu{Sistema}{Usuarios}.
+acceso. Las personas con el rol Usuario no pueden cambiar su contraseña por su cuenta: si la
+olvidan o necesitan cambiarla, usted les asigna una nueva (\seccion{sec:usuario-editar}).
 \end{consejo}
 
-\begin{tabla}{colspec={X[l] Q[6cm,l]}}
+\begin{tabla}{colspec={X[j] Q[6cm,j]}}
   Mensaje & Cómo resolverlo \\
   \msg{El nombre es obligatorio} & Escriba el nombre. \\
-  \msg{El correo es obligatorio} / \msg{El correo debe ser válido} & Escriba un correo con la
-    forma \texttt{nombre@empresa.com}. \\
+  \msg{El correo es obligatorio} / \msg{El correo debe ser válido} & Corrija el correo; debe tener
+    la forma \texttt{ana@empresa.com}. \\
   \msg{Este correo ya está registrado} & Ya existe una cuenta con ese correo. Búsquela en la
     lista. \\
   \msg{La contraseña es obligatoria} / \msg{La contraseña debe tener al menos 8 caracteres} &
     Escriba una contraseña más larga. \\
   \msg{El teléfono es obligatorio} / \msg{El teléfono debe tener al menos 10 dígitos} /
     \msg{El teléfono no puede tener más de 15 dígitos} & Revise la longitud del teléfono. \\
+  \msg{El rol es obligatorio} / \msg{El rol no es válido} & Elija \textbf{Usuario} o
+    \textbf{Administrador} en la lista. \\
 \end{tabla}
 
-\subsection{Editar un usuario y cambiar su contraseña}\label{sec:usuario-editar}
+\subsection{Editar un usuario, cambiar su rol o su contraseña}\label{sec:usuario-editar}
+
+Así se atiende también a quien olvidó su contraseña (\seccion{sec:recuperar}).
 
 \begin{pasos}
   \item En la fila del usuario, haga clic en \icono{\icEditar} \textbf{Editar}. El título es
         \textbf{Editar usuario} y debajo aparece su correo.
-  \item Cambie los datos que necesite.
+  \item Cambie los datos que necesite, incluido el \campo{Rol}.
   \item Para asignar una contraseña nueva, escríbala en \campo{Nueva contraseña}. Si deja el
         campo vacío, se conserva la actual (\msg{Déjela en blanco para conservar la actual.}).
   \item Haga clic en \boton{Guardar cambios}.
+  \item Si asignó una contraseña nueva, entréguela a la persona por un medio seguro.
 \end{pasos}
 
 \captura[7.5cm]{05-03-usuario-editar}{/dashboard/usuarios/.../editar}{Edición de un usuario.}
@@ -94,6 +104,12 @@ propia contraseña editando su fila en \menu{Sistema}{Usuarios}.
 \begin{resultado}
 Vuelve a la lista con el aviso \msg{Usuario actualizado correctamente.}
 \end{resultado}
+
+\begin{nota}
+No puede quitarse su propio rol de Administrador: si lo intenta, verá en rojo \msg{No puede
+quitarse su propio rol de administrador.} Así el panel nunca se queda sin nadie que pueda
+gestionar las cuentas.
+\end{nota}
 
 \subsection{Eliminar un usuario}
 
@@ -107,8 +123,9 @@ inmediato.
 
 \begin{nota}
 No puede eliminar su propia cuenta: su fila no tiene el ícono y, si lo intentara, el sistema
-respondería \msg{No puedes eliminar tu propio usuario.} Si necesita retirar su acceso, pídaselo
-a otro administrador.
+respondería \msg{No puedes eliminar tu propio usuario.} Para retirar la cuenta del
+Administrador, primero hay que dar el rol Administrador a otra cuenta, y esa otra cuenta es la
+que la elimina.
 \end{nota}
 
 % ---------------------------------------------------------------------
@@ -143,7 +160,7 @@ eran correos válidos, el aviso agrega \msg{Se omitieron \var{X} líneas sin cor
 …).} La caja se vacía sola para que no envíe la misma lista dos veces.
 \end{resultado}
 
-\begin{tabla}{colspec={Q[6.2cm,l] Q[2.2cm,c] X[l]}}
+\begin{tabla}{colspec={Q[6.2cm,j] Q[2.2cm,c] X[j]}}
   Ejemplo de línea & ¿Sirve? & Observación \\
   \texttt{cliente@empresa.com} & Sí & Formato correcto. \\
   \texttt{Cliente@Empresa.COM} & Sí & Se convierte a minúsculas. \\
@@ -156,14 +173,17 @@ El correo que recibe cada persona:
 
 \begin{itemize}
   \item \textbf{Asunto:} \msg{Hemos lanzado una nueva plataforma para cotizaciones}.
-  \item \textbf{Título:} \msg{Cotice en línea con Training Corporation}.
-  \item \textbf{Saludo:} \msg{Estimado/a cliente:}, seguido de un texto que explica que ahora
-        puede elegir el servicio, diligenciar el formulario de solicitud y recibir la propuesta
-        en su correo.
+  \item \textbf{Título:} \msg{Cotice en línea con Training Corporation S.A.S.}
+  \item \textbf{Saludo:} \msg{Estimado/a cliente:}, seguido de un texto que presenta la
+        plataforma \textbf{Training InnovaQuote} (el nombre es un enlace a la página de inicio) y
+        explica que ahora puede elegir el servicio, diligenciar el formulario de solicitud y
+        recibir la propuesta en su correo.
   \item \textbf{Botón:} \textbf{Solicitar una cotización}, que lleva a la página de solicitud de
         Training~InnovaQuote.
-  \item \textbf{Cierre:} la firma \msg{Cordialmente, Equipo de Training Corporation} y, al pie,
-        los datos de contacto definidos en \menu{Sistema}{Configuración}.
+  \item \textbf{Cierre:} la firma \msg{Cordialmente, Equipo de Training Corporation S.A.S.} y, al
+        pie, los datos de contacto definidos en \menu{Sistema}{Configuración}.
+  \item \textbf{Remitente:} todos los correos de la plataforma salen a nombre de
+        \textbf{Training Corporation S.A.S.}
 \end{itemize}
 
 \begin{importante}
@@ -172,7 +192,7 @@ un control de a quién invitó. Los correos se envían en segundo plano y pueden
 minutos en llegar.
 \end{importante}
 
-\begin{tabla}{colspec={X[l] Q[5.6cm,l]}}
+\begin{tabla}{colspec={X[j] Q[5.6cm,j]}}
   Mensaje de error & Cómo resolverlo \\
   \msg{Indique al menos una dirección de correo electrónico.} & La caja está vacía. \\
   \msg{No se encontró ningún correo válido. Verifique el formato (ejemplo: nombre@empresa.com).}
@@ -190,19 +210,19 @@ minutos en llegar.
 La pantalla \textbf{Configuración} (\msg{Destinatario de las notificaciones y datos de contacto
 que aparecen en los correos al cliente.}) tiene dos secciones. Todos los campos son opcionales.
 
-\begin{tabla}{colspec={Q[4.2cm,l] X[l]}}
+\begin{tabla}{colspec={Q[4.2cm,j] X[j]}}
   Campo & Para qué sirve \\
   \SetCell[c=2]{l, bg=nube} \textbf{Notificaciones} & \\
   Correo de notificaciones & Recibe el aviso \msg{Nueva solicitud de cotización \var{código}}
-    con cada solicitud, \textbf{junto con los documentos que adjuntó el cliente}, y el aviso
-    \msg{Cotización \var{código} generada (cliente notificado)} con cada propuesta enviada. Si
-    lo deja vacío, no se envían estos avisos y los documentos del cliente se pierden
-    (\seccion{sec:documentos-cliente}). \\
+    con cada solicitud, \textbf{junto con los documentos que adjuntó el cliente}, el aviso
+    \msg{Cotización \var{código} generada (cliente notificado)} con cada propuesta enviada y
+    los recordatorios de las solicitudes pendientes (\seccion{sec:recordatorios}). Si lo deja
+    vacío, no se envían estos avisos ni los recordatorios, y los documentos del cliente se
+    pierden (\seccion{sec:documentos-cliente}). \\
   \SetCell[c=2]{l, bg=nube} \textbf{Datos de contacto (pie de los correos)} & \\
   Correo de contacto & El correo al que pueden escribir los clientes. \\
   Teléfono & El teléfono de contacto. \\
-  URL del sitio web & La dirección del sitio web, completa, por ejemplo
-    \texttt{https://www.trainingcorporation.com.co}. \\
+  URL del sitio web & La dirección completa del sitio web. Debe empezar por \texttt{https://}. \\
   Texto del enlace & El texto visible del enlace al sitio web. Si lo deja vacío, se muestra la
     dirección. \\
   Dirección & La dirección física de la empresa. \\
@@ -230,7 +250,7 @@ Esta pantalla no tiene botón \botonsec{Cancelar}. Si no quiere guardar lo que c
 la pantalla sin hacer clic en \boton{Guardar configuración}.
 \end{nota}
 
-\begin{tabla}{colspec={X[l] Q[5.6cm,l]}}
+\begin{tabla}{colspec={X[j] Q[5.6cm,j]}}
   Mensaje de error & Cómo resolverlo \\
   \msg{El correo de notificaciones debe ser una dirección válida.} & Revise el formato del
     correo. \\

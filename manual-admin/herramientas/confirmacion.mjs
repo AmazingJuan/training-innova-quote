@@ -21,7 +21,7 @@ const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 // 1) Iniciar sesión una vez y dejar la cookie en el perfil.
 fs.rmSync(PERFIL, { recursive: true, force: true });
 const contexto = await chromium.launchPersistentContext(PERFIL, {
-    executablePath: '/usr/bin/chromium',
+    executablePath: process.env.CHROMIUM ?? '/usr/bin/chromium',
     args: [REGLA],
     ignoreHTTPSErrors: true,
     viewport: { width: 1180, height: 900 },
@@ -34,11 +34,11 @@ await Promise.all([pagina.waitForURL('**/dashboard'), pagina.click('button:has-t
 await contexto.close();
 
 // 2) Chromium normal, con la pantalla virtual y sin ningún cliente de automatización conectado a la página.
-const navegador = spawn('/usr/bin/chromium', [
+const navegador = spawn(process.env.CHROMIUM ?? '/usr/bin/chromium', [
     `--user-data-dir=${PERFIL}`, REGLA, '--ignore-certificate-errors', '--no-first-run', '--no-default-browser-check',
     '--password-store=basic', '--force-device-scale-factor=2', '--window-position=0,0', '--window-size=1180,900',
     '--remote-debugging-port=9333', '--test-type', '--lang=es-CO', '--disable-features=Translate,TranslateUI,InfiniteSessionRestore',
-    '--disable-infobars', '--disable-session-crashed-bubble', `--app=https://${DOMINIO}/dashboard/servicios`,
+    '--disable-infobars', '--disable-session-crashed-bubble', `--app=https://${DOMINIO}/dashboard/usuarios`,
 ], { stdio: 'ignore', env: { ...process.env, GTK_THEME: 'Adwaita:light', LANGUAGE: 'es_CO:es', LANG: 'es_CO.UTF-8' } });
 
 try {

@@ -6,7 +6,7 @@
 \entradilla{Referencia rápida de los avisos que muestra el panel después de cada acción,
 agrupados por módulo.}
 
-\begin{longtblr}{colspec={Q[3.1cm,l] X[l] Q[4.2cm,l]}}
+\begin{longtblr}{colspec={Q[3.3cm,j] X[j] Q[5cm,j]}}
   Módulo & Mensaje & Cuándo aparece \\
   Cotizaciones & \msg{URL de cotización subida exitosamente.} & Al enviar la propuesta. \\
   Cotizaciones & \msg{La URL de la cotización es obligatoria.} & Al enviar sin enlace. \\
@@ -18,16 +18,7 @@ agrupados por módulo.}
   Unidades de negocio & \msg{La unidad de negocio «\var{nombre}» ha sido creada exitosamente.} & Al crear. \\
   Unidades de negocio & \msg{La unidad de negocio «\var{nombre}» ha sido actualizada exitosamente.} & Al editar. \\
   Unidades de negocio & \msg{La unidad de negocio «\var{nombre}» ha sido eliminada exitosamente.} & Al eliminar. \\
-  Unidades de negocio & \msg{No se puede eliminar la unidad de negocio «\var{nombre}» porque tiene servicios asociados.} & Al eliminar una unidad con servicios. \\
-  Líneas de gestión & \msg{Línea de gestión creada correctamente.} & Al crear. \\
-  Líneas de gestión & \msg{Línea de gestión actualizada exitosamente.} & Al editar. \\
-  Líneas de gestión & \msg{Línea de gestión eliminada exitosamente.} & Al eliminar. \\
-  Líneas de gestión & \msg{No se puede eliminar la línea de gestión «\var{nombre}» porque tiene servicios asociados.} & Al eliminar una línea con servicios. \\
-  Servicios & \msg{Servicio creado correctamente.} & Al crear. \\
-  Servicios & \msg{Servicio actualizado exitosamente.} & Al editar. \\
-  Servicios & \msg{Servicio eliminado exitosamente.} & Al eliminar. \\
-  Servicios & \msg{No existen unidades de negocio con las cuales usted pueda asociar un servicio.} & Al crear un servicio sin unidades. \\
-  Servicios & \msg{No existen líneas de gestión con las cuales usted pueda asociar un servicio.} & Al crear un servicio sin líneas. \\
+  Unidades de negocio & \msg{No se puede eliminar la unidad de negocio «\var{nombre}» porque tiene solicitudes de cotización.} & Al eliminar una unidad que ya recibió solicitudes. \\
   Árbol de decisión & \msg{Pregunta «\var{pregunta}» creada.} & Al crear una pregunta. \\
   Árbol de decisión & \msg{Pregunta «\var{pregunta}» guardada.} & Al editar una pregunta. \\
   Árbol de decisión & \msg{Pregunta «\var{pregunta}» eliminada.} & Al eliminar una pregunta. \\
@@ -37,6 +28,7 @@ agrupados por módulo.}
   Usuarios & \msg{Usuario actualizado correctamente.} & Al editar. \\
   Usuarios & \msg{Usuario eliminado correctamente.} & Al eliminar. \\
   Usuarios & \msg{No puedes eliminar tu propio usuario.} & Al intentar borrar la cuenta propia. \\
+  Usuarios & \msg{No puede quitarse su propio rol de administrador.} & Al intentar pasar la cuenta propia al rol Usuario. \\
   Correos de bienvenida & \msg{Se pusieron en cola \var{N} correos de bienvenida.} & Al enviar la lista. \\
   Correos de bienvenida & \msg{Se omitieron \var{X} líneas sin correo válido (ej.: …).} & Si la lista tenía líneas inválidas. \\
   Correos de bienvenida & \msg{Máximo 500 correos por envío. Reduzca la lista e intente nuevamente.} & Lista de más de 500 correos. \\
@@ -59,9 +51,10 @@ agrupados por módulo.}
   {Una unidad solo se muestra a los clientes cuando su árbol de decisión tiene al menos una
    pregunta. Cree sus preguntas o copie las de otra unidad (\seccion{sec:copiar-arbol}).}
 
-\faq{No puedo eliminar una unidad de negocio o una línea de gestión.}
-  {Tiene servicios asociados. Elimine esos servicios o asígnelos a otra unidad o línea
-   (\seccion{sec:servicios}) e intente de nuevo.}
+\faq{No puedo eliminar una unidad de negocio.}
+  {La unidad ya recibió solicitudes de cotización, y el sistema la conserva para no perder su
+   historial. Si ya no quiere que los clientes la coticen, elimine las preguntas de su árbol de
+   decisión: una unidad sin preguntas no aparece en Training~InnovaQuote (\seccion{sec:arbol}).}
 
 \faq{Envié la propuesta con un enlace equivocado.}
   {El panel no permite cambiar el enlace después de enviarlo. Envíe al cliente el enlace
@@ -73,7 +66,7 @@ agrupados por módulo.}
    correo esté bien escrito (\seccion{sec:clientes}). Los correos se envían en segundo plano y
    pueden tardar unos minutos; si no llegan, avise al equipo técnico.}
 
-\faq{No recibo los avisos de nuevas solicitudes.}
+\faq{No recibo los avisos de nuevas solicitudes ni los recordatorios.}
   {Revise que el \campo{Correo de notificaciones} esté diligenciado en
    \menu{Sistema}{Configuración} (\seccion{sec:configuracion}) y revise la carpeta de correo no
    deseado de ese buzón.}
@@ -99,20 +92,28 @@ agrupados por módulo.}
    \campo{Al elegirla} o elimínela (\seccion{sec:ramas}).}
 
 \faq{Olvidé mi contraseña.}
-  {Use \textbf{¿Olvidó su contraseña?} en la pantalla de inicio de sesión
-   (\seccion{sec:recuperar}) o pida a otro administrador que le asigne una nueva
-   (\seccion{sec:usuario-editar}).}
+  {Pida a Gerencia una contraseña nueva (\seccion{sec:recuperar}). El panel no envía enlaces para
+   restablecerla: solo el Administrador asigna contraseñas (\seccion{sec:usuario-editar}).}
+
+\faq{No veo el módulo Usuarios.}
+  {Su cuenta tiene el rol Usuario. Ese módulo solo lo ven las cuentas con el rol Administrador
+   (\seccion{sec:quien}). Si necesita crear, cambiar o retirar una cuenta, pídaselo a Gerencia.}
 
 \faq{Necesito retirar el acceso a una persona.}
-  {Elimine su cuenta en \menu{Sistema}{Usuarios}. Si la cuenta es la suya, pídaselo a otro
-   administrador.}
+  {El Administrador elimina su cuenta en \menu{Sistema}{Usuarios}. Nadie puede eliminar su
+   propia cuenta.}
+
+\faq{Me llegó un correo «Cotización vencida».}
+  {Es un recordatorio de una solicitud que sigue pendiente y cuya fecha estimada de entrega ya
+   pasó (\seccion{sec:recordatorios}). Envíe la propuesta o comuníquese con el cliente: los
+   recordatorios se detienen en cuanto se envía la propuesta.}
 
 % ---------------------------------------------------------------------
 \chapter{Glosario}\label{ap:glosario}
 
 \entradilla{Términos que se usan en el panel y en este manual.}
 
-\begin{tabla}{colspec={Q[4.2cm,l] X[l]}}
+\begin{tabla}{colspec={Q[4.2cm,j] X[j]}}
   Término & Definición \\
   Abreviado & Letras y números que identifican a una unidad de negocio y forman el inicio de
     sus códigos de cotización, por ejemplo \textbf{EO}. \\
@@ -125,19 +126,22 @@ agrupados por módulo.}
   Código de cotización & Identificador único de cada solicitud, con la forma
     \textbf{ABREVIADO-V-AAnn}, por ejemplo \textbf{EO-V-2601}. \\
   Correo de notificaciones & Buzón interno que recibe un aviso con cada solicitud nueva y cada
-    propuesta enviada. \\
+    propuesta enviada, y los recordatorios de las solicitudes pendientes. \\
+  Fecha estimada de entrega & La fecha en que el cliente espera recibir la propuesta. Debe ser
+    al menos 3 días hábiles después de enviar la solicitud. \\
     Formulario de solicitud & El formulario que diligencia el cliente al solicitar una cotización.
     Se configura en el árbol de decisión. \\
-  Línea de gestión & Agrupación temática de los servicios, por ejemplo HSEQ. \\
   Orden principal & La secuencia numerada de preguntas que todos los clientes responden. \\
     Panel de cotizaciones & La parte privada de Training~InnovaQuote, donde trabaja el administrador. \\
   
   Pregunta de rama & Pregunta que solo aparece cuando el cliente elige cierta opción. \\
   Propuesta & El documento con la oferta comercial que se envía al cliente mediante un enlace. \\
+  Recordatorio & Correo automático a Gerencia cada 2,5 días hábiles mientras una solicitud siga
+    pendiente. \\
+  Rol & Lo que puede hacer una cuenta en el panel: \textbf{Usuario} (todo menos el módulo
+    Usuarios) o \textbf{Administrador} (además gestiona las cuentas y sus contraseñas). \\
   
-  Servicio & Un servicio de la oferta de una unidad de negocio, clasificado en una línea de
-    gestión. \\
-    Training~InnovaQuote & Nombre de la plataforma web de cotizaciones de Training Corporation, disponible en
+Training~InnovaQuote & Nombre de la plataforma web de cotizaciones de Training Corporation S.A.S., disponible en
     \ruta{\dominio}. \\
   Unidad de negocio & Tipo de servicio que el cliente elige al cotizar, por ejemplo Auditoría,
     Consultoría o Formación. \\

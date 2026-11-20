@@ -9,6 +9,7 @@ Pasos:
      calcular los números de página del índice y vuelve a generar el .docx con ellos.
 """
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -26,8 +27,12 @@ ENTORNO = MANUAL / 'herramientas' / '.entorno'
 
 
 def soffice():
+    """El LibreOffice portable de herramientas/.entorno/lo o, si no está, el del sistema."""
     candidatos = sorted(ENTORNO.glob('lo/raiz/opt/libreoffice*/program/soffice'))
-    return candidatos[-1] if candidatos else None
+    if candidatos:
+        return candidatos[-1]
+    sistema = shutil.which('soffice') or shutil.which('libreoffice')
+    return Path(sistema) if sistema else None
 
 
 def a_pdf(docx, carpeta):

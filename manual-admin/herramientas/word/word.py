@@ -145,7 +145,11 @@ class Generador:
         defecto.append(ox.el('w:lang', val='es-CO', eastAsia='es-CO', bidi='ar-SA'))
         ox.ordenar(defecto, ox.ORDEN_RPR)
 
-        self.estilo('Normal', base=None, fuente='Source Sans 3', tam=11, color=TINTA, antes=0, despues=6, linea=1.1)
+        # Todo el texto va justificado (con separación silábica, ver ooxml.py); títulos, encabezados, pies e índices
+        # quedan a la izquierda, porque son líneas sueltas o usan tabulaciones.
+        JUSTIFICADO, IZQUIERDA = WD_ALIGN_PARAGRAPH.JUSTIFY, WD_ALIGN_PARAGRAPH.LEFT
+        self.estilo('Normal', base=None, fuente='Source Sans 3', tam=11, color=TINTA, antes=0, despues=6, linea=1.1,
+                    alineado=JUSTIFICADO)
         for nombre in ('Heading 1', 'Heading 2', 'Heading 3', 'Heading 4'):
             s = doc.styles[nombre]
             rpr = s.element.get_or_add_rPr()
@@ -165,17 +169,22 @@ class Generador:
                     mantener=True)
         self.estilo('Etiqueta de capítulo', fuente='Montserrat', negrita=True, tam=9.5, color=C['cielo'], antes=0,
                     despues=4, linea=1.0, mantener=True, espaciado=2.2)
-        self.estilo('Entradilla', tam=13, color=PIZARRA, antes=0, despues=12, linea=1.45)
+        self.estilo('Entradilla', tam=13, color=PIZARRA, antes=0, despues=12, linea=1.45, alineado=JUSTIFICADO)
         self.estilo('Caption', tam=10, color=PIZARRA, antes=5, despues=14, alineado=WD_ALIGN_PARAGRAPH.CENTER, cursiva=False,
                     negrita=False)
         self.estilo('Imagen', antes=8, despues=0, alineado=WD_ALIGN_PARAGRAPH.CENTER, mantener=True, linea=1.0)
-        self.estilo('Texto de tabla', tam=10, antes=0, despues=0, linea=1.05)
+        self.estilo('Texto de tabla', tam=10, antes=0, despues=0, linea=1.05, alineado=JUSTIFICADO)
         self.estilo('Encabezado de tabla', fuente='Montserrat', negrita=True, tam=9, color='FFFFFF', antes=0, despues=0,
                     linea=1.05)
-        self.estilo('Texto de recuadro', antes=0, despues=4, linea=1.1)
-        self.estilo('List Paragraph', antes=0, despues=4, linea=1.1, sangria=0.6)
+        self.estilo('Texto de recuadro', antes=0, despues=4, linea=1.1, alineado=JUSTIFICADO)
+        self.estilo('List Paragraph', antes=0, despues=4, linea=1.1, sangria=0.6, alineado=JUSTIFICADO)
+        for nombre in ('Heading 1', 'Heading 2', 'Heading 3', 'Heading 4', 'Título sin número', 'Subtítulo sin número',
+                       'Etiqueta de capítulo', 'Encabezado de tabla'):
+            self.estilo(nombre, alineado=IZQUIERDA)
         self.estilo('Header', fuente='Montserrat SemiBold', tam=9, color=PIZARRA, antes=0, despues=0)
         self.estilo('Footer', tam=9, color=PIZARRA, antes=0, despues=0)
+        for nombre in ('Header', 'Footer'):
+            self.estilo(nombre, alineado=IZQUIERDA)
         for nombre in ('Header', 'Footer'):
             ppr = self.doc.styles[nombre].element.get_or_add_pPr()
             for t in ppr.findall(qn('w:tabs')):
@@ -184,6 +193,8 @@ class Generador:
         self.estilo('toc 1', fuente='Montserrat', negrita=True, tam=11.5, color=C['noche'], antes=10, despues=2)
         self.estilo('toc 2', tam=11, color=TINTA, antes=1, despues=1)
         self.estilo('table of figures', tam=10.5, color=TINTA, antes=1, despues=1)
+        for nombre in ('toc 1', 'toc 2', 'table of figures'):
+            self.estilo(nombre, alineado=IZQUIERDA)
         for nombre, (izq, colgante) in (('toc 1', (1.2, 1.2)), ('toc 2', (2.35, 1.15)), ('table of figures', (1.5, 1.5))):
             pf = self.doc.styles[nombre].paragraph_format
             pf.left_indent, pf.first_line_indent = Cm(izq), Cm(-colgante)
@@ -409,7 +420,7 @@ class Generador:
             self.bloque(b, self.doc, Fmt())
         self.doc.core_properties.title = 'Training InnovaQuote: manual de usuario del administrador'
         self.doc.core_properties.subject = 'Guía paso a paso del panel de administración de Training InnovaQuote'
-        self.doc.core_properties.author = 'Training Corporation'
+        self.doc.core_properties.author = 'Training Corporation S.A.S.'
         self.doc.core_properties.keywords = 'Training InnovaQuote, cotizaciones, manual, administrador'
         self.doc.core_properties.language = 'es-CO'
         # Modo de Word actual (sin «Modo de compatibilidad» al abrirlo)
@@ -528,7 +539,7 @@ class Generador:
     def contraportada(self):
         self.nueva_seccion(sin_marcas=True)
         self.fondo_pagina(FIGURAS / 'contraportada.png')
-        self.texto_en_marco(0, 23.95, 21, [('Training Corporation', Fmt(display=True, peso='b', color='FFFFFF', tamano=10), None),
+        self.texto_en_marco(0, 23.95, 21, [('Training Corporation S.A.S.', Fmt(display=True, peso='b', color='FFFFFF', tamano=10), None),
                                            ('\n', None, None), (self.lector.datos['dominio'], Fmt(color=C['niebla'], tamano=10), None)],
                             alineado='center', interlineado=14)
         self.texto_en_marco(0, 25.55, 21, [(f'Training InnovaQuote · Manual del administrador · Versión {self.lector.datos["versiondoc"]} · '

@@ -3,8 +3,8 @@
 % =====================================================================
 \chapter{Acceso al panel}\label{cap:acceso}
 
-\entradilla{Cómo entrar al panel, recuperar la contraseña y moverse por la interfaz. Lo que
-aprenda en este capítulo le sirve para todos los módulos.}
+\entradilla{Cómo entrar al panel, qué hacer si olvida la contraseña y cómo moverse por la
+interfaz. Lo que aprenda en este capítulo le sirve para todos los módulos.}
 
 \section{Iniciar sesión}\label{sec:iniciar-sesion}
 
@@ -41,17 +41,17 @@ cualquier persona que use ese navegador después podría entrar al panel con su 
 
 Cuando algo falla, el formulario muestra un mensaje en rojo debajo del campo afectado.
 
-\begin{tabla}{colspec={Q[3.6cm,l] X[l] Q[4.4cm,l]}}
+\begin{tabla}{colspec={Q[3.6cm,j] X[j] Q[4.4cm,j]}}
   Situación & Qué verá & Qué hacer \\
   Dejó un campo vacío & \msg{El correo electrónico es obligatorio.} o
     \msg{La contraseña es obligatoria.} & Complete el campo y vuelva a intentar. \\
   El correo no tiene un formato válido & El navegador le pide corregirlo, o el sistema muestra
-    \msg{Ingresa un correo electrónico válido.} & Revise que el correo tenga la forma
-    \texttt{nombre@empresa.com}. \\
+    \msg{Ingresa un correo electrónico válido.} & Corrija el correo; debe tener
+    la forma \texttt{ana@empresa.com}. \\
   El correo o la contraseña no coinciden & Un mensaje bajo el correo. Actualmente aparece en
     inglés: \msg{These credentials do not match our records.} & Revise mayúsculas y la tecla
-    \tecla{Bloq Mayús}. Si no la recuerda, recupérela (\seccion{sec:recuperar}). \\
-  Varios intentos fallidos seguidos & Tras 5 intentos fallidos el acceso se bloquea por unos
+    \tecla{Bloq Mayús}. Si no la recuerda, pida una nueva a Gerencia (\seccion{sec:recuperar}). \\
+  Cinco intentos fallidos & Tras 5 intentos fallidos el acceso se bloquea por unos
     segundos. El mensaje aparece en inglés: \msg{Too many login attempts. Please try again in
     \var{N} seconds.} & Espere el tiempo indicado e intente de nuevo. \\
 \end{tabla}
@@ -60,38 +60,22 @@ Cuando algo falla, el formulario muestra un mensaje en rojo debajo del campo afe
   {el formulario de inicio de sesión después de escribir una contraseña incorrecta, con el
    mensaje en rojo visible debajo del correo.}
 
-\section{Recuperar la contraseña}\label{sec:recuperar}
+\section{Si olvidó su contraseña}\label{sec:recuperar}
 
-Si olvidó su contraseña, puede crear una nueva desde la pantalla de inicio de sesión.
+El panel no envía enlaces para restablecer la contraseña: solo el Administrador (Gerencia) puede
+asignar o cambiar contraseñas. Por eso la pantalla de inicio de sesión muestra el texto
+\msg{Si olvidó su contraseña, solicite una nueva a Gerencia.}
 
 \begin{pasos}
-  \item En la pantalla de inicio de sesión, haga clic en \textbf{¿Olvidó su contraseña?}
-  \item Verá el texto \msg{¿Olvidó su contraseña? Escriba su correo electrónico y le enviaremos
-        un enlace para crear una nueva.} Escriba en el campo el correo de su cuenta.
-  \item Haga clic en \boton{Enviar enlace para restablecer contraseña}. Verá un mensaje de
-        confirmación en verde (actualmente en inglés).
-  \item Revise su bandeja de entrada y, si no lo encuentra, la carpeta de correo no deseado.
-        El correo llega en inglés, con el asunto \msg{Reset Password Notification}.
-  \item Abra el correo y haga clic en el botón \textbf{Reset Password}.
-  \item En la pantalla \textbf{Restablecer contraseña}, verifique su correo en
-        \campo{Correo electrónico}, escriba la nueva contraseña en \campo{Contraseña} y repítala
-        en \campo{Confirmar contraseña}. Debe tener al menos 8 caracteres.
-  \item Haga clic en \boton{Reset Password}.
+  \item Pida a Gerencia una contraseña nueva, indicando el correo de su cuenta.
+  \item Gerencia la asigna desde \menu{Sistema}{Usuarios} (\seccion{sec:usuario-editar}) y se la
+        entrega por un medio seguro.
+  \item Inicie sesión con la contraseña nueva (\seccion{sec:iniciar-sesion}).
 \end{pasos}
 
-\captura{02-03-recuperar-contrasena}{/forgot-password}{Solicitud del enlace para restablecer la contraseña.}
-  {la pantalla «¿Olvidó su contraseña?» con el campo de correo y el botón «Enviar enlace para
-   restablecer contraseña».}
-
-\begin{resultado}
-Vuelve a la pantalla de inicio de sesión con un mensaje de confirmación. Inicie sesión con la
-nueva contraseña.
-\end{resultado}
-
 \begin{nota}
-El enlace del correo vence a los 60 minutos y solo puede pedirse uno por minuto. Si vence,
-solicite uno nuevo. Otra opción es pedirle a otro administrador que le asigne una contraseña
-nueva desde \menu{Sistema}{Usuarios} (ver \seccion{sec:usuario-editar}).
+Lo mismo aplica si quiere cambiar su contraseña o sospecha que alguien más la conoce: pídale a
+Gerencia que le asigne una nueva.
 \end{nota}
 
 \section{El Panel de inicio}\label{sec:panel-inicio}
@@ -102,22 +86,21 @@ módulo del panel.}
 Después de iniciar sesión verá el saludo \textbf{Bienvenido/a, \var{su primer nombre}} y el texto
 \msg{Gestione las solicitudes de cotización, el catálogo que ve el cliente y la configuración
 del sistema.} Debajo aparecen tarjetas de acceso directo, agrupadas igual que la barra lateral.
-Haga clic en una tarjeta para abrir el módulo.
+Haga clic en una tarjeta para abrir el módulo. La tarjeta \textbf{Usuarios} solo aparece si su
+cuenta tiene el rol Administrador (\seccion{sec:quien}).
 
 \captura[8.5cm]{02-04-panel-inicio}{/dashboard}{Panel de inicio del administrador.}
   {la pantalla completa del Panel justo después de iniciar sesión: la barra lateral azul a la
    izquierda, el saludo «Bienvenido/a, …» y todas las tarjetas de los grupos Operación, Catálogo y
    Sistema.}
 
-\begin{tabla}{colspec={Q[2.2cm,l] Q[3.8cm,l] X[l] Q[1.9cm,c]}}
+\begin{tabla}{colspec={Q[2.2cm,j] Q[3.8cm,j] X[j] Q[1.9cm,c]}}
   Grupo & Tarjeta & Descripción en pantalla & Sección \\
   Operación & \icono{\icCotizacion}\ Cotizaciones & Solicitudes recibidas y su estado & \ref*{sec:cotizaciones} \\
   Operación & \icono{\icContactos}\ Clientes & Quién ha cotizado y su historial & \ref*{sec:clientes} \\
   Catálogo & \icono{\icMaletin}\ Unidades de negocio & Unidades y su código de cotización & \ref*{sec:unidades} \\
-  Catálogo & \icono{\icRama}\ Líneas de gestión & Agrupan los servicios ofrecidos & \ref*{sec:lineas} \\
-  Catálogo & \icono{\icLlave}\ Servicios & Servicios por unidad y línea & \ref*{sec:servicios} \\
   Catálogo & \icono{\icArbol}\ Árbol de decisión & Preguntas del cotizador & \ref*{sec:arbol} \\
-  Sistema & \icono{\icUsuarios}\ Usuarios & Cuentas con acceso al panel & \ref*{sec:usuarios} \\
+  Sistema & \icono{\icUsuarios}\ Usuarios (solo Administrador) & Cuentas con acceso al panel & \ref*{sec:usuarios} \\
   Sistema & \icono{\icCorreo}\ Correos de bienvenida & Invitar clientes a la plataforma & \ref*{sec:bienvenida} \\
   Sistema & \icono{\icAjustes}\ Configuración & Notificaciones y datos de contacto & \ref*{sec:configuracion} \\
 \end{tabla}
@@ -154,13 +137,11 @@ la muestra en forma de esquema; las letras se explican a continuación.
   \node[menu] at (0.38,6.18) {\ico{F2B9}\hspace{0.4em}Clientes};
   \node[grupomenu] at (0.35,5.7) {Catálogo};
   \node[menu] at (0.38,5.32) {\ico{F0B1}\hspace{0.4em}Unidades de negocio};
-  \node[menu] at (0.38,4.98) {\ico{F126}\hspace{0.4em}Líneas de gestión};
-  \node[menu] at (0.38,4.64) {\ico{F0AD}\hspace{0.4em}Servicios};
-  \node[menu] at (0.38,4.30) {\ico{F0E8}\hspace{0.4em}Árbol de decisión};
-  \node[grupomenu] at (0.35,3.82) {Sistema};
-  \node[menu] at (0.38,3.44) {\ico{F0C0}\hspace{0.4em}Usuarios};
-  \node[menu] at (0.38,3.10) {\ico{F0E0}\hspace{0.4em}Correos de bienvenida};
-  \node[menu] at (0.38,2.76) {\ico{F013}\hspace{0.4em}Configuración};
+  \node[menu] at (0.38,4.98) {\ico{F0E8}\hspace{0.4em}Árbol de decisión};
+  \node[grupomenu] at (0.35,4.50) {Sistema};
+  \node[menu] at (0.38,4.12) {\ico{F0C0}\hspace{0.4em}Usuarios};
+  \node[menu] at (0.38,3.78) {\ico{F0E0}\hspace{0.4em}Correos de bienvenida};
+  \node[menu] at (0.38,3.44) {\ico{F013}\hspace{0.4em}Configuración};
   \draw[white!60!azul, line width=0.5pt] (0.22,1.35) -- (3.38,1.35);
   \node[menu] at (0.38,1.05) {\ico{F08E}\hspace{0.4em}Ver sitio público};
   \node[menu] at (0.38,0.62) {\ico{F2F5}\hspace{0.4em}Cerrar sesión};
@@ -168,7 +149,7 @@ la muestra en forma de esquema; las letras se explican a continuación.
   % Aviso
   \draw[azul, fill=white, line width=0.8pt, rounded corners=2pt] (4.2,7.75) rectangle (15.0,8.3);
   \node[anchor=west, inner sep=0pt, font=\fontsize{6.5}{7}\selectfont, text=tinta] at (4.4,8.02)
-    {{\color{azul}\ico{F058}}\hspace{0.5em}Servicio creado correctamente.};
+    {{\color{azul}\ico{F058}}\hspace{0.5em}Configuración actualizada exitosamente.};
   \node[anchor=east, inner sep=0pt, font=\fontsize{6.5}{7}\selectfont, text=pizarra] at (14.8,8.02) {\ico{F00D}};
   % Encabezado de la pantalla
   \node[anchor=west, inner sep=0pt, font=\montserrat\fontseries{eb}\selectfont\fontsize{13}{14}\selectfont, text=azul] at (4.2,7.2) {Título de la pantalla};
@@ -199,7 +180,7 @@ la muestra en forma de esquema; las letras se explican a continuación.
   \node[anchor=east, inner sep=0pt, font=\fontsize{6}{7}\selectfont, text=pizarra] at (15.0,1.2)
     {\ico{F053}\hspace{0.3em}Anterior\hspace{1.2em}1 / 3\hspace{1.2em}Siguiente\hspace{0.3em}\ico{F054}};
   \draw[linea, line width=0.6pt] (3.6,0.62) -- (15.6,0.62);
-  \node[font=\fontsize{5.5}{6}\selectfont, text=pizarra] at (9.6,0.33) {© 2026 Training Corporation. Todos los derechos reservados.};
+  \node[font=\fontsize{5.5}{6}\selectfont, text=pizarra] at (9.6,0.33) {© 2026 Training Corporation S.A.S. Todos los derechos reservados.};
   % Marcas
   \node[marca] at (3.6,5.0) {A};
   \node[marca] at (3.6,1.05) {B};
@@ -215,18 +196,19 @@ la muestra en forma de esquema; las letras se explican a continuación.
 \begin{zonas}
   \item \textbf{Barra lateral.} Contiene el logo, el texto \textbf{Panel de cotizaciones} y los
         módulos agrupados en \textbf{Operación}, \textbf{Catálogo} y \textbf{Sistema}. El módulo
-        donde se encuentra aparece resaltado en blanco.
+        donde se encuentra aparece resaltado en blanco. \textbf{Usuarios} solo aparece con el rol
+        Administrador.
   \item \textbf{Pie de la barra lateral.} \textbf{Ver sitio público} abre Training~InnovaQuote en otra
         pestaña y \textbf{Cerrar sesión} termina su sesión. Debajo aparece el correo de la cuenta
         con la que entró.
   \item \textbf{Aviso del sistema.} Confirma el resultado de la última acción
         (\seccion{sec:avisos}).
   \item \textbf{Encabezado.} Título azul de la pantalla, una descripción en gris y, a la
-        derecha, los botones de acción, como \boton{\icMas\ Nuevo servicio}.
+        derecha, los botones de acción, como \boton{\icMas\ Nueva unidad}.
   \item \textbf{Búsqueda y filtros} (\seccion{sec:busqueda}).
   \item \textbf{Tabla} con los registros y los íconos de acción de cada fila
         (\seccion{sec:acciones-fila}).
-  \item \textbf{Paginación} y pie de página con el aviso de derechos de Training Corporation.
+  \item \textbf{Paginación} y pie de página con el aviso de derechos de Training Corporation S.A.S.
 \end{zonas}
 
 \capturaconnotas[11.5cm]{02-05-barra-lateral}{/dashboard}{Barra lateral del panel.}
@@ -238,6 +220,7 @@ la muestra en forma de esquema; las letras se explican a continuación.
      \item Haga clic en el nombre de un módulo para abrirlo.
      \item El módulo activo se resalta con fondo blanco y letra azul.
      \item Los grupos solo organizan los módulos: no se pueden abrir ni cerrar.
+     \item \textbf{Usuarios} solo aparece si su cuenta tiene el rol Administrador.
      \item Si la pantalla es baja, la barra lateral se desplaza sola con la rueda del ratón.
      \item \textbf{Ver sitio público} se abre en otra pestaña; el panel sigue abierto en la
            pestaña actual.
@@ -254,7 +237,7 @@ Después de guardar, eliminar o enviar algo, aparece un aviso en la parte superi
 
 \begin{itemize}
   \item \textbf{Éxito:} borde azul con un ícono \icono{\icOk}. Por ejemplo,
-        \msg{Línea de gestión creada correctamente.}
+        \msg{La unidad de negocio «Gestión de activos» ha sido creada exitosamente.}
   \item \textbf{Error:} recuadro rojo con un ícono de alerta. Por ejemplo,
         \msg{No puedes eliminar tu propio usuario.}
 \end{itemize}
@@ -262,7 +245,7 @@ Después de guardar, eliminar o enviar algo, aparece un aviso en la parte superi
 El aviso desaparece solo a los 8 segundos. Para cerrarlo antes, haga clic en la \icono[pizarra]{\icCerrar}
 de la derecha.
 
-\captura[3.2cm]{02-06-aviso}{/dashboard/lineas-gestion}{Aviso de confirmación después de guardar.}
+\captura[3.2cm]{02-06-aviso}{/dashboard/unidad-negocio}{Aviso de confirmación después de guardar.}
   {un recorte de la parte superior del contenido justo después de crear o editar un registro,
    con el aviso azul de éxito visible.}
 
@@ -298,8 +281,8 @@ primera página.
 
 \begin{consejo}
 La dirección de la página guarda la búsqueda, los filtros y la página. Puede guardarla como
-favorito en el navegador o enviársela a otro administrador para que vea exactamente la misma
-lista.
+favorito en el navegador o enviársela a otra persona del equipo para que vea exactamente la
+misma lista.
 \end{consejo}
 
 En pantallas angostas, las tablas se desplazan hacia los lados. Una sombra en el borde indica
@@ -309,7 +292,7 @@ que hay más columnas por ver.
 
 La columna \campo{Acciones} muestra íconos. Si pasa el ratón sobre uno, aparece su nombre.
 
-\begin{tabla}{colspec={Q[1.6cm,c,m] Q[3cm,l,m] X[l,m]}}
+\begin{tabla}{colspec={Q[1.6cm,c,m] Q[3cm,j,m] X[j,m]}}
   Ícono & Nombre & Qué hace \\
   {\color{pizarra}\fontsize{12}{12}\selectfont\icVer} & Ver detalle & Abre la ficha completa del registro. \\
   {\color{azul}\fontsize{12}{12}\selectfont\icEditar} & Editar & Abre el formulario para modificar el registro. \\
@@ -324,7 +307,7 @@ La columna \campo{Acciones} muestra íconos. Si pasa el ratón sobre uno, aparec
 \subsection{Confirmar una eliminación}\label{sec:confirmar}
 
 Antes de borrar algo, el navegador muestra un cuadro de confirmación con un mensaje propio de
-cada módulo, por ejemplo \msg{¿Eliminar el servicio «Trabajo en Alturas»?}
+cada módulo, por ejemplo \msg{¿Eliminar al usuario Andrés Mejía?}
 
 \begin{itemize}
   \item Haga clic en \textbf{Aceptar} para eliminar.
@@ -334,7 +317,7 @@ Los botones los dibuja el navegador, no Training~InnovaQuote: en un navegador en
 \textbf{Aceptar} y \textbf{Cancelar}; en uno en inglés, como el de la captura, dicen
 \textbf{OK} y \textbf{Cancel}. El cuadro también muestra la dirección \ruta{\dominio}.
 
-\captura[4.5cm]{02-08-confirmar-eliminar}{/dashboard/servicios}{Cuadro de confirmación antes de eliminar.}
+\captura[4.5cm]{02-08-confirmar-eliminar}{/dashboard/usuarios}{Cuadro de confirmación antes de eliminar.}
   {el cuadro de confirmación del navegador que aparece al hacer clic en el ícono rojo de
    eliminar de cualquier fila. Haga clic en «Cancelar» después de capturarlo.}
 
@@ -355,7 +338,7 @@ Los formularios para crear y editar registros funcionan igual en todo el panel:
   \item Al guardar, el sistema revisa los datos. Si algo falta o está mal, el mensaje aparece en
         rojo debajo del campo y no se guarda nada hasta corregirlo.
   \item \botonsec{Cancelar} vuelve a la lista sin guardar.
-  \item El botón principal, por ejemplo \boton{Crear servicio} o \boton{Guardar cambios},
+  \item El botón principal, por ejemplo \boton{Crear unidad} o \boton{Guardar cambios},
         guarda los datos. Mientras procesa, muestra \textbf{Guardando…}.
 \end{itemize}
 
