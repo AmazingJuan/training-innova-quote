@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light">
 <meta name="supported-color-schemes" content="light">
-<title>@yield('title', 'Training Corporation')</title>
+<title>@yield('title', 'Training Corporation S.A.S.')</title>
 {{-- The site's typefaces; clients that ignore web fonts fall back to Segoe UI / Arial. --}}
 <link href="https://fonts.bunny.net/css?family=montserrat:700,800|source-sans-3:400,600,700&display=swap" rel="stylesheet">
 <style type="text/css">
@@ -37,7 +37,7 @@
             <td class="px" style="padding:28px 40px 24px 40px; border-bottom:1px solid #d5e2eb;">
               <a href="{{ config('app.url') }}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
                 {{-- Embedded in the message (when it is sent), so it shows even where remote images are blocked. --}}
-                <img src="{{ isset($message) ? $message->embed(\App\Utils\Brand::logoPath()) : asset(\App\Utils\Brand::LOGO) }}" alt="Training Corporation" width="112" style="display:block; width:112px; height:auto; border:0;" />
+                <img src="{{ isset($message) ? $message->embed(\App\Utils\Brand::logoPath()) : asset(\App\Utils\Brand::LOGO) }}" alt="Training Corporation S.A.S." width="112" style="display:block; width:112px; height:auto; border:0;" />
               </a>
             </td>
           </tr>
@@ -58,7 +58,7 @@
           {{-- Footer in the site's navy. --}}
           <tr>
             <td class="px" bgcolor="#0b2c47" style="background:#0b2c47; padding:28px 40px; font-size:14px; line-height:1.5; color:#a9c6dc;">
-              <p style="margin:0 0 4px 0; font-family:{{ $display }}; font-size:15px; font-weight:700; color:#ffffff;">Training Corporation</p>
+              <p style="margin:0 0 4px 0; font-family:{{ $display }}; font-size:15px; font-weight:700; color:#ffffff;">Training Corporation S.A.S.</p>
               <p style="margin:0;">Asesoría, diseño de eventos de formación y evaluación organizacional.</p>
               <p style="margin:12px 0 0 0; font-size:13px; color:#93abc0;">@yield('footer_note', 'Este correo se generó automáticamente; no es necesario responderlo.')</p>
               <p style="margin:4px 0 0 0; font-size:13px; color:#93abc0;">© {{ date('Y') }} Training Corporation S.A.S.</p>
