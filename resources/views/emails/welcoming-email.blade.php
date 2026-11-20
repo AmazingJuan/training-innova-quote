@@ -8,7 +8,7 @@
 
 @section('content')
   @include('emails.partials.greeting', ['name' => $userName])
-  <p style="margin:0 0 24px 0;">Nos complace informarle que ahora puede solicitar sus cotizaciones desde nuestra nueva plataforma: elija el servicio, diligencie el formulario de solicitud y reciba la propuesta en su correo.</p>
+  <p style="margin:0 0 24px 0;">Nos complace informarle que ahora puede solicitar sus cotizaciones desde nuestra nueva plataforma <a href="{{ route('home') }}" target="_blank" rel="noopener noreferrer" style="color:#0072af; font-weight:700; text-decoration:underline;">Training InnovaQuote</a>: elija el servicio, diligencie el formulario de solicitud y reciba la propuesta en su correo.</p>
 
   @include('emails.partials.button', ['url' => route('quotation.select.business_unit'), 'label' => 'Solicitar una cotización', 'margin' => '0 0 32px 0'])
 

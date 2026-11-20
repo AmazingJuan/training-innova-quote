@@ -24,7 +24,7 @@ class AdminCatalogTest extends TestCase
     {
         parent::setUp();
 
-        $this->admin = User::factory()->create();
+        $this->admin = User::factory()->admin()->create();
         $this->actingAs($this->admin);
     }
 
@@ -79,7 +79,7 @@ class AdminCatalogTest extends TestCase
         $user = User::factory()->create(['password' => 'secret-123']);
 
         $this->put(route('dashboard.users.update', $user), [
-            'name' => 'Nuevo', 'email' => $user->email, 'phone' => '3001234567', 'password' => '',
+            'name' => 'Nuevo', 'email' => $user->email, 'phone' => '3001234567', 'password' => '', 'role' => 'user',
         ])->assertSessionHasNoErrors();
 
         $this->assertTrue(Hash::check('secret-123', $user->fresh()->password));

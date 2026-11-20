@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use App\Mail\Transport\MicrosoftGraphTransport;
+use App\Models\User;
 use App\Services\Settings;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
@@ -30,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
+
+        // Only administrators see and change the accounts (users and passwords).
+        Gate::define('manage-users', fn (User $user) => $user->isAdmin());
 
         // The public request form is anonymous and every request mails its sender as
         // gerencia@: without a limit a script could use it to mail strangers.

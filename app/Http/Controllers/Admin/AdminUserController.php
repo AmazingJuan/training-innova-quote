@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdminUserRequest;
 use App\Models\User;
@@ -17,7 +18,7 @@ class AdminUserController extends Controller
         $search = $request->string('search')->trim()->toString();
 
         $users = User::query()
-            ->select('id', 'name', 'email', 'phone')
+            ->select('id', 'name', 'email', 'phone', 'role')
             ->search($search, ['name', 'email', 'phone'])
             ->orderBy('id')
             ->paginate(self::PER_PAGE)
@@ -33,7 +34,9 @@ class AdminUserController extends Controller
 
     public function create(): InertiaResponse
     {
-        return Inertia::render('admin/users/create');
+        return Inertia::render('admin/users/create', [
+            'viewData' => ['roles' => self::roleOptions()],
+        ]);
     }
 
     public function store(AdminUserRequest $request): RedirectResponse
@@ -47,7 +50,8 @@ class AdminUserController extends Controller
     {
         return Inertia::render('admin/users/edit', [
             'viewData' => [
-                'user' => $user->only('id', 'name', 'email', 'phone'),
+                'user' => $user->only('id', 'name', 'email', 'phone', 'role'),
+                'roles' => self::roleOptions(),
             ],
         ]);
     }
@@ -68,5 +72,13 @@ class AdminUserController extends Controller
         $user->delete();
 
         return to_route('dashboard.users.index')->with('success', 'Usuario eliminado correctamente.');
+    }
+
+    /**
+     * @return list<array{value: string, label: string}>
+     */
+    private static function roleOptions(): array
+    {
+        return array_map(fn (UserRole $role) => ['value' => $role->value, 'label' => $role->label()], UserRole::cases());
     }
 }

@@ -16,13 +16,15 @@ Route::prefix('dashboard')
     ->group(function () {
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-        // Usuarios
-        Route::get('/usuarios', [AdminUserController::class, 'index'])->name('dashboard.users.index');
-        Route::get('/usuarios/crear', [AdminUserController::class, 'create'])->name('dashboard.users.create');
-        Route::post('/usuarios', [AdminUserController::class, 'store'])->name('dashboard.users.store');
-        Route::get('/usuarios/{user}/editar', [AdminUserController::class, 'edit'])->name('dashboard.users.edit');
-        Route::put('/usuarios/{user}', [AdminUserController::class, 'update'])->name('dashboard.users.update');
-        Route::delete('/usuarios/{user}', [AdminUserController::class, 'destroy'])->name('dashboard.users.delete');
+        // Usuarios (solo administradores)
+        Route::middleware('can:manage-users')->group(function () {
+            Route::get('/usuarios', [AdminUserController::class, 'index'])->name('dashboard.users.index');
+            Route::get('/usuarios/crear', [AdminUserController::class, 'create'])->name('dashboard.users.create');
+            Route::post('/usuarios', [AdminUserController::class, 'store'])->name('dashboard.users.store');
+            Route::get('/usuarios/{user}/editar', [AdminUserController::class, 'edit'])->name('dashboard.users.edit');
+            Route::put('/usuarios/{user}', [AdminUserController::class, 'update'])->name('dashboard.users.update');
+            Route::delete('/usuarios/{user}', [AdminUserController::class, 'destroy'])->name('dashboard.users.delete');
+        });
 
         // Clientes
         Route::get('/clientes', [AdminClientController::class, 'index'])->name('dashboard.clients.index');

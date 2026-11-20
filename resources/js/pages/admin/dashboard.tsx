@@ -1,10 +1,11 @@
-import AdminLayout, { adminNavigation } from '@/layouts/admin-layout';
+import AdminLayout, { useAdminNavigation } from '@/layouts/admin-layout';
 import type { PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 
 export default function Dashboard() {
     const { auth } = usePage<PageProps>().props;
     const firstName = auth.user?.name.split(' ')[0];
+    const navigation = useAdminNavigation();
 
     return (
         <AdminLayout title="Panel">
@@ -18,7 +19,7 @@ export default function Dashboard() {
                     </p>
                 </header>
 
-                {adminNavigation.map((group) => (
+                {navigation.map((group) => (
                     <section key={group.label} aria-labelledby={`group-${group.label}`}>
                         <h2 id={`group-${group.label}`} className="mb-3 text-sm font-semibold text-pizarra">
                             {group.label}

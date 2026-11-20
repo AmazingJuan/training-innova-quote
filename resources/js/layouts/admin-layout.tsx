@@ -19,7 +19,14 @@ import {
 } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 
-type NavItem = { routeName: string; label: string; icon: LucideIcon; description: string };
+type NavItem = {
+    routeName: string;
+    label: string;
+    icon: LucideIcon;
+    description: string;
+    /** Shown only to accounts with this permission. */
+    requires?: keyof PageProps['auth']['can'];
+};
 type NavGroup = { label: string; items: NavItem[] };
 
 /** Single source for the sidebar and the dashboard shortcuts. */
@@ -56,7 +63,13 @@ export const adminNavigation: NavGroup[] = [
     {
         label: 'Sistema',
         items: [
-            { routeName: 'dashboard.users.index', label: 'Usuarios', icon: Users, description: 'Cuentas con acceso al panel' },
+            {
+                routeName: 'dashboard.users.index',
+                label: 'Usuarios',
+                icon: Users,
+                description: 'Cuentas con acceso al panel',
+                requires: 'manageUsers',
+            },
             {
                 routeName: 'dashboard.welcome-broadcast.create',
                 label: 'Correos de bienvenida',
@@ -68,6 +81,14 @@ export const adminNavigation: NavGroup[] = [
     },
 ];
 
+/** The navigation the signed-in account is allowed to use. */
+export function useAdminNavigation(): NavGroup[] {
+    const { can } = usePage<PageProps>().props.auth;
+    return adminNavigation
+        .map((group) => ({ ...group, items: group.items.filter((item) => !item.requires || can[item.requires]) }))
+        .filter((group) => group.items.length > 0);
+}
+
 /** Active when the current URL is the item's path or nested below it. */
 function isActive(currentPath: string, routeName: string): boolean {
     const path = new URL(route(routeName)).pathname;
@@ -76,6 +97,7 @@ function isActive(currentPath: string, routeName: string): boolean {
 
 function Sidebar({ currentPath, onNavigate }: { currentPath: string; onNavigate: () => void }) {
     const { auth } = usePage<PageProps>().props;
+    const navigation = useAdminNavigation();
 
     return (
         // The whole column scrolls as one piece (with no visible bar) only when the screen is too short for it.
@@ -86,7 +108,7 @@ function Sidebar({ currentPath, onNavigate }: { currentPath: string; onNavigate:
             </Link>
 
             <nav className="flex-1 space-y-3 px-3 pb-3 pt-1" aria-label="Administración">
-                {adminNavigation.map((group) => (
+                {navigation.map((group) => (
                     <div key={group.label}>
                         <p className="px-3 pb-1 text-xs font-semibold text-white/90">{group.label}</p>
                         <ul className="space-y-0.5">
