@@ -45,7 +45,7 @@ export default function Index() {
                 >
                     {quotationOrders.data.map((order) => (
                         <tr key={order.id} className="hover:bg-nube/70">
-                            <td className={cn(adminTableTdClass, 'font-display font-bold')}>
+                            <td className={cn(adminTableTdClass, 'whitespace-nowrap font-display font-bold')}>
                                 <Link
                                     href={route('dashboard.quotation-orders.show', order.id)}
                                     className="text-tinta hover:text-azul-hondo hover:underline"
