@@ -23,8 +23,11 @@ const PAUSA_FORM = 24; // margen que se recorta del borde del contenido
 
 fs.mkdirSync(SALIDA, { recursive: true });
 
+// Chromium del sistema; con CHROMIUM=/ruta se puede usar otro (por ejemplo, Google Chrome).
+const NAVEGADOR = process.env.CHROMIUM ?? '/usr/bin/chromium';
+
 const browser = await chromium.launch({
-    executablePath: '/usr/bin/chromium',
+    executablePath: NAVEGADOR,
     args: [`--host-resolver-rules=MAP ${DOMINIO}:443 127.0.0.1:8443`, '--font-render-hinting=none'],
 });
 
@@ -58,7 +61,13 @@ const guardar = (id) => path.join(SALIDA, `${id}.png`);
 /** Recorta una imagen ya guardada (coordenadas en píxeles CSS). Se usa con las ventanas modales:
  *  recortar al capturar hace que el desenfoque del fondo se refleje en los bordes. */
 function recortar(archivo, x, y, ancho, alto, escala = 2) {
-    execFileSync('magick', [archivo, '-crop', `${ancho * escala}x${alto * escala}+${x * escala}+${y * escala}`, '+repage', archivo]);
+    const [cx, cy, cw, ch] = [x, y, ancho, alto].map((v) => v * escala);
+    try {
+        execFileSync('magick', [archivo, '-crop', `${cw}x${ch}+${cx}+${cy}`, '+repage', archivo], { stdio: 'ignore' });
+    } catch {
+        // Sin ImageMagick: el mismo recorte con Python y Pillow.
+        execFileSync('python3', ['-c', 'import sys;from PIL import Image;a=sys.argv;x,y,w,h=map(int,a[2:]);Image.open(a[1]).crop((x,y,x+w,y+h)).save(a[1])', archivo, cx, cy, cw, ch].map(String));
+    }
 }
 
 /** Ajusta la ventana para que todo lo que se va a capturar quepa sin desplazarse. */
@@ -145,11 +154,6 @@ const CAPTURAS = {
         await visitante.waitForTimeout(200);
         await visitante.screenshot({ path: guardar('02-02-login-error'), fullPage: true });
     },
-    '02-03-recuperar-contrasena': async ({ visitante }) => {
-        await ir(visitante, '/forgot-password');
-        await visitante.fill('#email', USUARIO.correo);
-        await visitante.screenshot({ path: guardar('02-03-recuperar-contrasena'), fullPage: true });
-    },
     '02-04-panel-inicio': async ({ panel }) => {
         await ir(panel, '/dashboard');
         await pantalla(panel, '02-04-panel-inicio');
@@ -159,7 +163,7 @@ const CAPTURAS = {
         await ir(panel, '/dashboard/ordenes-cotizacion');
         await panel.screenshot({ path: guardar('02-05-barra-lateral'), clip: { x: 0, y: 0, width: 256, height: 800 } });
     },
-    // El aviso se toma en 04-06, al crear la línea de gestión: aquí solo se deja el nombre reservado.
+    // El aviso (02-06) se toma en 04-10, al crear la unidad temporal: aquí solo se deja el nombre reservado.
     '02-07-lista-tipica': async ({ panel }) => {
         await ir(panel, '/dashboard/unidad-negocio');
         await pantalla(panel, '02-07-lista-tipica');
@@ -177,9 +181,10 @@ const CAPTURAS = {
         await ctx.close();
     },
     '03-01-cotizaciones-lista': async ({ panel }) => {
-        await panel.setViewportSize({ width: 1320, height: 900 });
+        await panel.setViewportSize({ width: 1500, height: 900 });
         await ir(panel, '/dashboard/ordenes-cotizacion');
-        await contenido(panel, '03-01-cotizaciones-lista', { alto: 720, ancho: 1320 });
+        await contenido(panel, '03-01-cotizaciones-lista', { alto: 720, ancho: 1500 });
+        await panel.setViewportSize({ width: ANCHO, height: 900 });
     },
     '03-02-cotizacion-detalle': async ({ panel }) => {
         await ir(panel, '/dashboard/ordenes-cotizacion');
@@ -262,33 +267,6 @@ const CAPTURAS = {
         await ir(panel, '/dashboard/unidad-negocio/1');
         await contenido(panel, '04-04-unidad-detalle', { alto: 640 });
     },
-    '04-05-lineas-lista': async ({ panel }) => {
-        await ir(panel, '/dashboard/lineas-gestion');
-        await contenido(panel, '04-05-lineas-lista', { alto: 640 });
-    },
-    '04-06-linea-crear': async ({ panel }) => {
-        await ir(panel, '/dashboard/lineas-gestion/crear');
-        await panel.fill('#name', 'Seguridad de la información');
-        await contenido(panel, '04-06-linea-crear');
-        // Se guarda de verdad para tomar el aviso de confirmación (02-06).
-        await panel.click('button:has-text("Crear línea")');
-        await marcar(panel, 'Línea de gestión creada correctamente');
-        await contenido(panel, '02-06-aviso', { alto: 150 });
-    },
-    '04-07-servicios-lista': async ({ panel }) => {
-        await ir(panel, '/dashboard/servicios');
-        await panel.selectOption('#business-unit-filter', { label: 'Consultoría' });
-        await panel.waitForLoadState('networkidle');
-        await panel.waitForTimeout(400);
-        await contenido(panel, '04-07-servicios-lista', { alto: 720 });
-    },
-    '04-08-servicio-crear': async ({ panel }) => {
-        await ir(panel, '/dashboard/servicios/crear');
-        await panel.fill('#name', 'Auditoría de seguridad vial');
-        await panel.selectOption('#business_unit_id', { label: 'Auditoría' });
-        await panel.selectOption('#gestion_line_id', { label: 'Seguridad y Salud en el Trabajo' });
-        await contenido(panel, '04-08-servicio-crear');
-    },
     '04-09-arbol-vista-general': async ({ panel }) => {
         await ir(panel, '/dashboard/arbol-decision');
         await contenido(panel, '04-09-arbol-vista-general', { alto: 820 });
@@ -300,8 +278,9 @@ const CAPTURAS = {
         await panel.fill('#abbreviation', 'GA');
         await panel.click('button:has-text("Crear unidad")');
         await marcar(panel, 'ha sido creada exitosamente');
+        await contenido(panel, '02-06-aviso', { alto: 150 });
         await ir(panel, '/dashboard/arbol-decision');
-        await panel.click('[role="tab"]:has-text("Gestión de activos")');
+        await panel.click('button:has-text("Gestión de activos")');
         await panel.waitForSelector('text=aún no tiene preguntas');
         await contenido(panel, '04-10-arbol-unidad-vacia', { alto: 620 });
         await ir(panel, '/dashboard/unidad-negocio');
@@ -368,8 +347,11 @@ const CAPTURAS = {
         await panel.click('button:has-text("Cancelar")');
     },
     '05-01-usuarios-lista': async ({ panel }) => {
+        // Con la columna Rol la tabla necesita más ancho que el habitual.
+        await panel.setViewportSize({ width: 1320, height: 900 });
         await ir(panel, '/dashboard/usuarios');
-        await contenido(panel, '05-01-usuarios-lista');
+        await contenido(panel, '05-01-usuarios-lista', { ancho: 1320 });
+        await panel.setViewportSize({ width: ANCHO, height: 900 });
     },
     '05-02-usuario-crear': async ({ panel }) => {
         await ir(panel, '/dashboard/usuarios/crear');
@@ -377,6 +359,7 @@ const CAPTURAS = {
         await panel.fill('#email', 'camilo.torres@trainingcorporation.com.co');
         await panel.fill('#phone', '3001234567');
         await panel.fill('#password', 'Clave-de-prueba-1');
+        await panel.selectOption('#role', 'user');
         await contenido(panel, '05-02-usuario-crear');
     },
     '05-03-usuario-editar': async ({ panel }) => {

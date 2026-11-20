@@ -26,6 +26,8 @@ Cuando un cliente envía el formulario de solicitud desde Training~InnovaQuote, 
         oferta y los documentos que adjuntó (\seccion{sec:documentos-cliente}).
   \item El cliente queda registrado en \menu{Operación}{Clientes}, identificado por su correo.
         Si ya existía, se actualizan sus datos.
+  \item Mientras la solicitud siga \pendiente, el \textbf{Correo de notificaciones} recibe un
+        recordatorio cada 2,5 días hábiles (\seccion{sec:recordatorios}).
 \end{itemize}
 
 La \figref{fig:ciclo} muestra el recorrido completo de una solicitud, desde que la envía el
@@ -110,7 +112,7 @@ actual, Auditoría usa \textbf{EO}, Consultoría usa \textbf{CNN} y Formación u
 La pantalla \textbf{Cotizaciones} (\msg{Solicitudes recibidas desde el cotizador. Abra una para
 subir la propuesta.}) muestra todas las solicitudes, con las más recientes arriba.
 
-\begin{tabla}{colspec={Q[2.6cm,l] X[l]}}
+\begin{tabla}{colspec={Q[2.6cm,j] X[j]}}
   Columna & Qué muestra \\
   Código & El código de la solicitud. Haga clic en él para abrir el detalle. En pantallas
     pequeñas, la unidad y la fecha se muestran debajo del código. \\
@@ -123,7 +125,7 @@ subir la propuesta.}) muestra todas las solicitudes, con las más recientes arri
     \icono{\icExterno}\ Abrir propuesta. \\
 \end{tabla}
 
-\begin{tabla}{colspec={Q[3.2cm,l,m] X[l,m]}}
+\begin{tabla}{colspec={Q[3.2cm,j,m] X[j,m]}}
   Estado & Significado \\
   \pendiente & La solicitud llegó y todavía no se ha enviado la propuesta. \\
   \generada & Ya se envió la propuesta al cliente. \\
@@ -148,17 +150,17 @@ La lista no tiene filtro por estado. Para encontrar rápido las pendientes, fíj
 \begin{pasos}
   \item En la lista, haga clic en el \campo{Código} o en el ícono \icono[pizarra]{\icVer}
         \textbf{Ver detalle}.
-  \item Se abre la pantalla \textbf{Cotización \var{código}}. Arriba a la izquierda está el
-        botón \botonsec{\icAtras\ Volver a cotizaciones}. Debajo del título verá la fecha
-        (\msg{Recibida el \var{dd/mm/aaaa}}) y el estado.
+  \item Se abre la pantalla \textbf{Cotización \var{código}}. Debajo del título verá la fecha
+        (\msg{Recibida el \var{dd/mm/aaaa}}) y el estado. Para volver a la lista, use el botón
+        \botonsec{\icAtras\ Volver a cotizaciones}, arriba a la izquierda.
   \item Revise las tarjetas de la pantalla:
 \end{pasos}
 
-\begin{tabla}{colspec={Q[3cm,l] X[l]}}
+\begin{tabla}{colspec={Q[3cm,j] X[j]}}
   Tarjeta & Contenido \\
-  Solicitud & La \campo{Unidad de negocio}. Las solicitudes antiguas, hechas antes del
-    formulario de solicitud actual, muestran además la \campo{Línea de gestión} y los
-    \campo{Servicios}. \\
+  Solicitud & La \campo{Unidad de negocio} y la \campo{Fecha estimada de entrega de la oferta},
+    es decir, la fecha en que el cliente espera recibir la propuesta. Esa fecha es la que usan
+    los recordatorios para marcar una solicitud como vencida (\seccion{sec:recordatorios}). \\
   Respuestas (\var{N}) & Cada pregunta del formulario con la respuesta del cliente, en el
     orden en que la respondió. Si el cliente adjuntó archivos, en \campo{Adjuntar documentos}
     se ven solo sus nombres (\seccion{sec:documentos-cliente}). \\
@@ -221,7 +223,7 @@ cambia a \generada\ \insignianeutra{Aún no vista} y el botón de la esquina pas
 
 Al guardar, el sistema envía dos correos:
 
-\begin{tabla}{colspec={Q[2.6cm,l] Q[5.2cm,l] X[l]}}
+\begin{tabla}{colspec={Q[2.6cm,j] Q[5.2cm,j] X[j]}}
   Destinatario & Asunto & Contenido \\
   El cliente & \msg{Su cotización \var{código} está lista} & Le informa que la propuesta ya
     está disponible y trae el botón \textbf{Ver la cotización}, que la abre. Termina con los
@@ -254,6 +256,35 @@ como si la hubiera visto. Tampoco cuenta si el cliente abre el documento por otr
 ejemplo con un enlace que usted le compartió directamente.
 \end{nota}
 
+\subsection{Recordatorios a Gerencia}\label{sec:recordatorios}
+
+Mientras una solicitud siga \pendiente, el sistema envía un recordatorio al
+\campo{Correo de notificaciones} (\seccion{sec:configuracion}) cada 2,5 días hábiles, contados
+desde que llegó la solicitud. Los recordatorios salen a las 8:00~a.~m. y a las 2:00~p.~m., de
+lunes a viernes; los sábados, domingos y festivos de Colombia no cuentan.
+
+\begin{tabla}{colspec={Q[5.4cm,j] X[j]}}
+  Asunto & Cuándo llega \\
+  \msg{Recordatorio: cotización pendiente \var{código}} & La solicitud sigue pendiente y la fecha
+    estimada de entrega que pidió el cliente todavía no ha pasado. \\
+  \msg{Cotización vencida: \var{código}} & Ya pasó la fecha estimada de entrega. El correo lo
+    advierte con el texto \msg{La fecha de entrega indicada por el cliente ya pasó.} \\
+\end{tabla}
+
+Cada recordatorio dice cuántos días hábiles lleva la solicitud sin cotización, trae los datos
+del cliente, la unidad de negocio, la fecha de envío, la fecha estimada de entrega y el número
+del recordatorio, y el botón \textbf{Abrir la solicitud}, que lleva al detalle en el panel.
+
+\begin{resultado}
+Los recordatorios se detienen solos en cuanto envía la propuesta (\seccion{sec:enviar-propuesta}).
+\end{resultado}
+
+\begin{nota}
+Si el \campo{Correo de notificaciones} está vacío, no se envían recordatorios. El cliente no
+puede pedir una fecha de entrega anterior a 3 días hábiles después de enviar la solicitud: el
+formulario se lo impide.
+\end{nota}
+
 \section{Clientes}\label{sec:clientes}
 
 \ficha{F2B9}{\menu{Operación}{Clientes}}{/dashboard/clientes}
@@ -272,7 +303,7 @@ Desde el panel no se pueden crear, editar ni eliminar clientes. Esta pantalla es
 La pantalla \textbf{Clientes} (\msg{Personas que han solicitado cotizaciones, con su
 historial.}) muestra primero a los clientes con la solicitud más reciente.
 
-\begin{tabla}{colspec={Q[2.8cm,l] X[l]}}
+\begin{tabla}{colspec={Q[2.8cm,j] X[j]}}
   Columna & Qué muestra \\
   Cliente & Nombre (enlace a su ficha) y correo. \\
   Empresa & Razón social y, debajo, el cargo. \\
@@ -361,7 +392,7 @@ archivos que no se descargan se borran del servidor a las 2 horas.
 
 Si algo falla, aparece un recuadro rojo debajo del encabezado:
 
-\begin{tabla}{colspec={X[l] Q[5.6cm,l]}}
+\begin{tabla}{colspec={X[j] Q[5.6cm,j]}}
   Mensaje & Qué hacer \\
   \msg{No se pudo iniciar la exportación. Intente nuevamente.} & Vuelva a hacer clic en el botón. \\
   \msg{No se pudo generar el archivo. Intente nuevamente.} & Vuelva a intentar. Si se repite,

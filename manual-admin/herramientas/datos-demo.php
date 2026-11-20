@@ -4,12 +4,14 @@
  * Datos de demostración para las capturas del manual.
  *
  * Trabaja sobre la base del entorno de capturas (ver entorno.sh y mariadb.sh):
- * la recrea desde cero, carga las unidades, servicios y formularios del
- * ExampleDataSeeder y agrega usuarios, clientes y solicitudes ficticias.
+ * la recrea desde cero, carga las unidades y sus formularios (DatabaseSeeder)
+ * y agrega usuarios, clientes y solicitudes ficticias.
  *
  *   bash -c 'source manual-admin/herramientas/entorno.sh && php manual-admin/herramientas/datos-demo.php'
  */
 
+use App\Enums\InteractionType;
+use App\Enums\UserRole;
 use App\Models\BusinessUnit;
 use App\Models\Client;
 use App\Models\Configuration;
@@ -32,24 +34,25 @@ if (config('database.connections.mysql.database') !== 'manual_capturas' || (stri
 }
 
 Artisan::call('migrate:fresh', ['--force' => true]);
-Artisan::call('db:seed', ['--class' => 'ExampleDataSeeder', '--force' => true]);
+Artisan::call('db:seed', ['--force' => true]);
 
 // ---------------------------------------------------------------------
 // Usuarios del panel
 // ---------------------------------------------------------------------
+// La cuenta con la que se toman las capturas es administradora: ve también el módulo Usuarios.
 $usuarios = [
-    ['Laura Restrepo', 'laura.restrepo@trainingcorporation.com.co', '3104567890'],
-    ['Andrés Mejía', 'andres.mejia@trainingcorporation.com.co', '3157654321'],
-    ['Paula Zapata', 'paula.zapata@trainingcorporation.com.co', '3009876543'],
+    ['Laura Restrepo', 'laura.restrepo@trainingcorporation.com.co', '3104567890', UserRole::Admin],
+    ['Andrés Mejía', 'andres.mejia@trainingcorporation.com.co', '3157654321', UserRole::User],
+    ['Paula Zapata', 'paula.zapata@trainingcorporation.com.co', '3009876543', UserRole::User],
 ];
-foreach ($usuarios as [$nombre, $correo, $telefono]) {
-    User::create(['name' => $nombre, 'email' => $correo, 'password' => Hash::make('Manual2026*'), 'phone' => $telefono]);
+foreach ($usuarios as [$nombre, $correo, $telefono, $rol]) {
+    User::create(['name' => $nombre, 'email' => $correo, 'password' => Hash::make('Manual2026*'), 'phone' => $telefono, 'role' => $rol]);
 }
 
 // ---------------------------------------------------------------------
 // Configuración (la misma del entorno local del proyecto)
 // ---------------------------------------------------------------------
-Configuration::current()->update([
+Configuration::query()->firstOrFail()->update([
     'notification_email' => 'gerencia@trainingcorporation.com.co',
     'company_contact_email' => 'gerencia@trainingcorporation.com.co',
     'company_contact_phone' => '+57 3217079467',
@@ -127,7 +130,7 @@ $responder = function (BusinessUnit $unidad, array $valores): array {
         $siguiente = $pregunta->next_condition_id;
         $valor = $valores[$pregunta->label] ?? null;
 
-        if ($pregunta->interaction_type === 'options' && $pregunta->options->isNotEmpty()) {
+        if ($pregunta->interaction_type === InteractionType::Options && $pregunta->options->isNotEmpty()) {
             $opcion = $pregunta->options->firstWhere('label', $valor) ?? $pregunta->options->first();
             $valor = $opcion->label;
             if (! $pregunta->multiple && $opcion->next_condition_id) {
@@ -168,12 +171,15 @@ foreach ($solicitudes as [$nombreUnidad, $fecha, $estado, $contacto, $ajustes]) 
     $orden = DB::transaction(function () use ($nombreUnidad, $contacto, $ajustes, $base, $responder) {
         $unidad = BusinessUnit::query()->where('name', $nombreUnidad)->firstOrFail();
 
+        $respuestas = $responder($unidad, $ajustes + $base[$nombreUnidad]);
+        $fechaOferta = $respuestas[$unidad->offerDateQuestion()?->getLabel() ?? ''] ?? null;
+
         return QuotationProposalOrder::create([
             'quotation_code' => $unidad->lockAndAllocateNextQuotationCode(),
             'client_id' => Client::upsertFromContact($contacto)->getId(),
-            'services' => [],
-            'business_unit' => $unidad->display_name,
-            'answers' => $responder($unidad, $ajustes + $base[$nombreUnidad]),
+            'business_unit_id' => $unidad->getId(),
+            'answers' => $respuestas,
+            'offer_date' => $fechaOferta ? Carbon::createFromFormat('!j/n/Y', $fechaOferta) : null,
         ]);
     });
 

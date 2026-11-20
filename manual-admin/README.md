@@ -63,9 +63,10 @@ python3 manual-admin/herramientas/word/generar.py
 
 El script dibuja como imágenes los diagramas y fondos (`figuras.py`), lee los capítulos
 (`latex.py`), arma el Word (`word.py`, `ooxml.py`, `imagenes.py`) y calcula los números de
-página del índice convirtiendo el Word a PDF con LibreOffice. LibreOffice debe estar en
-`herramientas/.entorno/lo`; si no está, el Word se genera igual, pero sin esos números. Para
-descargarlo (unos 220 MB, sin instalar nada en el sistema):
+página del índice convirtiendo el Word a PDF con LibreOffice. Usa el LibreOffice de
+`herramientas/.entorno/lo` o, si no está, el del sistema (`soffice`); sin ninguno, el Word se
+genera igual, pero sin esos números. Para descargar la versión portable (unos 220 MB, sin
+instalar nada en el sistema):
 
 ```bash
 cd manual-admin/herramientas
@@ -78,6 +79,25 @@ Requiere Python 3 con `python-docx`, `lxml` y `Pillow`. El convertidor solo enti
 comandos que usa este manual: si agrega un comando nuevo en LaTeX, `latex.py` avisa con un
 error que dice cuál es.
 
+### Texto justificado
+
+Todo el texto del manual va justificado, con separación silábica en español para que no queden
+huecos entre palabras: en LaTeX, las columnas de las tablas usan `j`; en Word, los estilos de
+texto, tablas, recuadros y listas están justificados y el documento trae la división automática
+de palabras activada. Para compilar el PDF hace falta el paquete de silabeo en español
+(en Fedora, `texlive-hyphen-spanish`; para revisar el Word con LibreOffice, `hyphen-es`).
+
+### Versión SGI
+
+La versión que se entrega lleva la capa del SGI: logo y rótulo en el encabezado, marca de agua
+«Copia controlada SGI» y el control de cambios al final. Esa capa se toma de la versión SGI
+aprobada y se aplica al Word generado:
+
+```bash
+python3 manual-admin/herramientas/word/capa_sgi.py <versión SGI aprobada.docx> \
+    manual-admin/manual-administrador.docx <manual SGI.docx>
+```
+
 ## Capítulo de capacidad
 
 Es un resumen corto en `capitulos/07-capacidad.tex`. Si repite las pruebas de carga con k6 y
@@ -89,7 +109,11 @@ usuarios) y la conclusión.
 Las capturas se toman en un entorno **aparte** (no usa su `.env` ni su base de datos): una
 instancia propia de MariaDB en el puerto 3307, datos de demostración ficticios y HTTPS local con
 el dominio final `cotizaciones.trainingcorporation.com.co`. Requiere `chromium`, `socat`,
-`openssl`, `php`, `node` y `ImageMagick`.
+`openssl`, `php` y `node`. Si el navegador no está en `/usr/bin/chromium`, indíquelo con
+`CHROMIUM=/ruta` (por ejemplo, `CHROMIUM=/usr/bin/google-chrome`). Los recortes usan
+ImageMagick o, si no está, Python con Pillow. En lugar de `mariadb.sh` y `preparar-bd.sh`
+puede usar un contenedor:
+`podman run -d -p 127.0.0.1:3307:3306 -e MARIADB_ROOT_PASSWORD=root -e MARIADB_DATABASE=manual_capturas -e MARIADB_USER=manual -e MARIADB_PASSWORD=manual docker.io/library/mariadb:11.4`.
 
 Desde la raíz del proyecto, cada comando en su propia terminal (los tres primeros se quedan
 corriendo):
@@ -112,6 +136,11 @@ xvfb-run -a -s "-screen 0 2400x1900x24" node confirmacion.mjs   # 02-08, cuadro 
 `datos-demo.php` reinicia la base de capturas cada vez que se ejecuta. Algunas capturas cambian
 datos (por ejemplo, 03-04 envía una propuesta), así que vuelva a cargar los datos de
 demostración antes de repetir el capítulo 3.
+
+La captura 02-08 necesita una pantalla virtual (`xvfb-run`) e ImageMagick (`import`). Si el
+equipo no los tiene, puede tomarse dentro de un contenedor `node:22-bookworm` con `chromium`,
+`xvfb`, `xauth` e `imagemagick` instalados, con `--network host` y la carpeta `manual-admin`
+montada (como root, Chromium necesita `--no-sandbox`).
 
 Las capturas no se pueden repetir en el servidor real: el script solo trabaja contra el entorno
 local.
