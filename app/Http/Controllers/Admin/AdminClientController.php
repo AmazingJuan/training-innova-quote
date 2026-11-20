@@ -1,0 +1,158 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Jobs\GenerateClientsExport;
+use App\Models\BusinessUnit;
+use App\Models\Client;
+use App\Models\QuotationProposalOrder;
+use App\Support\ClientExportStore;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Inertia\Inertia;
+use Inertia\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+
+class AdminClientController extends Controller
+{
+    public function index(Request $request): Response
+    {
+        $filters = $this->resolveFilters($request);
+
+        $clients = Client::query()
+            ->withClientStats()
+            ->applyClientFilters($filters)
+            ->orderByActivity()
+            ->paginate(self::PER_PAGE)
+            ->withQueryString()
+            ->through(fn (Client $client) => [
+                ...$this->contactData($client),
+                'last_quotation_at' => $this->isoDate($client->getAttribute('last_quotation_at')),
+            ]);
+
+        return Inertia::render('admin/clients/index', [
+            'viewData' => [
+                'clients' => $clients,
+                'filters' => $filters,
+                'options' => $this->filterOptions(),
+            ],
+        ]);
+    }
+
+    public function show(Client $client): Response
+    {
+        $client->loadCount(Client::statsCounts());
+
+        $orders = $client->quotationProposalOrders()->with('businessUnit:id,display_name')->latest()->get();
+
+        return Inertia::render('admin/clients/show', [
+            'viewData' => [
+                'client' => [
+                    ...$this->contactData($client),
+                    'first_quotation_at' => $orders->last()?->getCreatedAt()?->toIso8601String(),
+                    'last_quotation_at' => $orders->first()?->getCreatedAt()?->toIso8601String(),
+                ],
+                'quotations' => $orders->map(fn (QuotationProposalOrder $order) => [
+                    'id' => $order->getId(),
+                    'quotation_code' => $order->getQuotationCode(),
+                    'business_unit' => $order->getBusinessUnitName(),
+                    'is_generated' => $order->getIsGenerated(),
+                    'quotation_url' => $order->getQuotationUrl(),
+                    'created_at' => $order->getCreatedAt()?->toIso8601String(),
+                ]),
+            ],
+        ]);
+    }
+
+    /**
+     * Queue the Excel generation and return a token the frontend can poll.
+     */
+    public function startExport(Request $request, ClientExportStore $exports): JsonResponse
+    {
+        $token = $exports->open();
+        GenerateClientsExport::dispatch($token, $this->resolveFilters($request));
+
+        return response()->json(['token' => $token]);
+    }
+
+    public function exportStatus(string $token, ClientExportStore $exports): JsonResponse
+    {
+        return response()->json(['status' => $exports->status($token)->value]);
+    }
+
+    /**
+     * Single-use download: the file is removed once it has been sent.
+     */
+    public function downloadExport(string $token, ClientExportStore $exports): BinaryFileResponse
+    {
+        $path = $exports->claim($token);
+        abort_if($path === null, 404);
+
+        return response()
+            ->download($path, 'clientes_'.now()->format('d-m-Y_h-iA').'.xlsx')
+            ->deleteFileAfterSend();
+    }
+
+    /**
+     * @return array{search:string, company:string, business_unit:string}
+     */
+    private function resolveFilters(Request $request): array
+    {
+        return [
+            'search' => $request->string('search')->trim()->toString(),
+            'company' => $request->string('company')->trim()->toString(),
+            'business_unit' => $request->string('business_unit')->trim()->toString(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function contactData(Client $client): array
+    {
+        return [
+            'id' => $client->getId(),
+            'name' => $client->getName(),
+            'email' => $client->getEmail(),
+            'company' => $client->getCompany(),
+            'phone' => $client->getPhone(),
+            'role' => $client->getRole(),
+            'nit' => $client->getNit(),
+            'economic_activity' => $client->getEconomicActivity(),
+            'address' => $client->getAddress(),
+            'quotations_count' => (int) $client->getAttribute('quotations_count'),
+            'generated_count' => (int) $client->getAttribute('generated_count'),
+            'pending_count' => (int) $client->getAttribute('pending_count'),
+        ];
+    }
+
+    private function isoDate(mixed $value): ?string
+    {
+        return $value ? Carbon::parse($value)->toIso8601String() : null;
+    }
+
+    /**
+     * @return array{companies: list<string>, businessUnits: list<array{name: string, display_name: string}>}
+     */
+    private function filterOptions(): array
+    {
+        return [
+            'companies' => Client::query()
+                ->whereNotNull('company')
+                ->where('company', '!=', '')
+                ->distinct()
+                ->orderBy('company')
+                ->pluck('company')
+                ->all(),
+            // Only the units clients have asked for.
+            'businessUnits' => BusinessUnit::query()
+                ->whereHas('quotationOrders')
+                ->orderBy('display_name')
+                ->get(['name', 'display_name'])
+                ->map(fn (BusinessUnit $unit) => ['name' => $unit->getName(), 'display_name' => $unit->getDisplayName()])
+                ->all(),
+        ];
+    }
+}

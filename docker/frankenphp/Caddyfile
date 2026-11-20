@@ -1,0 +1,19 @@
+# Servidor de la app dentro del contenedor: FrankenPHP (PHP embebido en Caddy).
+# Solo HTTP en :8080. El HTTPS y el certificado los pone el contenedor caddy,
+# que hace de proxy hacia app:8080.
+{
+	auto_https off
+	admin off
+	skip_install_trust
+	frankenphp {
+		# Hilos de PHP: cada uno atiende una petición a la vez. 16 alcanza de sobra
+		# para ~50 personas llenando el formulario; se ajusta con PHP_THREADS en .env.
+		num_threads {$PHP_THREADS:16}
+	}
+}
+
+:8080 {
+	root * /var/www/html/public
+	encode zstd gzip
+	php_server
+}
