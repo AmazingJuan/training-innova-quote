@@ -13,7 +13,7 @@
 
 @section('content')
   @include('emails.partials.greeting', ['name' => $contact?->name])
-  <p style="margin:0 0 24px 0;">Agradecemos su interés en los servicios de Training Corporation. Hemos recibido su solicitud de cotización y nuestro equipo ya cuenta con la información necesaria para preparar su propuesta.</p>
+  <p style="margin:0 0 24px 0;">Agradecemos su interés en los servicios de Training Corporation S.A.S. Hemos recibido su solicitud de cotización y nuestro equipo ya cuenta con la información necesaria para preparar su propuesta.</p>
 
   @include('emails.partials.reference', ['code' => $code])
 

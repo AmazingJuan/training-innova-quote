@@ -4,7 +4,7 @@
 
 @section('preheader', 'Solicite cotizaciones de auditoría, consultoría y formación en línea.')
 
-@section('heading', 'Cotice en línea con Training Corporation')
+@section('heading', 'Cotice en línea con Training Corporation S.A.S.')
 
 @section('content')
   @include('emails.partials.greeting', ['name' => $userName])

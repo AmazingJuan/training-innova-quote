@@ -239,7 +239,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                 </main>
 
                 <footer className="border-t border-linea px-4 py-5 text-center text-xs text-pizarra sm:px-6 lg:px-10">
-                    © {new Date().getFullYear()} Training Corporation. Todos los derechos reservados.
+                    © {new Date().getFullYear()} Training Corporation S.A.S. Todos los derechos reservados.
                 </footer>
             </div>
         </div>

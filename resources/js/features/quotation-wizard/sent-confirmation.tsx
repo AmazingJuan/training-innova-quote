@@ -91,7 +91,7 @@ export function SentConfirmation({ sent, company }: SentConfirmationProps) {
                                 Solicitar otra cotización
                             </Link>
                             <a href={corporate.home} className="link">
-                                Volver al sitio de Training Corporation
+                                Volver al sitio de Training Corporation S.A.S.
                             </a>
                         </div>
                         <p className="text-sm text-pizarra" aria-live="polite">
